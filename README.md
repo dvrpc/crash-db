@@ -11,22 +11,28 @@ The Postgres user running this script must have been granted two roles: `pg_read
 - [ ] optimize queries when doing the data cleaning - turning off any kind of indexing, etc.
   - See e.g. <https://www.cybertec-postgresql.com/en/postgresql-bulk-loading-huge-amounts-of-data/> 
 - [ ] add help flag to show usage to setup_db.sh
-- [ ] figure out how to use variable in `copy` command, to pass data directory ("/tmp/crash-data") (hardcoding for now)
 - [ ] review this after complete: <https://www.postgresql.org/docs/current/populate.html>
 
 ## Environment Variables
 
-Create a .env file. `port` is required but others are optional. 
+Create a .env file. `port` is required but others should be optional, depending on your OS.
 ```sh
 port=5437
-db="crash2"  # If you want something other than "crash", which is the default.
+# If you want something other than default of "crash":
+db="crash2"
+# If you want something other than default of /tmp/crash-data:
+# NOTE: the system user you run the script/create the db as needs to read/write from this directory.
+user_data_dir="/tmp/somewhere"
+# If you want something other than default of /var/lib/postgresql:
+# NOTE: the postgres system user needs to be able to read/write from this directory.
+postgres_data_dir="/var/lib/postgresql/data" 
 ```
 
 ## Usage
 
 The database is created and populated via the setup.sh bash script. If it is not already executable, make it so with `chmod 755 setup_db.sh` and then invoke with `./setup_db.sh`. You can optionally drop and recreate the existing database with the `-r` flag: `./setup_db.sh -r`, which will also terminate any existing connections in order to do so.
 
-The script copies the files in /data to /tmp, to ease access by Postgresql's <a href="https://www.postgresql.org/docs/17/sql-copy.html">COPY</a>, which is used to import the data into temporary tables before it is cleaned.
+The script assumes that date files (CSVs) are in data/ relative to the project directory, which are then copied to appropriate folders (configurable via environment variables if necessary) to ease access by Postgresql's <a href="https://www.postgresql.org/docs/17/sql-copy.html">COPY</a>.
 
 ## Data
 

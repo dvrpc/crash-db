@@ -9,9 +9,19 @@ if [[ -z "${port}" ]]; then
   exit
 fi
 
-# Use db name from from .env or a default value.
+# Use db (name) from .env or a default value.
 if ! test -v db; then
   db="crash"
+fi
+
+# Use user_data_dir from .env or a default value.
+if ! test -v user_data_dir; then
+  user_data_dir="/tmp/crash-data"
+fi
+
+# Use postgres_data_dir from .env or a default value.
+if ! test -v postgres_data_dir; then
+  postgres_data_dir="/var/lib/postgresql"
 fi
 
 # Parse and handle command line arguments.
@@ -29,9 +39,10 @@ while getopts ":r" opt; do
   esac
 done
 
-# Copy data directory to /tmp for easier use in COPY, which requies absolute paths.
-data_dir="/tmp/crash-data/"
-mkdir -p "${data_dir}"
-cp -r data/* "${data_dir}"
+# Copy data files in data/ to location accessible by server, for easier use in COPY, which
+# requires absolute paths/certain permissions.
+mkdir -p "${user_data_dir}"
+cp -r data/* "${user_data_dir}"
 
-psql -p "${port}" -d "${db}" < src/main.sql # -v data_dir="${data_dir}"
+# Run the sql.
+psql -p "${port}" -d "${db}" -v user_data_dir="${user_data_dir}" -v postgres_data_dir="${postgres_data_dir}" < src/main.sql 

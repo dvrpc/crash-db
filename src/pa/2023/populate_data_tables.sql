@@ -3,8 +3,10 @@ declare
 	col_name text;
     db_tables text[] := '{crash, commveh, cycle, flag, person, roadway, trailveh, vehicle}';
     db_table text;
+    user_data_dir text := (select value from tmp_vars where name = 'user_data_dir');
+    postgres_data_dir text := (select value from tmp_vars where name = 'postgres_data_dir');
 begin
-    
+  
     -- Create intermediate temporary tables for cleaning data.
     foreach db_table in array db_tables loop
         execute format($query$create temporary table temp_%I (like pa_2023.%I including all)$query$, db_table, db_table);
@@ -16,17 +18,16 @@ begin
             execute format($query$alter table temp_%I alter column %I type text$query$, db_table, col_name);
         end loop;
     end loop;
-    
 
     /*
-        Copy the data into those tempoary tables.
+        Copy the data into those temporary tables.
     */
     foreach db_table in array db_tables loop
-        execute format($query$copy temp_%I from '/tmp/crash-data/pa/2023/%s_BUCKS_2023.csv' with (format csv, header, force_null *)$query$, db_table, upper(db_table));
-        execute format($query$copy temp_%I from '/tmp/crash-data/pa/2023/%s_CHESTER_2023.csv' with (format csv, header, force_null *)$query$, db_table, upper(db_table));
-        execute format($query$copy temp_%I from '/tmp/crash-data/pa/2023/%s_DELAWARE_2023.csv' with (format csv, header, force_null *)$query$, db_table, upper(db_table));
-        execute format($query$copy temp_%I from '/tmp/crash-data/pa/2023/%s_MONTGOMERY_2023.csv' with (format csv, header, force_null *)$query$, db_table, upper(db_table));
-        execute format($query$copy temp_%I from '/tmp/crash-data/pa/2023/%s_PHILADELPHIA_2023.csv' with (format csv, header, force_null *)$query$, db_table, upper(db_table));
+        execute format($query$copy temp_%I from '%s/pa/2023/%s_BUCKS_2023.csv' with (format csv, header, force_null *)$query$, db_table, user_data_dir, upper(db_table));
+        execute format($query$copy temp_%I from '%s/pa/2023/%s_CHESTER_2023.csv' with (format csv, header, force_null *)$query$, db_table, user_data_dir, upper(db_table));
+        execute format($query$copy temp_%I from '%s/pa/2023/%s_DELAWARE_2023.csv' with (format csv, header, force_null *)$query$, db_table, user_data_dir, upper(db_table));
+        execute format($query$copy temp_%I from '%s/pa/2023/%s_MONTGOMERY_2023.csv' with (format csv, header, force_null *)$query$, db_table, user_data_dir, upper(db_table));
+        execute format($query$copy temp_%I from '%s/pa/2023/%s_PHILADELPHIA_2023.csv' with (format csv, header, force_null *)$query$, db_table, user_data_dir, upper(db_table));
     end loop;
 
     -- Alter some specific text field values, usually from lookup tables.
@@ -67,13 +68,11 @@ begin
 
     end loop;
 
-
     -- Copy the data from the temp tables into the non-temp tables, by exporting to file and then reimporting. Easiest way to go from text types in temp tables to types in non-temp tables.
     foreach db_table in array db_tables loop
-        execute format($query$copy temp_%I to '/var/lib/postgresql/%I.csv' with (format csv, header)$query$, db_table, db_table);
-        execute format($query$copy pa_2023.%I from '/var/lib/postgresql/%I.csv' with (format csv, header, force_null *)$query$, db_table, db_table); 
+        execute format($query$copy temp_%I to '%s/%I.csv' with (format csv, header)$query$, db_table, postgres_data_dir, db_table);
+        execute format($query$copy pa_2023.%I from '%s/%I.csv' with (format csv, header, force_null *)$query$, db_table, postgres_data_dir, db_table); 
     end loop;
     
-
 end; $body$
 language plpgsql;
