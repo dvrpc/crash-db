@@ -22,62 +22,13 @@ begin
     /*
         Copy the data into those tempoary tables.
     */
-    -- crash
-    copy temp_crash from '/tmp/crash-data/pa/2023/CRASH_BUCKS_2023.csv' with (format csv, header, force_null *);
-    copy temp_crash from '/tmp/crash-data/pa/2023/CRASH_CHESTER_2023.csv' with (format csv, header, force_null *);
-    copy temp_crash from '/tmp/crash-data/pa/2023/CRASH_DELAWARE_2023.csv' with (format csv, header, force_null *);
-    copy temp_crash from '/tmp/crash-data/pa/2023/CRASH_MONTGOMERY_2023.csv' with (format csv, header, force_null *);
-    copy temp_crash from '/tmp/crash-data/pa/2023/CRASH_PHILADELPHIA_2023.csv' with (format csv, header, force_null *);
-
-    -- commveh
-    copy temp_commveh from '/tmp/crash-data/pa/2023/COMMVEH_BUCKS_2023.csv' with (format csv, header, force_null *);
-    copy temp_commveh from '/tmp/crash-data/pa/2023/COMMVEH_CHESTER_2023.csv' with (format csv, header, force_null *);
-    copy temp_commveh from '/tmp/crash-data/pa/2023/COMMVEH_DELAWARE_2023.csv' with (format csv, header, force_null *);
-    copy temp_commveh from '/tmp/crash-data/pa/2023/COMMVEH_MONTGOMERY_2023.csv' with (format csv, header, force_null *);
-    copy temp_commveh from '/tmp/crash-data/pa/2023/COMMVEH_PHILADELPHIA_2023.csv' with (format csv, header, force_null *);
-
-    -- cycle
-    copy temp_cycle from '/tmp/crash-data/pa/2023/CYCLE_BUCKS_2023.csv' with (format csv, header, force_null *);
-    copy temp_cycle from '/tmp/crash-data/pa/2023/CYCLE_CHESTER_2023.csv' with (format csv, header, force_null *);
-    copy temp_cycle from '/tmp/crash-data/pa/2023/CYCLE_DELAWARE_2023.csv' with (format csv, header, force_null *);
-    copy temp_cycle from '/tmp/crash-data/pa/2023/CYCLE_MONTGOMERY_2023.csv' with (format csv, header, force_null *);
-    copy temp_cycle from '/tmp/crash-data/pa/2023/CYCLE_PHILADELPHIA_2023.csv' with (format csv, header, force_null *);
-
-
-    -- flag
-    copy temp_flag from '/tmp/crash-data/pa/2023/FLAG_BUCKS_2023.csv' with (format csv, header, force_null *);
-    copy temp_flag from '/tmp/crash-data/pa/2023/FLAG_CHESTER_2023.csv' with (format csv, header, force_null *);
-    copy temp_flag from '/tmp/crash-data/pa/2023/FLAG_DELAWARE_2023.csv' with (format csv, header, force_null *);
-    copy temp_flag from '/tmp/crash-data/pa/2023/FLAG_MONTGOMERY_2023.csv' with (format csv, header, force_null *);
-    copy temp_flag from '/tmp/crash-data/pa/2023/FLAG_PHILADELPHIA_2023.csv' with (format csv, header, force_null *);
-
-    -- person
-    copy temp_person from '/tmp/crash-data/pa/2023/PERSON_BUCKS_2023.csv' with (format csv, header, force_null *);
-    copy temp_person from '/tmp/crash-data/pa/2023/PERSON_CHESTER_2023.csv' with (format csv, header, force_null *);
-    copy temp_person from '/tmp/crash-data/pa/2023/PERSON_DELAWARE_2023.csv' with (format csv, header, force_null *);
-    copy temp_person from '/tmp/crash-data/pa/2023/PERSON_MONTGOMERY_2023.csv' with (format csv, header, force_null *);
-    copy temp_person from '/tmp/crash-data/pa/2023/PERSON_PHILADELPHIA_2023.csv' with (format csv, header, force_null *);
-
-    -- roadway
-    copy temp_roadway from '/tmp/crash-data/pa/2023/ROADWAY_BUCKS_2023.csv' with (format csv, header, force_null *);
-    copy temp_roadway from '/tmp/crash-data/pa/2023/ROADWAY_CHESTER_2023.csv' with (format csv, header, force_null *);
-    copy temp_roadway from '/tmp/crash-data/pa/2023/ROADWAY_DELAWARE_2023.csv' with (format csv, header, force_null *);
-    copy temp_roadway from '/tmp/crash-data/pa/2023/ROADWAY_MONTGOMERY_2023.csv' with (format csv, header, force_null *);
-    copy temp_roadway from '/tmp/crash-data/pa/2023/ROADWAY_PHILADELPHIA_2023.csv' with (format csv, header, force_null *);
-
-    -- trailveh
-    copy temp_trailveh from '/tmp/crash-data/pa/2023/TRAILVEH_BUCKS_2023.csv' with (format csv, header, force_null *);
-    copy temp_trailveh from '/tmp/crash-data/pa/2023/TRAILVEH_CHESTER_2023.csv' with (format csv, header, force_null *);
-    copy temp_trailveh from '/tmp/crash-data/pa/2023/TRAILVEH_DELAWARE_2023.csv' with (format csv, header, force_null *);
-    copy temp_trailveh from '/tmp/crash-data/pa/2023/TRAILVEH_MONTGOMERY_2023.csv' with (format csv, header, force_null *);
-    copy temp_trailveh from '/tmp/crash-data/pa/2023/TRAILVEH_PHILADELPHIA_2023.csv' with (format csv, header, force_null *);
-
-    -- vehicle
-    copy temp_vehicle from '/tmp/crash-data/pa/2023/VEHICLE_BUCKS_2023.csv' with (format csv, header, force_null *);
-    copy temp_vehicle from '/tmp/crash-data/pa/2023/VEHICLE_CHESTER_2023.csv' with (format csv, header, force_null *);
-    copy temp_vehicle from '/tmp/crash-data/pa/2023/VEHICLE_DELAWARE_2023.csv' with (format csv, header, force_null *);
-    copy temp_vehicle from '/tmp/crash-data/pa/2023/VEHICLE_MONTGOMERY_2023.csv' with (format csv, header, force_null *);
-    copy temp_vehicle from '/tmp/crash-data/pa/2023/VEHICLE_PHILADELPHIA_2023.csv' with (format csv, header, force_null *);
+    foreach db_table in array db_tables loop
+        execute format($query$copy temp_%I from '/tmp/crash-data/pa/2023/%s_BUCKS_2023.csv' with (format csv, header, force_null *)$query$, db_table, upper(db_table));
+        execute format($query$copy temp_%I from '/tmp/crash-data/pa/2023/%s_CHESTER_2023.csv' with (format csv, header, force_null *)$query$, db_table, upper(db_table));
+        execute format($query$copy temp_%I from '/tmp/crash-data/pa/2023/%s_DELAWARE_2023.csv' with (format csv, header, force_null *)$query$, db_table, upper(db_table));
+        execute format($query$copy temp_%I from '/tmp/crash-data/pa/2023/%s_MONTGOMERY_2023.csv' with (format csv, header, force_null *)$query$, db_table, upper(db_table));
+        execute format($query$copy temp_%I from '/tmp/crash-data/pa/2023/%s_PHILADELPHIA_2023.csv' with (format csv, header, force_null *)$query$, db_table, upper(db_table));
+    end loop;
 
     -- Alter some specific text field values, usually from lookup tables.
     execute format($query$update temp_cycle set mc_dvr_hlmt_type = Null where mc_dvr_hlmt_type = ' '$query$);
