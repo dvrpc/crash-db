@@ -1,15 +1,16 @@
 /*
-    NOTE: the data dictionary does not place the CRN field correctly.
-    They are listed alphabetically there, but in the tables CRN is first,
-    followed by the rest of the fields alphabetically.
+NOTE for all tables: the data dictionary does not place the CRN field correctly.
+They are listed alphabetically there, but in the tables CRN is first,
+followed by the rest of the fields alphabetically.
+*/
 
+/*
 Notes from PennDOT's database primer:
 Information about the crash such as:
   - Where: County, Municipality, Work zone
   - When: Date, Time, Day of Week, Hour of Day, Month of Year
   - Item Counts: People, Vehicles, Unbelted, Fatal, etc.
 */
-
 create table pa_2023.crash (
     crn integer, -- crash record number, database key field that identifies a unique crash case 
     arrival_tm text, --time police arrived at the scene (hhmm)
@@ -113,6 +114,8 @@ create table pa_2023.crash (
 );
 
 /*
+NOTE: The order of the fields in the CSVs do not match the data dictionary; this is order in CSVs. Additionally, the "partial_trailer_vin" and "type_of_carrier" fields in the data dictionary are not included in the CSVs, and so are commented out below.
+
 Notes from PennDOT's database primer:
 Information about commercial vehicles, such as carrier information, the cargo body type, Hazmat
 information, and official agency registration numbers.
@@ -124,9 +127,9 @@ create table pa_2023.commveh (
     carrier_addr1 text,  -- address of carrier 
     carrier_addr2 text,  -- address of carrier line
     carrier_city text,  -- city of carrier
-    carrier_nm text,  -- name of the carrier
     carrier_state text,  -- state of carrier
     carrier_zip text,  -- zip code of carrier
+    carrier_nm text,  -- name of the carrier
     carrier_tel text,  -- telephone of carrier
     gvwr text,  -- gross vehicle weight rating 
     hazmat_cd1 text references pa_2023.hazmat_code (code),  -- hazmat code for material one onboard (see column code)
@@ -140,14 +143,14 @@ create table pa_2023.commveh (
     hazmat_rel_ind4 boolean,  -- indicator for hazmat four released
     icc_num text,  -- interstate commercial carrier number (not in use after 12/31/15) 
     osize_load_ind boolean,  -- oversize load indicator
-    partial_trailer_vin text,  -- first 11 characters of the trailer vin
+    -- partial_trailer_vin text,  -- first 11 characters of the trailer vin
     permitted integer, -- (01 = non-permitted load, 02 = permitted load, 99 = unknown)
     puc_num text,  -- pa utility commission number
     special_sizing1 text,  -- does this commercial unit have special sizing restrictions (00=No special sizing, 01=over height, 02=over length, 03=over weight, 04=over width)
     special_sizing2 text,  -- second special sizing restriction 
     special_sizing3 text,  -- third special sizing restriction 
     special_sizing4 text,  -- fourth special sizing restriction 
-    type_of_carrier text references pa_2023.type_of_carrier (code),  -- type of commercial carrier (see column code)
+    -- type_of_carrier text references pa_2023.type_of_carrier (code),  -- type of commercial carrier (see column code)
     unit_num integer,  -- unit number of the vehicle in the crash event 
     usdot_num text,  -- us dept of transportation number 
     veh_config_cd text references pa_2023.veh_config_cd (code)  -- vehicle configuration code (see column code)
@@ -186,6 +189,8 @@ create table pa_2023.cycle (
 );
 
 /*
+NOTE: The order of the fields in the CSV do not match the data dictionary; this is order in CSVs. Additionally, the "hit_utility_pole" and "school_bus_related" fields are not included in the CSVs and are commented out below.
+
 Notes from PennDOT's database primer:
 Series of Yes/No items that help refine lookups for specific factors about the crash such as:
 Drinking Driver, Use of a Cell Phone, Fatal Crash, Motorcycle involved, and over 60 other crash
@@ -197,9 +202,9 @@ create table pa_2023.flag (
     alcohol_related boolean, -- at least one driver or pedestrian with reported or suspected alcohol use
     angle_crash boolean, -- first harmful event involved a vehicle striking another at an angle
     atv boolean, -- crash involved at least one all-terrain- vehicle (atv).
-    backup_prior boolean, -- indicates that traffic was backed up due to a prior crash
-    backup_nonrecurring boolean, -- indicates that traffic was backed up due to a nonrecurring special event
     backup_congestion boolean, -- indicates that traffic was backed up due to normal congestion
+    backup_nonrecurring boolean, -- indicates that traffic was backed up due to a nonrecurring special event
+    backup_prior boolean, -- indicates that traffic was backed up due to a prior crash
     bicycle boolean, -- a bicycle was involved
     cell_phone boolean, -- driver using cell phone (hand held or hands free)
     child_passenger boolean, -- the crash involved at least one vehicle passenger under the age of 12.
@@ -219,8 +224,8 @@ create table pa_2023.flag (
     driver_50_64yr boolean, -- at least one driver 50-64 years of age
     driver_65_74yr boolean, -- at least one driver 65-74 years of age
     driver_75plus boolean, -- at least one driver 75 plus years of age
-    drug_related boolean, -- indicates either a motor vehicle driver or non-motorist (such as a bicyclist or pedestrian) had a condition of drug use or was suspected of drug use by police or had a positive drug test result indicating presence of a controlled substance. (definition changed may 2022)
     drugged_driver boolean, -- indicates any motor vehicle driver had a condition of drug use or was suspected of drug use by police or had a positive drug test result indicating presence of a controlled substance. (definition changed may 2022)
+    drug_related boolean, -- indicates either a motor vehicle driver or non-motorist (such as a bicyclist or pedestrian) had a condition of drug use or was suspected of drug use by police or had a positive drug test result indicating presence of a controlled substance. (definition changed may 2022)
     fatal boolean, -- at least one fatality
     fatal_or_susp_serious_inj boolean, -- the crash has at least one person who was killed or sustained a suspected serious injury
     fatigue_asleep boolean, -- at least one driver with a condition listed fatigued or asleep
@@ -236,9 +241,9 @@ create table pa_2023.flag (
     hit_parked_vehicle boolean, -- at least one legally or illegally parked vehicle was struck
     hit_pole boolean, -- at least one unit hit a pole
     hit_tree_shrub boolean, -- at least one unit hit a tree or shrub
-    hit_utility_pole boolean, -- at least one unit hit a utility pole (NOTE: this was a second "hit tree_shrub" in the data dictionary; assumed it should be "hit_utiltity_pole")
-    ho_oppdir_sdswp boolean, -- crash description of head-on or opposite direction sideswipe
     horse_buggy boolean, -- at least one horse and buggy unit involved
+    -- hit_utility_pole boolean, -- at least one unit hit a utility pole (NOTE: this was a second "hit tree_shrub" in the data dictionary; assumed it should be "hit_utiltity_pole")
+    ho_oppdir_sdswp boolean, -- crash description of head-on or opposite direction sideswipe
     hvy_truck_related boolean, -- at least one heavy truck was involved
     icy_road boolean, -- icy road indicator
     illegal_drug_related boolean, -- at least one driver or pedestrian had reported or suspected illegal drug use
@@ -261,8 +266,8 @@ create table pa_2023.flag (
     motorcycle boolean, -- the crash involved at least one motorcycle
     multiple_vehicle boolean, -- crash involved at least 2 vehicles
     nhtsa_agg_driving boolean, -- the crash meets the nhtsa definition of aggressive driving
-    no_clearance boolean, -- at least one unit proceeded without clearance after a stop.
     non_intersection boolean, -- the crash did not take place at an intersection
+    no_clearance boolean, -- at least one unit proceeded without clearance after a stop.
     opioid_related boolean, -- at least one driver or non-motorist was suspected of drug use and tested positive for opioids
     other_freeway boolean, -- indicates that the crash took place on a non-turnpike/non-interstate freeway
     overturned boolean, -- the crash involved at least one overturned vehicle
@@ -280,14 +285,14 @@ create table pa_2023.flag (
     running_stop_sign boolean, -- at least one driver ran a stop sign
     rural boolean, -- crash took place in a rural municipality
     school_bus boolean, -- the crash involved at least one school bus
-    school_bus_related boolean, -- the crash involved at least one school bus unit with or without a harmful event
+    -- school_bus_related boolean, -- the crash involved at least one school bus unit with or without a harmful event
     school_bus_unit boolean, -- the crash involved at least one school bus unit with a harmful event
     school_zone boolean, -- the crash took place in a school zone
     shldr_related boolean, -- shoulder related indicator
     signalized_int boolean, -- the crash took place at a signalized intersection 
     single_vehicle boolean, -- the crash involved a single vehicle
-    snow_slush_road boolean, -- the crash involved a snow or slush covered road
     snowmobile boolean, -- crash involved at least one snowmobile unit
+    snow_slush_road boolean, -- the crash involved a snow or slush covered road
     speed_change_lane boolean, -- the crash occurred where an acceleration or deceleration lane was present on a limited access highway
     speeding boolean, -- at least one vehicle was speeding
     speeding_related boolean, -- at least one vehicle was speeding, racing or was driving too fast for conditions

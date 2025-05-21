@@ -14,7 +14,6 @@ begin
     -- Change some field types in the temp tables to text so they'll accept all data (to fix later).
     foreach db_table in array db_tables loop
     	for col_name in select column_name from information_schema.Columns where table_name = 'temp_' || db_table and data_type not in ('text') loop
-            -- raise notice 'hi';
             execute format($query$alter table temp_%I alter column %I type text$query$, db_table, col_name);
         end loop;
     end loop;
@@ -31,11 +30,11 @@ begin
     copy temp_crash from '/tmp/crash-data/pa/2023/CRASH_PHILADELPHIA_2023.csv' with (format csv, header, force_null *);
 
     -- commveh
-    -- copy temp_commveh from '/tmp/crash-data/pa/2023/COMMVEH_BUCKS_2023.csv' with (format csv, header, force_null *);
-    -- copy temp_commveh from '/tmp/crash-data/pa/2023/COMMVEH_CHESTER_2023.csv' with (format csv, header, force_null *);
-    -- copy temp_commveh from '/tmp/crash-data/pa/2023/COMMVEH_DELAWARE_2023.csv' with (format csv, header, force_null *);
-    -- copy temp_commveh from '/tmp/crash-data/pa/2023/COMMVEH_MONTGOMERY_2023.csv' with (format csv, header, force_null *);
-    -- copy temp_commveh from '/tmp/crash-data/pa/2023/COMMVEH_PHILADELPHIA_2023.csv' with (format csv, header, force_null *);
+    copy temp_commveh from '/tmp/crash-data/pa/2023/COMMVEH_BUCKS_2023.csv' with (format csv, header, force_null *);
+    copy temp_commveh from '/tmp/crash-data/pa/2023/COMMVEH_CHESTER_2023.csv' with (format csv, header, force_null *);
+    copy temp_commveh from '/tmp/crash-data/pa/2023/COMMVEH_DELAWARE_2023.csv' with (format csv, header, force_null *);
+    copy temp_commveh from '/tmp/crash-data/pa/2023/COMMVEH_MONTGOMERY_2023.csv' with (format csv, header, force_null *);
+    copy temp_commveh from '/tmp/crash-data/pa/2023/COMMVEH_PHILADELPHIA_2023.csv' with (format csv, header, force_null *);
 
     -- cycle
     copy temp_cycle from '/tmp/crash-data/pa/2023/CYCLE_BUCKS_2023.csv' with (format csv, header, force_null *);
@@ -46,11 +45,11 @@ begin
 
 
     -- flag
-    -- copy temp_flag from '/tmp/crash-data/pa/2023/FLAG_BUCKS_2023.csv' with (format csv, header, force_null *);
-    -- copy temp_flag from '/tmp/crash-data/pa/2023/FLAG_CHESTER_2023.csv' with (format csv, header, force_null *);
-    -- copy temp_flag from '/tmp/crash-data/pa/2023/FLAG_DELAWARE_2023.csv' with (format csv, header, force_null *);
-    -- copy temp_flag from '/tmp/crash-data/pa/2023/FLAG_MONTGOMERY_2023.csv' with (format csv, header, force_null *);
-    -- copy temp_flag from '/tmp/crash-data/pa/2023/FLAG_PHILADELPHIA_2023.csv' with (format csv, header, force_null *);
+    copy temp_flag from '/tmp/crash-data/pa/2023/FLAG_BUCKS_2023.csv' with (format csv, header, force_null *);
+    copy temp_flag from '/tmp/crash-data/pa/2023/FLAG_CHESTER_2023.csv' with (format csv, header, force_null *);
+    copy temp_flag from '/tmp/crash-data/pa/2023/FLAG_DELAWARE_2023.csv' with (format csv, header, force_null *);
+    copy temp_flag from '/tmp/crash-data/pa/2023/FLAG_MONTGOMERY_2023.csv' with (format csv, header, force_null *);
+    copy temp_flag from '/tmp/crash-data/pa/2023/FLAG_PHILADELPHIA_2023.csv' with (format csv, header, force_null *);
 
     -- person
     copy temp_person from '/tmp/crash-data/pa/2023/PERSON_BUCKS_2023.csv' with (format csv, header, force_null *);
@@ -92,8 +91,6 @@ begin
     execute format($query$update temp_vehicle set make_cd = Null where make_cd in ('KALM', 'KNNW')$query$);
     execute format($query$update temp_vehicle set veh_position = Null where veh_position = '00'$query$);
     execute format($query$update temp_vehicle set vina_body_type_cd = Null where vina_body_type_cd in ('T', 'P4D', 'P', 'PSW', 'P4H', 'C', 'M', 'P3P', 'T2W', 'PC4')$query$);
-
-
     
     -- Alter the values of the fields that are supposed to be booleans - e.g. set 'U' and
     -- ints higher than 1 to null.
