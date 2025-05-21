@@ -1,7 +1,6 @@
 do $body$
 declare
 	col_name text;
-    col_type text;
     db_tables text[] := '{crash, commveh, cycle, flag, person, roadway, trailveh, vehicle}';
     db_table text;
 begin
