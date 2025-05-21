@@ -16,7 +16,7 @@ The Postgres user running this script must have been granted two roles: `pg_read
 
 ## Environment Variables
 
-Create a .env file. `port` is required but all else are optional. 
+Create a .env file. `port` is required but others are optional. 
 ```sh
 port=5437
 db="crash2"  # If you want something other than "crash", which is the default.
@@ -24,7 +24,7 @@ db="crash2"  # If you want something other than "crash", which is the default.
 
 ## Usage
 
-The database is created and populated via the setup.sh bash script. If it is not already executable, make it so with `chmod 755 setup_db.sh` and then invoke with `./setup_db.sh`. You can optionally drop and recreate the existing database with the `-r` flag: `./setup_db.sh -r`.
+The database is created and populated via the setup.sh bash script. If it is not already executable, make it so with `chmod 755 setup_db.sh` and then invoke with `./setup_db.sh`. You can optionally drop and recreate the existing database with the `-r` flag: `./setup_db.sh -r`, which will also terminate any existing connections in order to do so.
 
 The script copies the files in /data to /tmp, to ease access by Postgresql's <a href="https://www.postgresql.org/docs/17/sql-copy.html">COPY</a>, which is used to import the data into temporary tables before it is cleaned.
 
@@ -39,10 +39,8 @@ Crash data:
 
 #### Questions/Data Issues - 2023
 
+There are a number of discrepencies between the data dictionary and the CSVs. Details are noted in src/pa/2023/create_data_tables.sql, in a comment above each table.
+
 If there's a value of "2" where the data dictionary states there's only supposed to 0=no and 1=yes, is this unknown? (e.g. "lane_closed" in crash tables, probably others.) I'm changing them to nulls. Same thing with "U" where the data dictionary states possibilities of "Y" or "N". 
 
-In the 2023 Vehicle table CSVs, there's no hazmat_ind field, which is listed in the data dictionary for that table. I have commented it out in the `create table` query.
-
-In the 2023 Vehicle table CSVs, the field "TOW_IND" is not listed in the data dictionary. I've added it as a boolean.
-
-There are a number of "R" values for the "transported" field in the person CSVs - enough to suggest that this was intentional. However, field is supposed to be y/n. What would R mean? Converting to Null for now.
+There are a number of "R" values for the "transported" field in the person CSVs - enough to suggest that this was intentional. However, field is supposed to be y/n. What would R mean? Converting to null for now.

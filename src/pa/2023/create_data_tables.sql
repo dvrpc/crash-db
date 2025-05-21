@@ -114,7 +114,9 @@ create table pa_2023.crash (
 );
 
 /*
-NOTE: The order of the fields in the CSVs do not match the data dictionary; this is order in CSVs. Additionally, the "partial_trailer_vin" and "type_of_carrier" fields in the data dictionary are not included in the CSVs, and so are commented out below.
+NOTE: The order of the fields in the CSVs do not match the data dictionary; this is order in CSVs.
+Additionally, the "partial_trailer_vin" and "type_of_carrier" fields in the data dictionary are
+not included in the CSVs, and so are commented out below.
 
 Notes from PennDOT's database primer:
 Information about commercial vehicles, such as carrier information, the cargo body type, Hazmat
@@ -157,7 +159,8 @@ create table pa_2023.commveh (
 );
 
 /*
-NOTE: The order of the fields in the CSV do not match the data dictionary; this is order in CSVs (alphabetical after crn [and coincidentally thus totally alphabetically]).
+NOTE: The order of the fields in the CSV do not match the data dictionary; this is order in CSVs
+(alphabetical after crn [and coincidentally thus totally alphabetically]).
     
 Notes from PennDOT's database primer:
 Information that pertains to motorcycle/pedal cycles, such as helmet usage and appropriate attire
@@ -189,7 +192,9 @@ create table pa_2023.cycle (
 );
 
 /*
-NOTE: The order of the fields in the CSV do not match the data dictionary; this is order in CSVs. Additionally, the "hit_utility_pole" and "school_bus_related" fields are not included in the CSVs and are commented out below.
+NOTE: The order of the fields in the CSV do not match the data dictionary; this is order in CSVs.
+Additionally, the "hit_utility_pole" and "school_bus_related" fields are not included in the CSVs
+and are commented out below.
 
 Notes from PennDOT's database primer:
 Series of Yes/No items that help refine lookups for specific factors about the crash such as:
@@ -324,7 +329,8 @@ create table pa_2023.flag (
 /*
 
 NOTE: This is the order from the CSVs; the order of ejection_ind and eject_path_cd are swapped from
-what is the data dictionary. Additionally, this excludes the "transported_by" field that is listed in the data dictionary as it is not included in the header for the CSVs.
+what is the data dictionary. Additionally, this excludes the "transported_by" field that is listed
+in the data dictionary as it is not included in the header for the CSVs.
 
 Notes from PennDOT's database primer:
 Information about all people from all units related to the crash such as: Age, Sex, Drug and
@@ -392,6 +398,10 @@ create table pa_2023.trailveh (
 );
 
 /*
+NOTE: The "hazmat_ind" field in the data dictionary is not included in the CSVs, and so is
+commented out below. Additionally, the "tow_ind" field in the CSVs is not included in the data
+dictionary, and so has been added here.
+
 Notes from PennDOT's database primer:
 Information about all vehicles involved in the crash such as: Body Type, Commercial Vehicle,
 Movement, Position, Unit number in the crash and other vehicle related information.
@@ -425,7 +435,7 @@ create table pa_2023.vehicle (
     prin_imp_pt text references pa_2023.impact_point (code),  -- principle impact point – only for fatal crashes (see column code for impact point) 
     rdwy_alignment text references pa_2023.rdwy_alignment (code),  -- roadway alignment code (see column code) 
     special_usage text references pa_2023.special_usage (code),  -- special usage of the vehicle (see column code)
-    tow_ind boolean, -- NOTE: not in data dictionary but is in CSVs
+    tow_ind boolean, -- DVRPC addition (not in data dictionary but is in CSVs)
     travel_direction text references pa_2023.travel_direction (code),  -- travel direction of the vehicle (see column code) 
     travel_spd text,  -- estimated travel speed 
     trl_veh_cnt text,  -- trailing vehicle count 
