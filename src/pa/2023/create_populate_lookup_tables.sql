@@ -425,15 +425,15 @@ begin
         $query$, schema_name);
     
     execute format($query$insert into %I.location_type (code, description) values
-        ('0', 'Not applicable'),
-        ('1', 'Underpass'),
-        ('2', 'Ramp'),
-        ('3', 'Bridge'),
-        ('4', 'Tunnel'),
-        ('5', 'Toll Booth'),
-        ('6', 'Cross over related'),
-        ('7', 'Driveway or Parking Lot'),
-        ('8', 'Ramp and bridge'),
+        ('00', 'Not applicable'),
+        ('01', 'Underpass'),
+        ('02', 'Ramp'),
+        ('03', 'Bridge'),
+        ('04', 'Tunnel'),
+        ('05', 'Toll Booth'),
+        ('06', 'Cross over related'),
+        ('07', 'Driveway or Parking Lot'),
+        ('08', 'Ramp and bridge'),
         ('99', 'Unknown')
         $query$, schema_name);
     
@@ -1082,6 +1082,9 @@ begin
         ('IA', 'Iowa/ US'),
         ('ID', 'Idaho/ US'),
         ('IN', 'Indiana/ US'),
+        ('IL', 'Illinois/ US'), -- DVRPC added, wasn't in data dictionary
+        ('JA', 'Jalisco/ Mex'), -- DVRPC added, wasn't in data dictionary
+        ('KS', 'Kansas/ US'), -- DVRPC added, wasn't in data dictionary
         ('KY', 'Kentucky/ US'),
         ('LA', 'Louisiana/ US'),
         ('MA', 'Massachusetts/ US'),
@@ -1107,8 +1110,18 @@ begin
         ('NL', 'Nuevo Leon/ Mex'),
         ('NM', 'New Mexico/ US'),
         ('NS', 'Nova Scotia/ Can'),
+        ('NV', 'Nevada/ US'), -- DVRPC added, wasn't in data dictionary
+        ('NY', 'New York/ US'), -- DVRPC added, wasn't in data dictionary
+        ('OA', 'Oaxaca/ Mex'), -- DVRPC added, wasn't in data dictionary
+        ('OH', 'Ohio/ US'), -- DVRPC added, wasn't in data dictionary
         ('ON', 'Ontario/ Can'),
+        ('OK', 'Oklahoma/ US'), -- DVRPC added, wasn't in data dictionary
+        ('OR', 'Oregon/ US'), -- DVRPC added, wasn't in data dictionary
+        ('PA', 'Pennsylvania/ US'), -- DVRPC added, wasn't in data dictionary
+        ('PE', 'Prince Edward Island/ Can'), -- DVRPC added, wasn't in data dictionary
         ('PR', 'Puerto Rico/ US'),
+        ('PU', 'Puebla/ Mex'), -- DVRPC added, wasn't in data dictionary
+        ('QC', 'Quebec/ Can'), -- DVRPC added, wasn't in data dictionary
         ('RI', 'Rhode Island/ US'),
         ('SC', 'South Carolina/ US'),
         ('SD', 'South Dakota/ US'),
@@ -3727,6 +3740,9 @@ begin
         $query$, schema_name);
     
     execute format($query$insert into %I.police_agencies (code, description) values
+        ('00000', 'Unknown'), -- DVRPC addition - in CSVs but not data dictionary
+        ('68Z99', 'Unknown'), -- DVRPC addition - in CSVs but not data dictionary
+        ('68K00', 'Unknown'), -- DVRPC addition - in CSVs but not data dictionary
         ('01203', 'CONEWAGO TOWNSHIP'),
         ('01204', 'CUMBERLAND TOWNSHIP'),
         ('01208', 'ABBOTTSTOWN HAMILTON'),

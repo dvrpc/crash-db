@@ -154,31 +154,34 @@ create table pa_2023.commveh (
 );
 
 /*
+NOTE: The order of the fields in the CSV do not match the data dictionary; this is order in CSVs (alphabetical after crn [and coincidentally thus totally alphabetically]).
+    
 Notes from PennDOT's database primer:
 Information that pertains to motorcycle/pedal cycles, such as helmet usage and appropriate attire
 and other accessories such as side bags
 */
+
 create table pa_2023.cycle (
     crn integer, -- crash record number, database key field that identifies a unique crash case 
-    mc_engine_size text, -- motorcycle engine size (cc)
-    mc_passngr_ind boolean, -- did the motorcycle have a passenger?
     mc_bag_ind boolean, -- did the motorcycle have side bags?
-    mc_trail_ind boolean, -- did the motorcycle have trailer?
+    mc_dvr_boots_ind boolean, -- did motorcycle driver wear boots?
     mc_dvr_edc_ind boolean, -- did motorcycle driver have safety training?
     mc_dvr_eyeprt_ind boolean, -- did motorcycle driver wear eye protection?
-    mc_dvr_lngslv_ind boolean, -- did motorcycle driver have long sleeves?
-    mc_dvr_lngpnts_ind boolean, -- did motorcycle driver wear long pants?
-    mc_dvr_boots_ind boolean, -- did motorcycle driver wear boots?
-    mc_dvr_hlmton_ind boolean, -- did motorcycle driver wear helmet?
-    mc_dvr_hlmtdot_ind boolean, -- was driver’s helmet penndot certified?
     mc_dvr_hlmt_type text references pa_2023.helmet_type (code), -- code for helmet type of the motorcycle driver (see column code)
-    mc_pas_eyeprt_ind boolean, -- did motorcycle passenger wear eye protection?
-    mc_pas_lngslv_ind boolean, -- did motorcycle passenger have long sleeves?
-    mc_pas_lngpnts_ind boolean, -- did motorcycle passenger wear long pants?
+    mc_dvr_hlmtdot_ind boolean, -- was driver’s helmet penndot certified?
+    mc_dvr_hlmton_ind boolean, -- did motorcycle driver wear helmet?
+    mc_dvr_lngpnts_ind boolean, -- did motorcycle driver wear long pants?
+    mc_dvr_lngslv_ind boolean, -- did motorcycle driver have long sleeves?
+    mc_engine_size text, -- motorcycle engine size (cc)
+    mc_passngr_ind boolean, -- did the motorcycle have a passenger?
     mc_pas_boots_ind boolean, -- did motorcycle passenger wear boots?
-    mc_pas_hlmton_ind boolean, -- did motorcycle passenger wear a helmet?
+    mc_pas_eyeprt_ind boolean, -- did motorcycle passenger wear eye protection?
     mc_pas_hlmtdot_ind boolean, -- was passenger’s helmet penndot cert.?
+    mc_pas_hlmton_ind boolean, -- did motorcycle passenger wear a helmet?
     mc_pas_hlmt_type text references pa_2023.helmet_type (code), -- code for helmet type of the motorcycle pass. (see column code)
+    mc_pas_lngpnts_ind boolean, -- did motorcycle passenger wear long pants?
+    mc_pas_lngslv_ind boolean, -- did motorcycle passenger have long sleeves?
+    mc_trail_ind boolean, -- did the motorcycle have trailer?
     unit_num integer -- unit number of the vehicle in the crash event
 );
 
@@ -314,6 +317,10 @@ create table pa_2023.flag (
 );
 
 /*
+
+NOTE: This is the order from the CSVs; the order of ejection_ind and eject_path_cd are swapped from
+what is the data dictionary. Additionally, this excludes the "transported_by" field that is listed in the data dictionary as it is not included in the header for the CSVs.
+
 Notes from PennDOT's database primer:
 Information about all people from all units related to the crash such as: Age, Sex, Drug and
 alcohol results, Where they sat and in which vehicle, Were they ejected from the vehicle? etc.
@@ -328,18 +335,18 @@ create table pa_2023.person (
     airbag4 text references pa_2023.airbag (code), -- airbag(s) that were deployed for this person (see column code) 
     dvr_lic_state text references pa_2023.state_code (code), -- state of licensed driver (see column code) 
     dvr_ped_condition text references pa_2023.dvr_ped_condition (code), -- driver pedestrian condition code (see column code) 
-    ejection_ind text references pa_2023.ejection_ind (code), -- ejection indicator – only for vehicle occupants (see column code) 
     eject_path_cd text references pa_2023.eject_path_cd (code), -- ejection path code– only for vehicle occupants (see column code) 
+    ejection_ind text references pa_2023.ejection_ind (code), -- ejection indicator – only for vehicle occupants (see column code) 
     extric_ind text references pa_2023.extric_ind (code), -- extrication indicator– only for vehicle occupants (see column code) 
     inj_severity text references pa_2023.inj_severity (code), -- injury severity code (see column code) 
     non_motorist boolean, -- indicates if this person is a non-motorist
     person_num integer, -- person number – sequential per unit 
     person_type text references pa_2023.person_type (code), -- person type code (see column code) 
-    restraint_helmet text references pa_2023.helmet_type (code), -- restraint or helmet (see column code) 
+    restraint_helmet text references pa_2023.restraint_helmet (code), -- restraint or helmet (see column code) 
     seat_position text references pa_2023.seat_position (code), -- seat in unit where person sat (see column code) 
     sex text references pa_2023.sex (code), -- sex of this individual; (see column code) 
     transported boolean, -- transported to medical facility y/n
-    transported_by text, -- method by which the person was transported (00 = not transported, 01 = ems air, 02 = ems ground, 98 = other, 99 = unknown)
+    -- transported_by text, -- method by which the person was transported (00 = not transported, 01 = ems air, 02 = ems ground, 98 = other, 99 = unknown)
     unit_num integer, -- unit number of the vehicle (or pedestrian) assigned to this person 
     vulnerable_roadway_user boolean -- is this person classified as a vulnerable roadway user?
 );
@@ -370,7 +377,7 @@ Information about the types and kind of trailers that were being towed by vehicl
 */
 create table pa_2023.trailveh (
     crn integer,  -- crash record number, database key field that identifies a unique crash case 
-    trl_seq_num integer,  -- trailer sequence number 
+    trl_seq_num text,  -- trailer sequence number 
     trailer_partial_vin text,  -- first 12 characters of the vin for this trailer 
     trl_veh_reg_state text references pa_2023.state_code (code),  -- trailer registration state (see state codes)
     trl_veh_tag_num text,  -- trailer registration tag number 
