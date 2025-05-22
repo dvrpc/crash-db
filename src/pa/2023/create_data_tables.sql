@@ -383,13 +383,15 @@ create table pa_2023.roadway (
 );
 
 /*
+NOTE: This is the order from the CSVs; the order of the "trailer_partial_vin" and "trl_seq_num" are swapped in the data dictionary.
+
 Notes from PennDOT's database primer:
 Information about the types and kind of trailers that were being towed by vehicles.
 */
 create table pa_2023.trailveh (
     crn integer,  -- crash record number, database key field that identifies a unique crash case 
-    trl_seq_num text,  -- trailer sequence number 
     trailer_partial_vin text,  -- first 12 characters of the vin for this trailer 
+    trl_seq_num text,  -- trailer sequence number 
     trl_veh_reg_state text references pa_2023.state_code (code),  -- trailer registration state (see state codes)
     trl_veh_tag_num text,  -- trailer registration tag number 
     trl_veh_tag_yr text,  -- trailer registration year 
