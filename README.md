@@ -34,6 +34,10 @@ The database is created and populated via the setup.sh bash script. If it is not
 
 The script assumes that data files (CSVs) are in data/ relative to the project directory, which are then copied to appropriate folders (configurable via environment variables if necessary) to ease access by Postgresql's <a href="https://www.postgresql.org/docs/17/sql-copy.html">COPY</a>.
 
+### Utility Scripts
+
+The way these are invoked may change. At present, there's one script, at src/diff_headers.sh, which checks that all the headers in the data files are the same across each table/state/year. Run it with `./src/diff_headers.sh <state> <year>` from the project root.
+
 ## Data
 
 ### PennDOT

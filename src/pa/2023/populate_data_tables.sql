@@ -53,7 +53,7 @@ begin
             execute format($query$update temp_%I set %I = '0' where %I = '00'$query$, db_table, col_name, col_name);
             -- Must wrap in an exception since the cast could fail.
             begin
-                execute format($query$update temp_%I set %I = null where cast(%I as int) > 1$query$, db_table, col_name, col_name);
+                execute format($query$update temp_%I set %I = null where %I::int > 1$query$, db_table, col_name, col_name);
             exception
                 when invalid_text_representation then
                     null; -- No need to do anything here - if it can't be cast as int, that's fine. 
