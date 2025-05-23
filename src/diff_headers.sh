@@ -16,8 +16,8 @@ if [ $# != "${num_args_required}" ]; then
   exit 1
 fi
 
-# Give command line arguments variable names.
-state=$1
+# Give command line arguments variable names, making state lowercase.
+state="${1,,}"
 year=$2
 
 if [ "${state}" = 'pa' ]; then
