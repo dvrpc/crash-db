@@ -148,10 +148,10 @@ create table pa_2023.commveh (
     -- partial_trailer_vin text,  -- first 11 characters of the trailer vin
     permitted boolean, -- (01 = non-permitted load, 02 = permitted load, 99 = unknown)
     puc_num text,  -- pa utility commission number
-    special_sizing1 text,  -- does this commercial unit have special sizing restrictions (00=No special sizing, 01=over height, 02=over length, 03=over weight, 04=over width)
-    special_sizing2 text,  -- second special sizing restriction 
-    special_sizing3 text,  -- third special sizing restriction 
-    special_sizing4 text,  -- fourth special sizing restriction 
+    special_sizing1 text references pa_2023.special_sizing (code), -- does this commercial unit have special sizing restrictions
+    special_sizing2 text references pa_2023.special_sizing (code), 
+    special_sizing3 text references pa_2023.special_sizing (code), 
+    special_sizing4 text references pa_2023.special_sizing (code), 
     -- type_of_carrier text references pa_2023.type_of_carrier (code),  -- type of commercial carrier (see column code)
     unit_num integer,  -- unit number of the vehicle in the crash event 
     usdot_num text,  -- us dept of transportation number 

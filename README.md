@@ -77,3 +77,4 @@ The crash table's "urban_rural" field lists (in comments only, not as separate l
 
 The commveh table's "axle_cnt" doesn't have a lookup table, but obviously uses 99 for unknown. Converted to null. But what about 16 and 18? What's the highest number of axles a vehicle and trailers could have?
 
+Are assumptions (that is, 2=No and 9=unknown) about actual values (as opposed to possible values listed in data dictionary, which are 0=No 1=Yes) of hazmat_rel_ind1 through hazmat_rel_ind4 correct?

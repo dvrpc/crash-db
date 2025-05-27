@@ -56,7 +56,20 @@ begin
     execute format($query$update temp_commveh set permitted = '1' where permitted = '02'$query$);
     execute format($query$update temp_commveh set permitted = null where permitted = '99'$query$);
 
+
+    /* The data dictionary lists possible values 1=yes 0=No for hazmat_rel_ind1 through
+    hazmat_rel_ind4, but the values in the CSVS are 1,2,9. Assuming 1=yes, 2=no, 9=unknown so they
+    can be converted to booleans properly. */
+    execute format($query$update temp_commveh set hazmat_rel_ind1 = 0 where hazmat_rel_ind1 = '2'$query$);
+    execute format($query$update temp_commveh set hazmat_rel_ind1 = null where hazmat_rel_ind1 = '09'$query$);
+    execute format($query$update temp_commveh set hazmat_rel_ind2 = 0 where hazmat_rel_ind2 = '2'$query$);
+    execute format($query$update temp_commveh set hazmat_rel_ind2 = null where hazmat_rel_ind2 = '09'$query$);
+    execute format($query$update temp_commveh set hazmat_rel_ind3 = 0 where hazmat_rel_ind3 = '2'$query$);
+    execute format($query$update temp_commveh set hazmat_rel_ind3 = null where hazmat_rel_ind3 = '09'$query$);
+    execute format($query$update temp_commveh set hazmat_rel_ind4 = 0 where hazmat_rel_ind4 = '2'$query$);
+    execute format($query$update temp_commveh set hazmat_rel_ind4 = null where hazmat_rel_ind4 = '09'$query$);
     
+   
     -- Alter the values of the fields in the temp tables that will end up being booleans - e.g.
     -- set 'U' and ints higher than 1 to null.
     foreach db_table in array db_tables loop
