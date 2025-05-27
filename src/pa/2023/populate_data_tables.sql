@@ -45,6 +45,13 @@ begin
     execute format($query$update temp_crash set hour_of_day = null where hour_of_day::int > 23$query$);
     execute format($query$update temp_crash set roadway_cleared = null where roadway_cleared::int > '2359'$query$);
     execute format($query$update temp_crash set time_of_day = null where time_of_day::int > '2359'$query$);
+    /* The data dictionary lists no lookup table but possible values "01 = non-permitted load, 02 =
+    permitted load, 99 = unknown)" for the "permitted" column of the commveh table. Convert to
+    values that can be used to interpret int to boolean (below). */
+    execute format($query$update temp_commveh set permitted = '0' where permitted = '01'$query$);
+    execute format($query$update temp_commveh set permitted = '1' where permitted = '02'$query$);
+    execute format($query$update temp_commveh set permitted = null where permitted = '99'$query$);
+
     
     -- Alter the values of the fields in the temp tables that will end up being booleans - e.g.
     -- set 'U' and ints higher than 1 to null.
@@ -69,6 +76,7 @@ begin
 
     -- Another boolean change, but which seems unique to this field and possibly meant to be something else.
     execute format($query$update temp_person set transported = null where transported = 'R'$query$);
+
 
     -- Copy the data from the temp tables into the non-temp tables, by exporting to file and then reimporting. Easiest way to go from text types in temp tables to types in non-temp tables.
     foreach db_table in array db_tables loop

@@ -146,7 +146,7 @@ create table pa_2023.commveh (
     icc_num text,  -- interstate commercial carrier number (not in use after 12/31/15) 
     osize_load_ind boolean,  -- oversize load indicator
     -- partial_trailer_vin text,  -- first 11 characters of the trailer vin
-    permitted integer, -- (01 = non-permitted load, 02 = permitted load, 99 = unknown)
+    permitted boolean, -- (01 = non-permitted load, 02 = permitted load, 99 = unknown)
     puc_num text,  -- pa utility commission number
     special_sizing1 text,  -- does this commercial unit have special sizing restrictions (00=No special sizing, 01=over height, 02=over length, 03=over weight, 04=over width)
     special_sizing2 text,  -- second special sizing restriction 
