@@ -13,6 +13,24 @@ The Postgres user running this script must have been granted two roles: `pg_read
 - [ ] add help flag to show usage to setup_db.sh
 - [ ] review this after complete: <https://www.postgresql.org/docs/current/populate.html>
 
+For either the pa or the dvrpc schema, add in "shape" for better geometry field, using this or something close to it (from Sean Lawrence):
+
+```sql
+select 
+  latitude, 
+  longitude,
+  ST_SetSRID(ST_Point((
+        CAST(SUBSTRING(longitude FROM 1 FOR POSITION(' ' IN longitude) - 1) AS NUMERIC) + 
+        CAST(SUBSTRING(longitude FROM POSITION(' ' IN longitude) + 1 FOR POSITION(':' IN longitude) - POSITION(' ' IN longitude) - 1) AS NUMERIC) / 60 + 
+        CAST(SUBSTRING(longitude FROM POSITION(':' IN longitude) + 1) AS NUMERIC) / 3600) * -1,
+        (CAST(SUBSTRING(latitude FROM 1 FOR POSITION(' ' IN latitude) - 1) AS NUMERIC) + 
+        CAST(SUBSTRING(latitude FROM POSITION(' ' IN latitude) + 1 FOR POSITION(':' IN latitude) - POSITION(' ' IN latitude) - 1) AS NUMERIC) / 60 + 
+        CAST(SUBSTRING(latitude FROM POSITION(':' IN latitude) + 1) AS NUMERIC) / 3600)
+    ),4326) as shape
+from 
+  crash -- will need schema specified
+```
+
 ## Environment Variables
 
 Create a .env file. `port` is required but others should be optional, depending on your OS.
