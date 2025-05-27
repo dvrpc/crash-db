@@ -72,3 +72,7 @@ There are a number of discrepencies between the data dictionary and the CSVs. De
 If there's a value of "2" where the data dictionary states there's only supposed to 0=no and 1=yes, is this unknown? (e.g. "lane_closed" in crash tables, probably others.) I'm changing them to nulls. Same thing with "U" where the data dictionary states possibilities of "Y" or "N". 
 
 There are a number of "R" values for the "transported" field in the person CSVs - enough to suggest that this was intentional. However, field is supposed to be y/n. What would R mean? Converting to null for now.
+
+The crash table's "urban_rural" field lists (in comments only, not as separate lookup table) possible values 1=rural, 2=urbanized, 3=urban, but only values in field for all 2023 counties are 1 and 2. So should it be 1=rural, 2=urban? What is "urbanized"?
+
+
