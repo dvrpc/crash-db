@@ -124,7 +124,7 @@ information, and official agency registration numbers.
 */
 create table pa_2023.commveh (
     crn integer,  -- crash record number, database key field that identifies a unique crash case 
-    axle_cnt text,  -- number of axles on the vehicle
+    axle_cnt integer,  -- number of axles on the vehicle
     cargo_bd_type text references pa_2023.cargo_bd_type (code),  -- code for the cargo carrier’s body type (see column code)
     carrier_addr1 text,  -- address of carrier 
     carrier_addr2 text,  -- address of carrier line
