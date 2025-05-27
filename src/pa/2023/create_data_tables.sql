@@ -25,7 +25,7 @@ create table pa_2023.crash (
     chldpas_susp_serious_inj_count integer, -- total child passengers under the age of 8 with suspected serious injuries 
     collision_type text references pa_2023.collision_type (code), --collision category that defines crash
     comm_veh_count integer, -- total commercial vehicles involved
-    cons_zone_spd_lim text, -- speed limit for the construction zone 
+    cons_zone_spd_lim integer, -- speed limit for the construction zone 
     county text references pa_2023.county (code), -- county code number where crash occurred 
     crash_month text, -- month when the crash occurred
     crash_year text, -- year when the crash occurred 
@@ -46,7 +46,7 @@ create table pa_2023.crash (
     fatal_count integer, -- total amount of fatalities involved 
     heavy_truck_count integer, -- total amount of heavy trucks involved 
     horse_buggy_count integer, -- total number of horse and buggy units involved in the crash 
-    hour_of_day text, -- the hour of day when the crash occurred (00 to 23) TODO: add constraint
+    hour_of_day text, -- the hour of day when the crash occurred (00 to 23)
     illumination text references pa_2023.illumination (code), -- code that defines lighting at crash scene (see column code) 
     injury_count integer, -- total count of all injuries sustained
     intersect_type text references pa_2023.intersect_type (code), -- code that defines the intersection type (see column code) 
