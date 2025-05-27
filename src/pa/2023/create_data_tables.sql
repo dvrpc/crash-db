@@ -74,7 +74,7 @@ create table pa_2023.crash (
     rdwy_surf_type_cd text references pa_2023.rdwy_surface_type (code), -- code for the roadway surface type –only for fatal crashes (see column code) 
     relation_to_road text references pa_2023.relation_to_road (code), -- code for the crash’s relativity to the road (see column code) 
     road_condition text references pa_2023.road_condition (code), -- roadway surface condition code (see column code) 
-    roadway_cleared text, -- time the roadway was opened to traffic (0000-2359 or 9999) TODO: add constraint
+    roadway_cleared text, -- time the roadway was opened to traffic (0000-2359 or 9999)
     sch_bus_ind boolean, -- did the crash involve a school bus?
     sch_zone_ind boolean, -- did the crash occur in a school zone?
     secondary_crash boolean, -- was this crash caused at least in part to a prior crash?

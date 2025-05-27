@@ -43,6 +43,8 @@ begin
     execute format($query$update temp_vehicle set veh_position = null where veh_position = '00'$query$);
     execute format($query$update temp_vehicle set vina_body_type_cd = null where vina_body_type_cd in ('T', 'P4D', 'P', 'PSW', 'P4H', 'C', 'M', 'P3P', 'T2W', 'PC4')$query$);
     execute format($query$update temp_crash set hour_of_day = null where hour_of_day::int > 23$query$);
+    execute format($query$update temp_crash set roadway_cleared = null where roadway_cleared::int > '2359'$query$);
+    execute format($query$update temp_crash set time_of_day = null where time_of_day::int > '2359'$query$);
     
     -- Alter the values of the fields in the temp tables that will end up being booleans - e.g.
     -- set 'U' and ints higher than 1 to null.
