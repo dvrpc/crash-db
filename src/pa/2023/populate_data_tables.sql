@@ -46,6 +46,9 @@ begin
     execute format($query$update temp_crash set roadway_cleared = null where roadway_cleared::int > '2359'$query$);
     execute format($query$update temp_crash set time_of_day = null where time_of_day::int > '2359'$query$);
     execute format($query$update temp_commveh set axle_cnt = null where axle_cnt = '99'$query$);
+    execute format($query$update temp_commveh set gvwr = null where gvwr = 'UNKNOW'$query$);
+    execute format($query$update temp_commveh set gvwr = replace(gvwr, ',', '')$query$);
+
     /* The data dictionary lists no lookup table but possible values "01 = non-permitted load, 02 =
     permitted load, 99 = unknown)" for the "permitted" column of the commveh table. Convert to
     values that can be used to interpret int to boolean (below). */
