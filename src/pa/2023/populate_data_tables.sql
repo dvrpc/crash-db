@@ -65,11 +65,10 @@ begin
                     raise notice '%', SQLSTATE;
             end;
         end loop;
+    end loop;
 
     -- Another boolean change, but which seems unique to this field and possibly meant to be something else.
     execute format($query$update temp_person set transported = null where transported = 'R'$query$);
-
-    end loop;
 
     -- Copy the data from the temp tables into the non-temp tables, by exporting to file and then reimporting. Easiest way to go from text types in temp tables to types in non-temp tables.
     foreach db_table in array db_tables loop
