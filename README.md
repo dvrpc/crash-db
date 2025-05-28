@@ -67,9 +67,12 @@ Crash data:
 
 #### Questions/Data Issues - 2023
 
-There are a number of discrepencies between the data dictionary and the CSVs. Details are noted in src/pa/2023/create_data_tables.sql, in a comment above each table.
+There are a number of discrepancies between the data dictionary and the CSVs. Those related to
+field order, extra fields, or missing fields are noted in src/pa/2023/create_data_tables.sql, in a comment above each table. Those about values can be found in src/pa/2023/populate_data_tables.sql, where they are first identified through constrains/custom domains and then fixed in queries. Further questions are below.
 
-If there's a value of "2" where the data dictionary states there's only supposed to 0=no and 1=yes, is this unknown? (e.g. "lane_closed" in crash tables, probably others.) I'm changing them to nulls. Same thing with "U" where the data dictionary states possibilities of "Y" or "N". 
+For fields that can be represented as booleans, there are often values not described in the data dictionaries in data. 'U' and '9' can be fairly confidently assumed to be null. However, there are some that are not so straightforward:
+  - lane_closed (crash table) contains 0,1,2,9, and U; 2,9,U have been converted to nulls. Correct?
+  - hazmat_rel_ind1 through hazmat_rel_ind4 (commveh table) data contains 1,2,9 (no 0). Are assumptions (that is, 2=No and 9=unknown) correct?
 
 There are a number of "R" values for the "transported" field in the person CSVs - enough to suggest that this was intentional. However, field is supposed to be y/n. What would R mean? Converting to null for now.
 
@@ -77,4 +80,3 @@ The crash table's "urban_rural" field lists (in comments only, not as separate l
 
 The commveh table's "axle_cnt" doesn't have a lookup table, but obviously uses 99 for unknown. Converted to null. But what about 16 and 18? What's the highest number of axles a vehicle and trailers could have?
 
-Are assumptions (that is, 2=No and 9=unknown) about actual values (as opposed to possible values listed in data dictionary, which are 0=No 1=Yes) of hazmat_rel_ind1 through hazmat_rel_ind4 correct?

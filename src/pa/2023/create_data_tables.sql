@@ -1,7 +1,6 @@
 /*
 NOTE for all tables: the data dictionary does not place the CRN field correctly.
-They are listed alphabetically there, but in the tables CRN is first,
-followed by the rest of the fields alphabetically.
+They are listed alphabetically in data dictionary, but in the tables CRN is first.
 */
 
 /*
