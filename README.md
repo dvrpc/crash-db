@@ -72,7 +72,7 @@ field order, extra fields, or missing fields are noted in src/pa/2023/create_dat
 
 For fields that can be represented as booleans, there are often values not described in the data dictionaries in data. 'U' and '9' can be fairly confidently assumed to be null. However, there are some that are not so straightforward:
   - lane_closed (crash table) contains 0,1,2,9, and U; 2,9,U have been converted to nulls. Correct?
-  - hazmat_rel_ind1 through hazmat_rel_ind4 (commveh table) data contains 1,2,9 (no 0). Are assumptions (that is, 2=No and 9=unknown) correct?
+  - hazmat_rel_ind1 through hazmat_rel_ind4 (commveh table) data contains 1,2,9 (no 0). Are assumptions (that is, 2=false and 9=unknown) correct?
 
 There are a number of "R" values for the "transported" field in the person CSVs - enough to suggest that this was intentional. However, field is supposed to be y/n. What would R mean? Converting to null for now.
 
