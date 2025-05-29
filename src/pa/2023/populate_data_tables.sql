@@ -30,6 +30,7 @@ begin
     create domain text9_as_bool text check(value = '9');
     create domain textYN_as_bool text check(value in ('Y', 'N'));
     create domain textYNU_as_bool text check(value in ('Y', 'N', 'U'));
+    create domain textYNUspace_as_bool text check(value in ('Y', 'N', 'U', ' '));
   
     create domain text_01_02_99_as_bool text check(value in ('01', '02', '99'));
     create domain text_0_1_01_02_99_as_bool text check(value in ('0', '1', '01', '02', '99'));
@@ -39,7 +40,7 @@ begin
         execute format($query$create temporary table temp_%I (like pa_2023.%I including all)$query$, db_table, db_table);
     end loop;
 
-    -- Change some field types in the temp tables to text so they'll accept all data (to fix later).
+    -- Change field types in the temp tables to text so they'll accept all data (to fix later).
     foreach db_table in array db_tables loop
     	for col_name in select column_name from information_schema.Columns where table_name = 'temp_' || db_table and data_type not in ('text') loop
             execute format($query$alter table temp_%I alter column %I type text$query$, db_table, col_name);
@@ -182,6 +183,28 @@ begin
     -- Success, but need to allow 0,1 for bool conversion below.
     alter table temp_commveh alter permitted type text_01_02_99_as_bool using permitted::text_01_02_99_as_bool;
     alter table temp_commveh alter permitted type text_0_1_01_02_99_as_bool using permitted::text_0_1_01_02_99_as_bool;
+
+    /* CYCLE table */
+    -- FAILED (contains ' ')
+    alter table temp_cycle alter mc_passngr_ind type textYNU_as_bool using mc_passngr_ind::textYNU_as_bool;
+    -- Success on the rest of these, do nothing below aside from convert to bool in
+    -- << bool_conversion >> loop.
+    alter table temp_cycle alter mc_passngr_ind type textYNUspace_as_bool using mc_passngr_ind::textYNUspace_as_bool;
+    alter table temp_cycle alter mc_bag_ind type textYNUspace_as_bool using mc_bag_ind::textYNUspace_as_bool;
+    alter table temp_cycle alter mc_trail_ind type textYNUspace_as_bool using mc_trail_ind::textYNUspace_as_bool;
+    alter table temp_cycle alter mc_dvr_edc_ind type textYNUspace_as_bool using mc_dvr_edc_ind::textYNUspace_as_bool;
+    alter table temp_cycle alter mc_dvr_eyeprt_ind type textYNUspace_as_bool using mc_dvr_eyeprt_ind::textYNUspace_as_bool;
+    alter table temp_cycle alter mc_dvr_lngslv_ind type textYNUspace_as_bool using mc_dvr_lngslv_ind::textYNUspace_as_bool;
+    alter table temp_cycle alter mc_dvr_lngpnts_ind type textYNUspace_as_bool using mc_dvr_lngpnts_ind::textYNUspace_as_bool;
+    alter table temp_cycle alter mc_dvr_boots_ind type textYNUspace_as_bool using mc_dvr_boots_ind::textYNUspace_as_bool;
+    alter table temp_cycle alter mc_dvr_hlmton_ind type textYNUspace_as_bool using mc_dvr_hlmton_ind::textYNUspace_as_bool;
+    alter table temp_cycle alter mc_dvr_hlmtdot_ind type textYNUspace_as_bool using mc_dvr_hlmtdot_ind::textYNUspace_as_bool;
+    alter table temp_cycle alter mc_pas_eyeprt_ind type textYNUspace_as_bool using mc_pas_eyeprt_ind::textYNUspace_as_bool;
+    alter table temp_cycle alter mc_pas_lngslv_ind type textYNUspace_as_bool using mc_pas_lngslv_ind::textYNUspace_as_bool;
+    alter table temp_cycle alter mc_pas_lngpnts_ind type textYNUspace_as_bool using mc_pas_lngpnts_ind::textYNUspace_as_bool;
+    alter table temp_cycle alter mc_pas_boots_ind type textYNUspace_as_bool using mc_pas_boots_ind::textYNUspace_as_bool;
+    alter table temp_cycle alter mc_pas_hlmton_ind type textYNUspace_as_bool using mc_pas_hlmton_ind::textYNUspace_as_bool;
+    alter table temp_cycle alter mc_pas_hlmtdot_ind type textYNUspace_as_bool using mc_pas_hlmtdot_ind::textYNUspace_as_bool;
 
     /*
         Copy the data into those temporary tables.
