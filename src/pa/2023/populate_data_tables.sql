@@ -159,8 +159,7 @@ begin
     alter table temp_commveh alter hazmat_rel_ind2 type textYNU_as_bool using hazmat_rel_ind2::textYNU_as_bool;
     -- FAILED (contains 1)
     alter table temp_commveh alter hazmat_rel_ind2 type text9_as_bool using hazmat_rel_ind2::text9_as_bool;
-    -- SUCCESS, just change 9 = null below. It then gets turned into bool in the
-    -- << bool_conversion>> loop.
+    -- Success; do nothing below aside from convert to bool in << bool_conversion >> loop.
     alter table temp_commveh alter hazmat_rel_ind2 type text19_as_bool using hazmat_rel_ind2::text19_as_bool;
 
     -- Success, do nothing below aside from convert to bool in << bool_conversion >> loop.
@@ -262,7 +261,7 @@ begin
     -- Change invalid values/codes used for null to null.
     execute format($query$update temp_crash set arrival_tm = null where arrival_tm::int > 2359$query$);
     execute format($query$update temp_crash set dispatch_tm = null where dispatch_tm::int > 2359$query$);
-    execute format($query$update temp_crash set est_hrs_closed = null where dispatch_tm::int > 2359$query$);
+    execute format($query$update temp_crash set est_hrs_closed = null where est_hrs_closed::int > 2359$query$);
     execute format($query$update temp_crash set hour_of_day = null where hour_of_day::int > 23$query$);
     execute format($query$update temp_crash set roadway_cleared = null where roadway_cleared::int > 2359$query$);
     execute format($query$update temp_crash set time_of_day = null where time_of_day::int > 2359$query$);
