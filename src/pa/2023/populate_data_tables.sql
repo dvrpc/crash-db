@@ -8,12 +8,12 @@ declare
 begin
 
     /*
-        Define domains for data validation.
+        Define domains in order to get invalid data into temporary tables.
+        The invalid data will then be cleaned, with the non-temp tables
+        contain the domains/constraints for valid data.
     */
     -- Use integers as base type for those that will end up being ints.
-    create domain int24hhmm integer check(value <= 2359);
     create domain int24hhmm_9999 integer check(value <= 2359 or value = 9999);
-    create domain int0_23 integer check(value between 0 and 23);
     create domain int0_23_99 integer check(value between 0 and 23 or value = 99);
 
     -- Use text as base type for those will end up being booleans.
@@ -55,20 +55,13 @@ begin
       fails, try less restrictive contraints until success.
     */
     /* CRASH table */
-    -- FAILED (contains 9999).
-    alter table temp_crash alter arrival_tm type int24hhmm using arrival_tm::int24hhmm;
-    -- Succcess, cleaning query added below to convert 9999 to null.
+    -- int24hhmm domain failed; domain altered on temp table to get data in & clean it below.
     alter table temp_crash alter arrival_tm type int24hhmm_9999 using arrival_tm::int24hhmm_9999;
 
-    -- FAILED (contains 9999).
-    alter table temp_crash alter dispatch_tm type int24hhmm using dispatch_tm::int24hhmm;
-    -- Succcess, cleaning query added below to convert 9999 to null.
+    -- int24hhmm domain failed; domain altered on temp table to get data in & clean it below.
     alter table temp_crash alter dispatch_tm type int24hhmm_9999 using dispatch_tm::int24hhmm_9999;
 
-    -- FAILED (contains 99).
-    alter table temp_crash alter hour_of_day type int0_23 using hour_of_day::int0_23;
-
-    -- Succeeded; cleaning query added below to convert 99 to null
+    -- int0_23 domain failed; domain alter on temp table to get data in and then clean it below.
     alter table temp_crash alter hour_of_day type int0_23_99 using hour_of_day::int0_23_99;
 
     -- FAILED (contains N)
