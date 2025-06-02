@@ -26,8 +26,8 @@ create table pa_2023.crash (
     comm_veh_count integer, -- total commercial vehicles involved
     cons_zone_spd_lim integer, -- speed limit for the construction zone 
     county text references pa_2023.county (code), -- county code number where crash occurred 
-    crash_month text, -- month when the crash occurred
-    crash_year text, -- year when the crash occurred 
+    crash_month text check (crash_month in ('01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12')), -- month when the crash occurred
+    crash_year text check (crash_year = '2023'), -- year when the crash occurred 
     day_of_week text references pa_2023.day_of_week (code), -- day of the week code when crash occurred (see column code)
     dec_lat numeric(6, 4), -- decimal format of the latitude, latitude expressed in decimal degrees (e.g. 99.9999)
     dec_long numeric(6, 4), -- decimal format of the longitude, longitude expressed in decimal degrees (e.g. 99.9999)
