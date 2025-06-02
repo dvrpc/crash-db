@@ -6,8 +6,6 @@ The Postgres user running this script must have been granted two roles: `pg_read
 
 ## TODO:
 
-- [ ] finish cleaning data for pa 2023
-  - [ ] verify the order/inclusion of all the fields between the data dictionary/create tables sql scripts and the actual CSVs - have found several discrepencies (noted in sql scripts)
 - [ ] optimize queries when doing the data cleaning - turning off any kind of indexing, etc.
   - See e.g. <https://www.cybertec-postgresql.com/en/postgresql-bulk-loading-huge-amounts-of-data/> 
 - [ ] add help flag to show usage to setup_db.sh

@@ -29,6 +29,7 @@ begin
     create domain text19_as_bool text check(value in ('1', '9'));
     create domain text9_as_bool text check(value = '9');
     create domain textYN_as_bool text check(value in ('Y', 'N'));
+    create domain textYNR_as_bool text check(value in ('Y', 'N', 'R'));
     create domain textYNU_as_bool text check(value in ('Y', 'N', 'U'));
     create domain textYNUspace_as_bool text check(value in ('Y', 'N', 'U', ' '));
   
@@ -206,6 +207,41 @@ begin
     alter table temp_cycle alter mc_pas_hlmton_ind type textYNUspace_as_bool using mc_pas_hlmton_ind::textYNUspace_as_bool;
     alter table temp_cycle alter mc_pas_hlmtdot_ind type textYNUspace_as_bool using mc_pas_hlmtdot_ind::textYNUspace_as_bool;
 
+    /* FLAG table
+      Every field, except CRN, will be a boolean and constraints described as 0=No, 1=Yes.
+    */
+    for col_name in select column_name from information_schema.Columns where table_name = 'flag' and table_schema = 'pa_2023' and column_name != 'crn' loop
+        -- All succeeded.
+        execute format($query$alter table pa_2023.flag alter %I type text01_as_bool using %I::text01_as_bool$query$, col_name, col_name); 
+    end loop;
+
+
+    /* PERSON table */
+    alter table temp_person alter non_motorist type text01_as_bool using non_motorist::text01_as_bool;
+
+    -- FAILED (contains N)
+    alter table temp_person alter transported type text01_as_bool using transported::text01_as_bool;
+    -- FAILED (contains R)
+    alter table temp_person alter transported type textYN_as_bool using transported::textYN_as_bool;
+    -- Success; R converted to null below.
+    alter table temp_person alter transported type textYNR_as_bool using transported::textYNR_as_bool;
+
+    alter table temp_person alter vulnerable_roadway_user type text01_as_bool using vulnerable_roadway_user::text01_as_bool;
+        
+    /* Nothing to verify in ROADWAY or TRAILVEH tables. */
+
+    /* VEHICLE table. */
+    alter table temp_vehicle alter comm_veh type textYNU_as_bool using comm_veh::textYNU_as_bool;
+
+    -- FAILED (contains Y)
+    alter table temp_vehicle alter ins_ind type text01_as_bool using ins_ind::text01_as_bool;
+    -- Success
+    alter table temp_vehicle alter ins_ind type textYNU_as_bool using ins_ind::textYNU_as_bool;
+
+    alter table temp_vehicle alter nm_at_intersection type textYNU_as_bool using nm_at_intersection::textYNU_as_bool;
+    alter table temp_vehicle alter nm_lighting type textYNU_as_bool using nm_lighting::textYNU_as_bool;
+    alter table temp_vehicle alter nm_reflect type textYNU_as_bool using nm_reflect::textYNU_as_bool;
+
     /*
         Copy the data into those temporary tables.
     */
@@ -241,6 +277,7 @@ begin
     -- Make values that are used to represent nulls null.
     execute format($query$update temp_commveh set axle_cnt = null where axle_cnt = '99'$query$);
     execute format($query$update temp_commveh set gvwr = null where gvwr = 'UNKNOW'$query$);
+    execute format($query$update temp_person set age = null where age = '99'$query$);
 
     -- Miscellaneous fixes.
     execute format($query$update temp_commveh set gvwr = replace(gvwr, ',', '')$query$);
