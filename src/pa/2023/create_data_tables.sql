@@ -10,12 +10,12 @@ Information about the crash such as:
   - When: Date, Time, Day of Week, Hour of Day, Month of Year
   - Item Counts: People, Vehicles, Unbelted, Fatal, etc.
 */
-create domain int24hhmm integer check(value <= 2359);
-create domain int0_23 integer check(value between 0 and 23);
+create domain text24hhmm text check(value::int <= 2359);
+create domain text00_23 text check(value::int between 0 and 23);
 
 create table pa_2023.crash (
     crn integer, -- crash record number, database key field that identifies a unique crash case 
-    arrival_tm int24hhmm, --time police arrived at the scene (hhmm)
+    arrival_tm text24hhmm, --time police arrived at the scene (hhmm)
     automobile_count integer, -- total amount of automobiles involved
     belted_death_count integer, -- total deaths of belted occupants 
     belted_susp_serious_inj_count integer, -- total suspected serious injuries of belted occupants 
@@ -34,7 +34,7 @@ create table pa_2023.crash (
     day_of_week text references pa_2023.day_of_week (code), -- day of the week code when crash occurred (see column code)
     dec_lat numeric(6, 4), -- decimal format of the latitude, latitude expressed in decimal degrees (e.g. 99.9999)
     dec_long numeric(6, 4), -- decimal format of the longitude, longitude expressed in decimal degrees (e.g. 99.9999)
-    dispatch_tm int24hhmm, -- time police were dispatched to the scene (hhmm) 
+    dispatch_tm text24hhmm, -- time police were dispatched to the scene (hhmm) 
     district text references pa_2023.district (code), -- district number where crash occurred (based on county) (see column code) 
     driver_count_16yr integer, -- total amount of 16-year-old drivers 
     driver_count_17yr integer, -- total amount of 17-year-old drivers 
@@ -44,11 +44,11 @@ create table pa_2023.crash (
     driver_count_50_64yr integer, -- total amount of 50 to 64-year-old drivers 
     driver_count_65_74yr integer, -- total amount of 65 to 74-year-old drivers 
     driver_count_75plus integer, -- total amount of drivers ages 75 and up 
-    est_hrs_closed text, -- estimated hours roadway was closed (hhmm) 
+    est_hrs_closed text24hhmm, -- estimated hours roadway was closed (hhmm) 
     fatal_count integer, -- total amount of fatalities involved 
     heavy_truck_count integer, -- total amount of heavy trucks involved 
     horse_buggy_count integer, -- total number of horse and buggy units involved in the crash 
-    hour_of_day int0_23, -- the hour of day when the crash occurred (00 to 23)
+    hour_of_day text00_23, -- the hour of day when the crash occurred (00 to 23)
     illumination text references pa_2023.illumination (code), -- code that defines lighting at crash scene (see column code) 
     injury_count integer, -- total count of all injuries sustained
     intersect_type text references pa_2023.intersect_type (code), -- code that defines the intersection type (see column code) 
@@ -76,7 +76,7 @@ create table pa_2023.crash (
     rdwy_surf_type_cd text references pa_2023.rdwy_surface_type (code), -- code for the roadway surface type –only for fatal crashes (see column code) 
     relation_to_road text references pa_2023.relation_to_road (code), -- code for the crash’s relativity to the road (see column code) 
     road_condition text references pa_2023.road_condition (code), -- roadway surface condition code (see column code) 
-    roadway_cleared text, -- time the roadway was opened to traffic (0000-2359 or 9999)
+    roadway_cleared text24hhmm, -- time the roadway was opened to traffic (0000-2359 or 9999)
     sch_bus_ind boolean, -- did the crash involve a school bus?
     sch_zone_ind boolean, -- did the crash occur in a school zone?
     secondary_crash boolean, -- was this crash caused at least in part to a prior crash?
@@ -88,7 +88,7 @@ create table pa_2023.crash (
     tcd_func_cd text references pa_2023.tcd_func_cd (code), -- code for traffic control device state (see column code) 
     tcd_type text references pa_2023.tcd_type (code), -- code that defines the traffic control device (see column code) 
     tfc_detour_ind boolean, -- was traffic detoured?
-    time_of_day text, -- the time of day when the crash occurred (0000 through 2359)
+    time_of_day text24hhmm, -- the time of day when the crash occurred (0000 through 2359)
     tot_inj_count integer, -- count of total injuries sustained by persons involved in this crash. does not include fatal injuries. 
     total_units integer, -- total count of all vehicles and pedestrians
     unb_death_count integer, -- no. of people killed not wearing a seatbelt

@@ -12,11 +12,9 @@ begin
         The invalid data will then be cleaned, with the non-temp tables
         contain the domains/constraints for valid data.
     */
-    -- Use integers as base type for those that will end up being ints.
-    create domain int24hhmm_9999 integer check(value <= 2359 or value = 9999);
-    create domain int0_23_99 integer check(value between 0 and 23 or value = 99);
+    create domain text24hhmm_9999 text check(value::int <= 2359 or value::int = 9999);
+    create domain text00_23_99 text check(value::int between 0 and 23 or value::int = 99);
 
-    -- Use text as base type for those will end up being booleans.
     create domain text01_as_bool text check(value in ('0', '1'));
     create domain text012_as_bool text check(value in ('0', '1', '2'));
     create domain text0129_as_bool text check(value in ('0', '1', '2', '9'));
@@ -32,7 +30,6 @@ begin
     create domain textYNR_as_bool text check(value in ('Y', 'N', 'R'));
     create domain textYNU_as_bool text check(value in ('Y', 'N', 'U'));
     create domain textYNUspace_as_bool text check(value in ('Y', 'N', 'U', ' '));
-  
     create domain text_01_02_99_as_bool text check(value in ('01', '02', '99'));
     create domain text_0_1_01_02_99_as_bool text check(value in ('0', '1', '01', '02', '99'));
 
@@ -55,14 +52,14 @@ begin
       fails, try less restrictive contraints until success.
     */
     /* CRASH table */
-    -- int24hhmm domain failed; domain altered on temp table to get data in & clean it below.
-    alter table temp_crash alter arrival_tm type int24hhmm_9999 using arrival_tm::int24hhmm_9999;
+    -- text24hhmm domain failed on these; domain altered on temp table to get data in & clean it below.
+    alter table temp_crash alter arrival_tm type text24hhmm_9999 using arrival_tm::text24hhmm_9999;
+    alter table temp_crash alter dispatch_tm type text24hhmm_9999 using dispatch_tm::text24hhmm_9999;
+    alter table temp_crash alter roadway_cleared type text24hhmm_9999 using roadway_cleared::text24hhmm_9999;
+    alter table temp_crash alter time_of_day type text24hhmm_9999 using time_of_day::text24hhmm_9999;
 
-    -- int24hhmm domain failed; domain altered on temp table to get data in & clean it below.
-    alter table temp_crash alter dispatch_tm type int24hhmm_9999 using dispatch_tm::int24hhmm_9999;
-
-    -- int0_23 domain failed; domain alter on temp table to get data in and then clean it below.
-    alter table temp_crash alter hour_of_day type int0_23_99 using hour_of_day::int0_23_99;
+    -- text00_23 domain failed; domain alter on temp table to get data in and then clean it below.
+    alter table temp_crash alter hour_of_day type text00_23_99 using hour_of_day::text00_23_99;
 
     -- FAILED (contains N)
     alter table temp_crash alter intersection_related type text01_as_bool using intersection_related::text01_as_bool;
