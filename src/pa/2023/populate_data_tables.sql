@@ -52,7 +52,7 @@ begin
       to booleans in the << bool_conversion >> loop, which first converts 9 and U to null).
     */
     foreach db_table in array db_tables loop
-    	for col_name, dat_type  in select column_name, data_type from information_schema.columns where table_name = 'temp_' || db_table and data_type not in ('text') loop
+    	for col_name, dat_type  in select column_name, data_type from information_schema.columns where table_name = 'temp_' || db_table and data_type != 'text' loop
             if dat_type = 'boolean' then
                 execute format($q$alter table temp_%I alter column %I type text019YNUspace_as_bool using %I::text019YNUspace_as_bool$q$, db_table, col_name, col_name);
             else
