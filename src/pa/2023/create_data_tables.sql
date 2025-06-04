@@ -12,6 +12,7 @@ Information about the crash such as:
 */
 create domain text24hhmm text check(value::int <= 2359);
 create domain text00_23 text check(value::int between 0 and 23);
+create domain text_year text check(value::int >= 1900);
 
 create table pa_2023.crash (
     crn integer, -- crash record number, database key field that identifies a unique crash case 
@@ -393,10 +394,10 @@ Information about the types and kind of trailers that were being towed by vehicl
 create table pa_2023.trailveh (
     crn integer,  -- crash record number, database key field that identifies a unique crash case 
     trailer_partial_vin text,  -- first 12 characters of the vin for this trailer 
-    trl_seq_num text,  -- trailer sequence number 
+    trl_seq_num integer,  -- trailer sequence number 
     trl_veh_reg_state text references pa_2023.state_code (code),  -- trailer registration state (see state codes)
     trl_veh_tag_num text,  -- trailer registration tag number 
-    trl_veh_tag_yr text,  -- trailer registration year 
+    trl_veh_tag_yr text_year,  -- trailer registration year 
     trl_veh_type_cd text references pa_2023.trl_veh_type_cd (code),  -- trailer type code (see column code) 
     unit_num integer  -- unit number of the vehicle the trailer is associated with 
 );
@@ -425,14 +426,14 @@ create table pa_2023.vehicle (
     impact_point text references pa_2023.impact_point (code),  -- initial impact point (see column code) 
     ins_ind boolean,  -- insurance indicator
     make_cd text references pa_2023.veh_make (code),  -- make code (see vehicle make table)
-    model_yr text,  -- model year of the vehicle 
-    nm_at_intersection text, -- non-motorist at intersection? (y=yes, n=no, u=unknown)
+    model_yr text_year,  -- model year of the vehicle 
+    nm_at_intersection boolean, -- non-motorist at intersection? (y=yes, n=no, u=unknown)
     nm_crossing_tcd text references pa_2023.non_motorist_crossing_tcd (code), -- non-motorist crossing traffic control device (see column code) 
     nm_distraction text references pa_2023.non_motorist_distraction (code), -- non-motorist distraction (see column code) 
     nm_in_crosswalk text references pa_2023.non_motorist_in_crosswalk (code), -- non-motorist in crosswalk? (see column code) 
-    nm_lighting text, -- non-motorist lighting (y=yes, n=no, u=unknown)
+    nm_lighting boolean, -- non-motorist lighting (y=yes, n=no, u=unknown)
     nm_powered text references pa_2023.non_motorist_powered_conveyance (code), -- non-motorist powered conveyance? (see column code) 
-    nm_reflect text, -- non-motorist reflectors or reflective wear? (y=yes, n=no, u=unknown)
+    nm_reflect boolean, -- non-motorist reflectors or reflective wear? (y=yes, n=no, u=unknown)
     owner_driver text references pa_2023.owner_driver (code),  -- was the vehicle owned by the driver? if not, who owns the vehicle? (see column code) 
     partial_vin text,  -- vehicle identification number (first eleven characters) 
     people_in_unit integer,  -- total people in unit
@@ -441,8 +442,8 @@ create table pa_2023.vehicle (
     special_usage text references pa_2023.special_usage (code),  -- special usage of the vehicle (see column code)
     tow_ind boolean, -- DVRPC addition (not in data dictionary but is in CSVs)
     travel_direction text references pa_2023.travel_direction (code),  -- travel direction of the vehicle (see column code) 
-    travel_spd text,  -- estimated travel speed 
-    trl_veh_cnt text,  -- trailing vehicle count 
+    travel_spd integer,  -- estimated travel speed 
+    trl_veh_cnt integer,  -- trailing vehicle count 
     under_ride_ind text references pa_2023.under_ride_ind (code),  -- under ride damage indicator– only for fatal crashes (see column code) 
     unit_num integer,  -- unit number assigned to the vehicle or pedestrian 
     unit_type text references pa_2023.unit_type (code),  -- unit type (see column code) 

@@ -33,6 +33,9 @@ begin
     create domain text_01_02_99_as_bool text check(value in ('01', '02', '99'));
     create domain text_0_1_01_02_99_as_bool text check(value in ('0', '1', '01', '02', '99'));
 
+    -- Domain to allow years < 1900 through before being cleaned.
+    create domain text_year_greater_than_0 text check(value::int > 0);
+
     -- Create intermediate temporary tables for cleaning data.
     foreach db_table in array db_tables loop
         execute format($query$create temporary table temp_%I (like pa_2023.%I including all)$query$, db_table, db_table);
@@ -217,7 +220,11 @@ begin
 
     alter table temp_person alter vulnerable_roadway_user type text01_as_bool using vulnerable_roadway_user::text01_as_bool;
         
-    /* Nothing to verify in ROADWAY or TRAILVEH tables. */
+    /* Nothing to verify in ROADWAY table. */
+
+    /* TRAILVEH table. */
+    -- domain text_year failed, contained 999 as year. Cleaned below.
+    alter table temp_trailveh alter trl_veh_tag_yr type text_year_greater_than_0 using trl_veh_tag_yr::text_year_greater_than_0;
 
     /* VEHICLE table. */
     alter table temp_vehicle alter comm_veh type textYNU_as_bool using comm_veh::textYNU_as_bool;
@@ -270,6 +277,7 @@ begin
 
     -- Miscellaneous fixes.
     execute format($query$update temp_commveh set gvwr = replace(gvwr, ',', '')$query$);
+    execute format($query$update temp_trailveh set trl_veh_tag_yr = null where trl_veh_tag_yr::int < 1900$query$);
 
     /* The data dictionary lists no lookup table but possible values "01 = non-permitted load, 02 =
     permitted load, 99 = unknown)" for the "permitted" column of the commveh table. Convert to
