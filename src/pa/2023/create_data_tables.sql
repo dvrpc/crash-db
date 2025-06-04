@@ -341,7 +341,7 @@ alcohol results, Where they sat and in which vehicle, Were they ejected from the
 create table pa_2023.person (
     crn integer, -- crash record number, database key field that identifies a unique crash case 
     age integer, -- age of person (those under the age of 1 are listed as 1, those over the age of 98 are listed as 98 and 99 indicates an unknown age)
-    airbag_pads text, -- airbag deployment for motor vehicle occupant or bicycle/motorcycle protective gear (see column code) 
+    airbag_pads text references pa_2023.airbag_pads (code), -- airbag deployment for motor vehicle occupant or bicycle/motorcycle protective gear (see column code) 
     airbag1 text references pa_2023.airbag (code), -- airbag(s) that were deployed for this person (see column code) 
     airbag2 text references pa_2023.airbag (code), -- airbag(s) that were deployed for this person (see column code) 
     airbag3 text references pa_2023.airbag (code), -- airbag(s) that were deployed for this person (see column code) 
