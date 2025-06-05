@@ -1,11 +1,13 @@
 -- Create and populate all the lookup tables for a specific schema.
-do $body$
+create or replace procedure pa_create_and_populate_lookup_tables(year text) as $body$
+
 declare
-    schema_name text = 'pa_2023';
+    schema_name text = 'pa_' || year;
     table_names text[] =
         '{access_ctrl,airbag,airbag_pads,avoid_man_cd,body_type,cargo_bd_type,clothing_type,collision_type,county,damage_ind,day_of_week,district,dvr_ped_condition,dvr_pres_ind,ejection_ind,eject_path_cd,emerg_veh_use_cd,extric_ind,grade,hazmat_code,hazmat_release_ind,helmet_type,illumination,inj_severity,intersect_type,impact_point,lane_closure_direction,location_type,max_severity_level,non_motorist_crossing_tcd,non_motorist_distraction,non_motorist_in_crosswalk,non_motorist_powered_conveyance,owner_driver,person_type,relation_to_road,restraint_helmet,rdwy_alignment,rdwy_orient,rdwy_surface_type,road_condition,road_owner,seat_position,sex,special_sizing,special_usage,spec_juris_cd,tcd_func_cd,tcd_type,travel_direction,trl_veh_type_cd,type_of_carrier,under_ride_ind,unit_type,urban_rural,veh_color_cd,veh_config_cd,veh_or_non_motorist_movement,veh_or_non_motorist_position,veh_role,veh_or_non_motorist_type,vina_body_type_cd,weather1,weather2,work_zone_loc,work_zone_type,state_code,municipalities,police_agencies,veh_make}';
     table_name text;
 begin
+
     -- Create lookup tables.
     foreach table_name in ARRAY table_names LOOP
         execute format($create_query$create table if not exists %I.%I (code text not null unique, description text not null)$create_query$, schema_name, table_name);
@@ -5563,6 +5565,6 @@ begin
     -- execute format($query$insert into %I. (code, description) values
     --     $query$, schema_name);
     -- 
-end $body$;
 
-
+end        
+$body$ language plpgsql;
