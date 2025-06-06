@@ -61,7 +61,9 @@ begin
         -- FAILED (contains 8). Let everything through and let the bool_conversion loop fix.
         execute format($q$alter table temp_crash_%s alter workers_pres type text$q$, year);
 
-        -- extra column on commveh
+        -- extra column on commveh. It's "type_of_carrier", which is listed in the data dictionary
+        -- but was not in the 2023 CSVS and so is - thus far - excluded from our database since
+        -- we started with 2023. Have to decide what to do about this.
 
     end if;
 end;
