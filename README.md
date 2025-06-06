@@ -6,6 +6,7 @@ The Postgres user running this script must have been granted two roles: `pg_read
 
 ## TODO:
 
+- [ ] In 2022, the filename for the flag tables have a plural FLAGS, rather than FLAG as in 2023. If other years are like this, write a script to rename them. For now, I'm just manually done it.
 - [ ] optimize queries when doing the data cleaning - turning off any kind of indexing, etc.
   - See e.g. <https://www.cybertec-postgresql.com/en/postgresql-bulk-loading-huge-amounts-of-data/> 
 - [ ] add help flag to show usage to setup_db.sh
@@ -63,7 +64,9 @@ Crash data:
   - [Data dictionary](https://gis.penndot.gov/gishub/crashZip/Open%20Data%20Portal%20Data%20Dictionary%20(07-24).pdf)
   - [Download data by county or entire state](https://pennshare.maps.arcgis.com/apps/webappviewer/index.html?id=8fdbf046e36e41649bbfd9d7dd7c7e7e)
 
-#### Questions/Data Issues - 2023
+#### Questions/Data Issues
+
+##### 2023
 
 There are a number of discrepancies between the data dictionary and the CSVs. Those related to
 field order, extra fields, or missing fields are noted in src/pa/2023/create_data_tables.sql, in a comment above each table. Those about values can be found in src/pa/alter_temp_domains.sql (which identifies the data issues) and src/pa/clean_data.sql (which cleans it). Further questions are below.
@@ -77,4 +80,7 @@ There are a number of "R" values for the "transported" field in the person CSVs 
 The crash table's "urban_rural" field lists (in comments only, not as separate lookup table) possible values 1=rural, 2=urbanized, 3=urban, but only values in field for all 2023 counties are 1 and 2. So should it be 1=rural, 2=urban? What is "urbanized"?
 
 The commveh table's "axle_cnt" doesn't have a lookup table, but obviously uses 99 for unknown. Converted to null. But what about 16 and 18? What's the highest number of axles a vehicle and trailers could have?
+
+##### 2022
+
 
