@@ -1,6 +1,6 @@
 # Crash Database
 
-The database is contructed via a number of shell and sql scripts. The main entry point is setup_db.sh.
+The database is constructed via a number of shell and sql scripts. The main entry point is setup_db.sh.
 
 The Postgres user running this script must have been granted two roles: `pg_read_server_files` and `pg_write_server_files`. As a superuser, run `grant pg_read_server_files, pg_write_server_files to <user>`.
 
@@ -48,7 +48,7 @@ postgres_data_dir="/var/lib/postgresql/data"
 
 The database is created and populated via the setup.sh bash script. If it is not already executable, make it so with `chmod 755 setup_db.sh` and then invoke with `./setup_db.sh`. You can optionally drop and recreate the existing database with the `-r` flag: `./setup_db.sh -r`, which will also terminate any existing connections in order to do so.
 
-The script assumes that data files (CSVs) are in data/ relative to the project directory, which are then copied to appropriate folders (configurable via environment variables if necessary) to ease access by Postgresql's <a href="https://www.postgresql.org/docs/17/sql-copy.html">COPY</a>.
+The script assumes that data files (CSVs) are in data/ relative to the project directory, which are then copied to appropriate folders (configurable via environment variables if necessary) to ease access by Postgres's <a href="https://www.postgresql.org/docs/17/sql-copy.html">COPY</a>.
 
 ### Utility Scripts
 
@@ -66,7 +66,7 @@ Crash data:
 #### Questions/Data Issues - 2023
 
 There are a number of discrepancies between the data dictionary and the CSVs. Those related to
-field order, extra fields, or missing fields are noted in src/pa/2023/create_data_tables.sql, in a comment above each table. Those about values can be found in src/pa/2023/populate_data_tables.sql, where they are first identified through constrains/custom domains and then fixed in queries. Further questions are below.
+field order, extra fields, or missing fields are noted in src/pa/2023/create_data_tables.sql, in a comment above each table. Those about values can be found in src/pa/alter_temp_domains.sql (which identifies the data issues) and src/pa/clean_data.sql (which cleans it). Further questions are below.
 
 For fields that can be represented as booleans, there are often values not described in the data dictionaries in data. 'U' and '9' can be fairly confidently assumed to be null. However, there are some that are not so straightforward:
   - lane_closed (crash table) contains 0,1,2,9, and U; 2,9,U have been converted to nulls. Correct?
