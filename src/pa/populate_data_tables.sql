@@ -1,5 +1,7 @@
-create or replace procedure pa_populate_data_tables(year text) as $body$
-
+create or replace procedure pa_populate_data_tables(year text)
+language plpgsql
+as
+$body$
 declare
     col_name text;
     dat_type text;
@@ -8,27 +10,22 @@ declare
     user_data_dir text := (select value from tmp_vars where name = 'user_data_dir');
     postgres_data_dir text := (select value from tmp_vars where name = 'postgres_data_dir');
 begin
-
-
     -- Create temporary tables for cleaning data.
     foreach db_table in array db_tables loop
-        execute format($$
-            create temporary table temp_%I_%s (like pa_%s.%I including all)
-        $$, db_table, year, year, db_table);
+        execute format($tt$create temporary table temp_%I_%s (like pa_%s.%I including all)$tt$, db_table, year, year, db_table);
     end loop;
 
     /*
-      Change field types in the temp tables to text so they'll accept all data (to fix later).
-      For those that will be booleans, use the domain above that can be unambigously converted
-      to booleans in the << bool_conversion >> loop, which first converts 9 and U to null).
+        Change field types in the temp tables to text so they'll accept all data (to fix later).
+        For those that will be booleans, use the domain above that can be unambiguously converted
+        to booleans in the << bool_conversion >> loop, which first converts 9 and U to null).
     */
     foreach db_table in array db_tables loop
-    	for col_name, dat_type  in select column_name, data_type from information_schema.columns where table_name = 'temp_' || db_table || '_' || year and data_type != 'text' loop
+    	for col_name, dat_type in select column_name, data_type from information_schema.columns where table_name = 'temp_' || db_table || '_' || year and data_type != 'text' loop
             if dat_type = 'boolean' then
                 execute format($q$alter table temp_%I_%s alter column %I type text019YNUspace_as_bool using %I::text019YNUspace_as_bool$q$, db_table, year, col_name, col_name);
             else
                 execute format($q$alter table temp_%I_%s alter column %I type text$q$, db_table, year, col_name);
-
             end if;
         end loop;
     end loop;
@@ -162,12 +159,11 @@ begin
     -- Another boolean change, but which seems unique to this field and possibly meant to be something else.
     execute format($q$update temp_person_%s set transported = null where transported = 'R'$q$, year);
 
-
     -- Copy the data from the temp tables into the non-temp tables, by exporting to file and then reimporting. Easiest way to go from text types in temp tables to types in non-temp tables.
     foreach db_table in array db_tables loop
         execute format($q$copy temp_%I_%s to '%s/%I.csv' with (format csv, header)$q$, db_table, year, postgres_data_dir, db_table);
         execute format($q$copy pa_%s.%I from '%s/%I.csv' with (format csv, header, force_null *)$q$, year, db_table, postgres_data_dir, db_table); 
     end loop;
 
-end        
-$body$ language plpgsql;
+end;
+$body$

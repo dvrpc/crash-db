@@ -1,8 +1,9 @@
-create or replace procedure pa_create_data_tables(year text) as $body$
-
+create or replace procedure pa_create_data_tables(year text)
+language plpgsql
+as
+$body$
 declare
-    schema_name text = 'pa_' || year;
-
+    schema_name text := 'pa_' || year;
 begin
     /*
         NOTE for all tables: the data dictionary does not place the CRN field correctly.
@@ -16,7 +17,7 @@ begin
           - When: Date, Time, Day of Week, Hour of Day, Month of Year
           - Item Counts: People, Vehicles, Unbelted, Fatal, etc.
     */
-    execute format($q$create table %1$s.crash (
+    execute format($t1$create table %1$s.crash (
         crn integer, -- crash record number, database key field that identifies a unique crash case 
         arrival_tm text24hhmm, --time police arrived at the scene (hhmm)
         automobile_count integer, -- total amount of automobiles involved
@@ -116,7 +117,7 @@ begin
         wz_other boolean, -- was this a special type of work zone?
         wz_shlder_mdn boolean, -- was a median/shoulder in the zone?
         wz_workers_inj_killed boolean -- were any work zone workers injured or killed as a result of this crash?
-    )$q$, schema_name, year);
+    )$t1$, schema_name, year);
 
     /*
         NOTE: The order of the fields in the CSVs do not match the data dictionary;
@@ -127,7 +128,7 @@ begin
         Information about commercial vehicles, such as carrier information, the cargo body type,
         Hazmat information, and official agency registration numbers.
     */
-    execute format($q$create table %1$s.commveh (
+    execute format($t2$create table %1$s.commveh (
         crn integer,  -- crash record number, database key field that identifies a unique crash case 
         axle_cnt integer,  -- number of axles on the vehicle
         cargo_bd_type text references %1$s.cargo_bd_type (code),  -- code for the cargo carrier’s body type (see column code)
@@ -161,7 +162,7 @@ begin
         unit_num integer,  -- unit number of the vehicle in the crash event 
         usdot_num text,  -- us dept of transportation number 
         veh_config_cd text references %1$s.veh_config_cd (code)  -- vehicle configuration code (see column code)
-    )$q$, schema_name);
+    )$t2$, schema_name);
 
     /*
         NOTE: The order of the fields in the CSV do not match the data dictionary;
@@ -172,7 +173,7 @@ begin
         attire and other accessories such as side bags
     */
 
-    execute format($q$create table %1$s.cycle (
+    execute format($t3$create table %1$s.cycle (
         crn integer, -- crash record number, database key field that identifies a unique crash case 
         mc_bag_ind boolean, -- did the motorcycle have side bags?
         mc_dvr_boots_ind boolean, -- did motorcycle driver wear boots?
@@ -194,7 +195,7 @@ begin
         mc_pas_lngslv_ind boolean, -- did motorcycle passenger have long sleeves?
         mc_trail_ind boolean, -- did the motorcycle have trailer?
         unit_num integer -- unit number of the vehicle in the crash event
-    )$q$, schema_name);
+    )$t3$, schema_name);
 
     /*
         NOTE: The order of the fields in the CSV do not match the data dictionary;
@@ -206,7 +207,7 @@ begin
         as: Drinking Driver, Use of a Cell Phone, Fatal Crash, Motorcycle involved, and over 60
         other crash defining items.
     */
-    execute format($q$create table %1$s.flag (
+    execute format($t4$create table %1$s.flag (
         crn integer, -- crash record number – identifies a unique crash, database key field that identifies a unique crash case 
         aggressive_driving boolean, -- at least one aggressive driver action
         alcohol_related boolean, -- at least one driver or pedestrian with reported or suspected alcohol use
@@ -329,7 +330,7 @@ begin
         wet_road boolean, -- wet road indicator
         work_zone boolean, -- work zone indicator
         young_driver boolean -- the crash involved at least 1 driver age 16-20
-    )$q$, schema_name);
+    )$t4$, schema_name);
 
     /*
         NOTE: This is the order from the CSVs; the order of "ejection_ind" and
@@ -342,7 +343,7 @@ begin
         alcohol results, Where they sat and in which vehicle, Were they ejected from the vehicle?
         etc.
     */
-    execute format($q$create table %1$s.person (
+    execute format($t5$create table %1$s.person (
         crn integer, -- crash record number, database key field that identifies a unique crash case 
         age integer, -- age of person (those under the age of 1 are listed as 1, those over the age of 98 are listed as 98 and 99 indicates an unknown age)
         airbag_pads text references %1$s.airbag_pads (code), -- airbag deployment for motor vehicle occupant or bicycle/motorcycle protective gear (see column code) 
@@ -366,14 +367,14 @@ begin
         -- transported_by text, -- method by which the person was transported (00 = not transported, 01 = ems air, 02 = ems ground, 98 = other, 99 = unknown)
         unit_num integer, -- unit number of the vehicle (or pedestrian) assigned to this person 
         vulnerable_roadway_user boolean -- is this person classified as a vulnerable roadway user?
-    )$q$, schema_name); 
+    )$t5$, schema_name); 
 
     /*
         Notes from PennDOT's database primer:
         Information about all the roadways involved in the crash such as: Route number or name,
         Segment, Offset, Type of Roadway, Rating, and many other Roadway defining elements.
     */
-    execute format($q$create table %1$s.roadway (
+    execute format($t6$create table %1$s.roadway (
         crn integer, -- crash record number, database key field that identifies a unique crash case 
         access_ctrl text references %1$s.access_ctrl (code), -- access control code– only for state roads (see column code) 
         adj_rdwy_seq integer, -- adjusted roadway sequence number 
@@ -387,7 +388,7 @@ begin
         segment text, -- segment number– only for state roads 
         speed_limit integer, -- speed limit 
         street_name text -- name of the roadway 
-    )$q$, schema_name); 
+    )$t6$, schema_name); 
 
     /*
         NOTE: This is the order from the CSVs; the order of the "trailer_partial_vin" and
@@ -396,7 +397,7 @@ begin
         Notes from PennDOT's database primer:
         Information about the types and kind of trailers that were being towed by vehicles.
     */
-    execute format($q$create table %1$s.trailveh (
+    execute format($t7$create table %1$s.trailveh (
         crn integer,  -- crash record number, database key field that identifies a unique crash case 
         trailer_partial_vin text,  -- first 12 characters of the vin for this trailer 
         trl_seq_num integer,  -- trailer sequence number 
@@ -405,7 +406,7 @@ begin
         trl_veh_tag_yr text_year,  -- trailer registration year 
         trl_veh_type_cd text references %1$s.trl_veh_type_cd (code),  -- trailer type code (see column code) 
         unit_num integer  -- unit number of the vehicle the trailer is associated with 
-    )$q$, schema_name);
+    )$t7$, schema_name);
 
     /*
         NOTE: The "hazmat_ind" field in the data dictionary is not included in the CSVs, and so is
@@ -417,7 +418,7 @@ begin
         Movement, Position, Unit number in the crash and other vehicle related information. Non-
         motorist units are also kept in this table.
     */
-    execute format($q$create table %1$s.vehicle (
+    execute format($t8$create table %1$s.vehicle (
         crn integer,  -- crash record number, database key field that identifies a unique crash case 
         avoid_man_cd text references %1$s.avoid_man_cd (code),  -- avoidance maneuver code - only for fatal crashes (see column code) 
         body_type text references %1$s.body_type (code),  -- body type code (see column code) 
@@ -458,6 +459,6 @@ begin
         veh_role text references %1$s.veh_role (code),  -- vehicle role (see column code) 
         veh_type text references %1$s.veh_or_non_motorist_type (code),  -- vehicle or non-motorist type (see column code) 
         vina_body_type_cd text references %1$s.vina_body_type_cd (code)  -- body type code interpreted by vina software (see column code) 
-    )$q$, schema_name);
-end
-$body$ language plpgsql;
+    )$t8$, schema_name);
+end;
+$body$
