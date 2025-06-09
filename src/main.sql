@@ -7,7 +7,7 @@ insert into tmp_vars (name, value) values ('user_data_dir', :'user_data_dir');
 insert into tmp_vars (name, value) values ('postgres_data_dir', :'postgres_data_dir');
 
 
--- Domains that data should ulimately conform to.
+-- Domains that data should ultimately conform to.
 create domain text24hhmm text check(value::int <= 2359);
 create domain text00_23 text check(value::int between 0 and 23);
 create domain text_year text check(value::int >= 1900);
@@ -25,9 +25,9 @@ create domain text_year_greater_than_0 text check(value::int > 0);
 
 /*
     Boolean domains, using text as the base.
-    The first one is the broadest that can be successfully and unambigously
+    The first one is the broadest that can be successfully and unambiguously
     converted into boolean (after 9 and U converted to null). In the attempt to validate the
-    data in the tempoary tables, it should be used first. If the values in a field fail it, the
+    data in the temporary tables, it should be used first. If the values in a field fail it, the
     ones below, starting from most restrictive to least, should then be used.
 */
 create domain text019YNUspace_as_bool text check(value in ('0', '1', 'Y', 'N', 'U', '9', ' '));
