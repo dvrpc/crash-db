@@ -68,3 +68,4 @@ call pa_populate_data_tables('2023');
 -- call pa_create_data_tables('2022');
 -- call pa_populate_data_tables('2022');
 
+vacuum analyze

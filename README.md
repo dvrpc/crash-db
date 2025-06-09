@@ -7,10 +7,7 @@ The Postgres user running this script must have been granted two roles: `pg_read
 ## TODO:
 
 - [ ] In 2022, the filename for the flag tables have a plural FLAGS, rather than FLAG as in 2023. If other years are like this, write a script to rename them. For now, I've just manually done it.
-- [ ] optimize queries when doing the data cleaning - turning off any kind of indexing, etc.
-  - See e.g. <https://www.cybertec-postgresql.com/en/postgresql-bulk-loading-huge-amounts-of-data/> 
 - [ ] add help flag to show usage to setup_db.sh
-- [ ] review this after complete: <https://www.postgresql.org/docs/current/populate.html>
 
 For either the pa or the dvrpc schema, add in "shape" for better geometry field, using this or something close to it (from Sean Lawrence):
 
