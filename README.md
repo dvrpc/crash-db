@@ -6,7 +6,7 @@ The Postgres user running this script must have been granted two roles: `pg_read
 
 ## TODO:
 
-- [ ] In 2022, the filename for the flag tables have a plural FLAGS, rather than FLAG as in 2023. If other years are like this, write a script to rename them. For now, I'm just manually done it.
+- [ ] In 2022, the filename for the flag tables have a plural FLAGS, rather than FLAG as in 2023. If other years are like this, write a script to rename them. For now, I've just manually done it.
 - [ ] optimize queries when doing the data cleaning - turning off any kind of indexing, etc.
   - See e.g. <https://www.cybertec-postgresql.com/en/postgresql-bulk-loading-huge-amounts-of-data/> 
 - [ ] add help flag to show usage to setup_db.sh
@@ -80,6 +80,10 @@ There are a number of "R" values for the "transported" field in the person CSVs 
 The crash table's "urban_rural" field lists (in comments only, not as separate lookup table) possible values 1=rural, 2=urbanized, 3=urban, but only values in field for all 2023 counties are 1 and 2. So should it be 1=rural, 2=urban? What is "urbanized"?
 
 The commveh table's "axle_cnt" doesn't have a lookup table, but obviously uses 99 for unknown. Converted to null. But what about 16 and 18? What's the highest number of axles a vehicle and trailers could have?
+
+Primary keys:
+  - "person" table: is crn/unit_num supposed to be primary key? Duplicate when attempted.
+  - "trailveh" table: data dictionary says "The CRN, UNIT_NUM and define the unit that corresponds to the vehicle record". Assume "trl_seq_num" is the missing field here?
 
 ##### 2022
 

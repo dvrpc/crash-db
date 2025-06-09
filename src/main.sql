@@ -64,7 +64,7 @@ call pa_create_data_tables('2023');
 call pa_populate_data_tables('2023');
 
 -- Create and populate PA 2022 tables.
-call pa_create_and_populate_lookup_tables('2022');
-call pa_create_data_tables('2022');
-call pa_populate_data_tables('2022');
+-- call pa_create_and_populate_lookup_tables('2022');
+-- call pa_create_data_tables('2022');
+-- call pa_populate_data_tables('2022');
 
