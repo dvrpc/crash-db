@@ -58,10 +58,15 @@ create domain text_0_1_2_3_7_11_as_bool text check(value in ('0', '1', '2', '3',
 \i src/pa/clean_data.sql
 \i src/pa/alter_temp_domains.sql
 
+-- Create and populate PA 2024 tables.
+call pa_create_and_populate_lookup_tables('2024');
+call pa_create_data_tables('2024');
+call pa_populate_data_tables('2024');
+
 -- Create and populate PA 2023 tables.
-call pa_create_and_populate_lookup_tables('2023');
-call pa_create_data_tables('2023');
-call pa_populate_data_tables('2023');
+-- call pa_create_and_populate_lookup_tables('2023');
+-- call pa_create_data_tables('2023');
+-- call pa_populate_data_tables('2023');
 
 -- Create and populate PA 2022 tables.
 -- call pa_create_and_populate_lookup_tables('2022');

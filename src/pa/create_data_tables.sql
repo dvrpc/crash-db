@@ -6,11 +6,14 @@ declare
     schema_name text := 'pa_' || year;
 begin
     /*
-        NOTE for all tables: the data dictionary does not place the CRN field correctly.
+        DVRPC NOTE for all tables: the data dictionary does not place the CRN field correctly.
         They are listed alphabetically in data dictionary, but in the tables CRN is first.
     */
 
     /*
+        DVRPC NOTES:
+          - The order of the fields in the CSVs do not match the data dictionary; this is order in CSVs.
+        
         Notes from PennDOT's database primer:
         Information about the crash such as:
           - Where: County, Municipality, Work zone
@@ -55,8 +58,8 @@ begin
         hour_of_day text00_23, -- the hour of day when the crash occurred (00 to 23)
         illumination text references %1$s.illumination (code), -- code that defines lighting at crash scene (see column code) 
         injury_count integer, -- total count of all injuries sustained
-        intersect_type text references %1$s.intersect_type (code), -- code that defines the intersection type (see column code) 
         intersection_related boolean, -- was this midblock crash related to a nearby intersection?
+        intersect_type text references %1$s.intersect_type (code), -- code that defines the intersection type (see column code) 
         lane_closed boolean, -- was there a lane closure?
         latitude text, -- gps latitude determined by penndot (dd mm:ss.ddd)
         ln_close_dir text references %1$s.lane_closure_direction (code), -- direction of traffic in closed lane (s) (see column code) 
@@ -79,8 +82,8 @@ begin
         possible_inj_count integer, -- total number of people with an injury severity of “possible injury” 
         rdwy_surf_type_cd text references %1$s.rdwy_surface_type (code), -- code for the roadway surface type –only for fatal crashes (see column code) 
         relation_to_road text references %1$s.relation_to_road (code), -- code for the crash’s relativity to the road (see column code) 
-        road_condition text references %1$s.road_condition (code), -- roadway surface condition code (see column code) 
         roadway_cleared text24hhmm, -- time the roadway was opened to traffic (0000-2359 or 9999)
+        road_condition text references %1$s.road_condition (code), -- roadway surface condition code (see column code) 
         sch_bus_ind boolean, -- did the crash involve a school bus?
         sch_zone_ind boolean, -- did the crash occur in a school zone?
         secondary_crash boolean, -- was this crash caused at least in part to a prior crash?
@@ -93,11 +96,11 @@ begin
         tcd_type text references %1$s.tcd_type (code), -- code that defines the traffic control device (see column code) 
         tfc_detour_ind boolean, -- was traffic detoured?
         time_of_day text24hhmm, -- the time of day when the crash occurred (0000 through 2359)
-        tot_inj_count integer, -- count of total injuries sustained by persons involved in this crash. does not include fatal injuries. 
         total_units integer, -- total count of all vehicles and pedestrians
+        tot_inj_count integer, -- count of total injuries sustained by persons involved in this crash. does not include fatal injuries. 
+        unbelted_occ_count integer, -- total count of all unbelted occupants 
         unb_death_count integer, -- no. of people killed not wearing a seatbelt
         unb_susp_serious_inj_count integer, -- total # of unbelted sustaining suspected serious injuries
-        unbelted_occ_count integer, -- total count of all unbelted occupants 
         unk_inj_deg_count integer, -- no. of injuries with unknown severity 
         unk_inj_per_count integer, -- no. of people that are unknown if injured 
         urban_rural text, -- code to classify crash as urban or rural (1=rural, 2=urbanized, 3=urban) 
@@ -105,10 +108,10 @@ begin
         vehicle_count integer, -- total number of all motor vehicles involved in the crash 
         weather1 text references %1$s.weather1 (code), -- code for the first weather condition at time of crash (see column code)
         weather2 text references %1$s.weather2 (code), -- code for the second weather condition at time of crash (see column code) 
+        workers_pres boolean, -- were construction personnel present?
         work_zone_ind boolean, -- did the crash occur in a work zone
         work_zone_loc text references %1$s.work_zone_loc (code), -- the work zone location code (see column code)
         work_zone_type text references %1$s.work_zone_type (code), -- code to define the type of work zone (see column code)
-        workers_pres boolean, -- were construction personnel present?
         wz_close_detour boolean, -- was traffic rerouted due to work zone?
         wz_flagger boolean, -- did work zone have a flagman? 
         wz_law_offcr_ind boolean, -- did work zone have a patrolman?
@@ -120,9 +123,8 @@ begin
     )$t1$, schema_name, year);
 
     /*
-        NOTE: The order of the fields in the CSVs do not match the data dictionary;
-        this is order in CSVs. Additionally, the "partial_trailer_vin" and "type_of_carrier" fields
-        in the data dictionary are not included in the CSVs, and so are commented out below.
+        DVRPC NOTES:
+          - The order of the fields in the CSVs do not match the data dictionary; this is order in CSVs. 
 
         Notes from PennDOT's database primer:
         Information about commercial vehicles, such as carrier information, the cargo body type,
@@ -158,15 +160,15 @@ begin
         special_sizing2 text references %1$s.special_sizing (code), 
         special_sizing3 text references %1$s.special_sizing (code), 
         special_sizing4 text references %1$s.special_sizing (code), 
-        -- type_of_carrier text references %1$s.type_of_carrier (code),  -- type of commercial carrier (see column code)
+        type_of_carrier text references %1$s.type_of_carrier (code),  -- type of commercial carrier (see column code)
         unit_num integer,  -- unit number of the vehicle in the crash event 
         usdot_num text,  -- us dept of transportation number 
         veh_config_cd text references %1$s.veh_config_cd (code)  -- vehicle configuration code (see column code)
     )$t2$, schema_name);
 
     /*
-        NOTE: The order of the fields in the CSV do not match the data dictionary;
-        this is order in CSVs.
+        DVRPC NOTES:
+          - The order of the fields in the CSVs do not match the data dictionary; this is order in CSVs. 
     
         Notes from PennDOT's database primer:
         Information that pertains to motorcycle/pedal cycles, such as helmet usage and appropriate
@@ -198,10 +200,9 @@ begin
     )$t3$, schema_name);
 
     /*
-        NOTE: The order of the fields in the CSV do not match the data dictionary;
-        this is order in CSVs. Additionally, the "hit_utility_pole" and "school_bus_related" fields
-        are not included in the CSVs and are commented out below.
-
+        DVRPC NOTES:
+          - The order of the fields in the CSVs do not match the data dictionary; this is order in CSVs. 
+    
         Notes from PennDOT's database primer:
         Series of Yes/No items that help refine lookups for specific factors about the crash such
         as: Drinking Driver, Use of a Cell Phone, Fatal Crash, Motorcycle involved, and over 60
@@ -213,6 +214,7 @@ begin
         alcohol_related boolean, -- at least one driver or pedestrian with reported or suspected alcohol use
         angle_crash boolean, -- first harmful event involved a vehicle striking another at an angle
         atv boolean, -- crash involved at least one all-terrain- vehicle (atv).
+        atv_route boolean, -- crash involved an ATV and at least 1 roadway where ATVs are permitted.
         backup_congestion boolean, -- indicates that traffic was backed up due to normal congestion
         backup_nonrecurring boolean, -- indicates that traffic was backed up due to a nonrecurring special event
         backup_prior boolean, -- indicates that traffic was backed up due to a prior crash
@@ -222,8 +224,8 @@ begin
         comm_vehicle boolean, -- crash has at least one involved commercial vehicle
         core_network boolean, -- crash took place on a core network roadway.
         cross_median boolean, -- at least one unit crossed a median
-        curve_dvr_error boolean, -- at least one driver action involving curve negotiation
         curved_road boolean, -- curve in road
+        curve_dvr_error boolean, -- at least one driver action involving curve negotiation
         deer_related boolean, -- deer struck or deer in roadway
         distracted boolean, -- at least one driver action indicating a distraction
         drinking_driver boolean, -- at least one drinking driver
@@ -240,6 +242,7 @@ begin
         fatal boolean, -- at least one fatality
         fatal_or_susp_serious_inj boolean, -- the crash has at least one person who was killed or sustained a suspected serious injury
         fatigue_asleep boolean, -- at least one driver with a condition listed fatigued or asleep
+        federal_aid_route boolean, -- at least 1 roadway classified as a federal aid route.
         fire_in_vehicle boolean, -- at least one vehicle with fire damage
         hazardous_truck boolean, -- at least one heavy truck carrying hazardous material
         hit_barrier boolean, -- at least one unit hit a barrier
@@ -251,18 +254,24 @@ begin
         hit_gdrail_end boolean, -- at least one unit hit a guide rail end
         hit_parked_vehicle boolean, -- at least one legally or illegally parked vehicle was struck
         hit_pole boolean, -- at least one unit hit a pole
+        hit_roadway_equipment boolean, -- at least 1 unit hit roadway equipment
+        hit_run boolean, -- at least 1 Hit and Run unit
+        hit_temp_construction_barrier boolean, -- at least 1 unit hit a temporary construction barrier
+        hit_traffic_island boolean, -- at least 1 unit hit a traffic island
         hit_tree_shrub boolean, -- at least one unit hit a tree or shrub
+        hit_utility_pole boolean, -- at least one unit hit a utility pole
         horse_buggy boolean, -- at least one horse and buggy unit involved
-        -- hit_utility_pole boolean, -- at least one unit hit a utility pole (NOTE: this was a second "hit tree_shrub" in the data dictionary; assumed it should be "hit_utiltity_pole")
         ho_oppdir_sdswp boolean, -- crash description of head-on or opposite direction sideswipe
         hvy_truck_related boolean, -- at least one heavy truck was involved
         icy_road boolean, -- icy road indicator
         illegal_drug_related boolean, -- at least one driver or pedestrian had reported or suspected illegal drug use
         illumination_dark boolean, -- illumination indicates that the crash scene lighting was dark
         impaired_driver boolean, -- at least one driver was impaired by drugs or alcohol at least one person was injured in the crash
+        impaired_nonmotorist boolean, -- crash involved at least 1 non-motorist impaired by drugs or alcohol
         injury boolean, -- at least one person was injured in the crash, 0=no, 1=yes
         injury_or_fatal boolean, -- at least one person was injured or killed in the crash
         intersection boolean, -- crash took place at an intersection
+        intersection_related boolean, -- crash occurred in relation to the intersection
         interstate boolean, -- crash took place on a non-turnpike interstate
         lane_departure boolean, -- the crash had an indication that at least one vehicle departed their lane of travel during the crash events
         left_turn boolean, -- the crash had at least 1 unit that performed a left turn movement.
@@ -296,7 +305,7 @@ begin
         running_stop_sign boolean, -- at least one driver ran a stop sign
         rural boolean, -- crash took place in a rural municipality
         school_bus boolean, -- the crash involved at least one school bus
-        -- school_bus_related boolean, -- the crash involved at least one school bus unit with or without a harmful event
+        school_bus_related boolean, -- the crash involved at least one school bus unit with or without a harmful event
         school_bus_unit boolean, -- the crash involved at least one school bus unit with a harmful event
         school_zone boolean, -- the crash took place in a school zone
         shldr_related boolean, -- shoulder related indicator
@@ -304,9 +313,9 @@ begin
         single_vehicle boolean, -- the crash involved a single vehicle
         snowmobile boolean, -- crash involved at least one snowmobile unit
         snow_slush_road boolean, -- the crash involved a snow or slush covered road
-        speed_change_lane boolean, -- the crash occurred where an acceleration or deceleration lane was present on a limited access highway
         speeding boolean, -- at least one vehicle was speeding
         speeding_related boolean, -- at least one vehicle was speeding, racing or was driving too fast for conditions
+        speed_change_lane boolean, -- the crash occurred where an acceleration or deceleration lane was present on a limited access highway
         state_road boolean, -- the crash involved at least one state owned road
         stop_controlled_int boolean, -- the crash took place at a stop controlled intersection
         sudden_deer boolean, -- the crash involved a deer in the roadway
@@ -333,11 +342,9 @@ begin
     )$t4$, schema_name);
 
     /*
-        NOTE: This is the order from the CSVs; the order of "ejection_ind" and
-        "eject_path_cd" are swapped from what is the data dictionary. Additionally, this excludes
-        the "transported_by" field that is listed in the data dictionary as it is not included in
-        the header for the CSVs.
-
+        DVRPC NOTES:
+          - The order of the fields in the CSVs do not match the data dictionary; this is order in CSVs. 
+    
         Notes from PennDOT's database primer:
         Information about all people from all units related to the crash such as: Age, Sex, Drug and
         alcohol results, Where they sat and in which vehicle, Were they ejected from the vehicle?
@@ -346,15 +353,15 @@ begin
     execute format($t5$create unlogged table %1$s.person (
         crn integer, -- crash record number, database key field that identifies a unique crash case 
         age integer, -- age of person (those under the age of 1 are listed as 1, those over the age of 98 are listed as 98 and 99 indicates an unknown age)
-        airbag_pads text references %1$s.airbag_pads (code), -- airbag deployment for motor vehicle occupant or bicycle/motorcycle protective gear (see column code) 
         airbag1 text references %1$s.airbag (code), -- airbag(s) that were deployed for this person (see column code) 
         airbag2 text references %1$s.airbag (code), -- airbag(s) that were deployed for this person (see column code) 
         airbag3 text references %1$s.airbag (code), -- airbag(s) that were deployed for this person (see column code) 
         airbag4 text references %1$s.airbag (code), -- airbag(s) that were deployed for this person (see column code) 
+        airbag_pads text references %1$s.airbag_pads (code), -- airbag deployment for motor vehicle occupant or bicycle/motorcycle protective gear (see column code) 
         dvr_lic_state text references %1$s.state_code (code), -- state of licensed driver (see column code) 
         dvr_ped_condition text references %1$s.dvr_ped_condition (code), -- driver pedestrian condition code (see column code) 
-        eject_path_cd text references %1$s.eject_path_cd (code), -- ejection path code– only for vehicle occupants (see column code) 
         ejection_ind text references %1$s.ejection_ind (code), -- ejection indicator – only for vehicle occupants (see column code) 
+        eject_path_cd text references %1$s.eject_path_cd (code), -- ejection path code– only for vehicle occupants (see column code) 
         extric_ind text references %1$s.extric_ind (code), -- extrication indicator– only for vehicle occupants (see column code) 
         inj_severity text references %1$s.inj_severity (code), -- injury severity code (see column code) 
         non_motorist boolean, -- indicates if this person is a non-motorist
@@ -364,12 +371,16 @@ begin
         seat_position text references %1$s.seat_position (code), -- seat in unit where person sat (see column code) 
         sex text references %1$s.sex (code), -- sex of this individual; (see column code) 
         transported boolean, -- transported to medical facility y/n
-        -- transported_by text, -- method by which the person was transported (00 = not transported, 01 = ems air, 02 = ems ground, 98 = other, 99 = unknown)
+        transported_by text references %1$s.transported_by (code), -- method by which the person was transported
         unit_num integer, -- unit number of the vehicle (or pedestrian) assigned to this person 
         vulnerable_roadway_user boolean -- is this person classified as a vulnerable roadway user?
     )$t5$, schema_name); 
 
     /*
+        DVRPC NOTES:
+          - The order of the fields in the CSVs do not match the data dictionary; this is order in CSVs. 
+          - Data dictionary contains field "adj_roadway_seq" that is not in CSVs; excluded.
+
         Notes from PennDOT's database primer:
         Information about all the roadways involved in the crash such as: Route number or name,
         Segment, Offset, Type of Roadway, Rating, and many other Roadway defining elements.
@@ -377,10 +388,10 @@ begin
     execute format($t6$create unlogged table %1$s.roadway (
         crn integer, -- crash record number, database key field that identifies a unique crash case 
         access_ctrl text references %1$s.access_ctrl (code), -- access control code– only for state roads (see column code) 
-        adj_rdwy_seq integer, -- adjusted roadway sequence number 
-        lane_count text, -- travel lane count (both directions for non- divided roads. single direction for divided highways) 
-        offset_in_segment text, -- offset (in feet) within the segment – only for state roads 
-        rdwy_county text references %1$s.county (code), -- roadway county code (could differ from county of crash) (see column code) for county 
+        county text references %1$s.county (code), -- roadway county code (could differ from county of crash) (see column code) for county 
+        lane_count text, -- travel lane count (both directions for non-divided roads. single direction for divided highways) 
+        offset_ft text, -- offset (in feet) within the segment – only for state roads
+        ramp boolean, -- the crash involved an interchange ramp
         rdwy_orient text references %1$s.rdwy_orient (code), -- roadway orientation code (see column code) 
         rdwy_seq_num integer, -- crash roadway sequence number 
         road_owner text references %1$s.road_owner (code), -- roadway maintained by state, local or private jurisdiction. (see column code) 
@@ -391,8 +402,8 @@ begin
     )$t6$, schema_name); 
 
     /*
-        NOTE: This is the order from the CSVs; the order of the "trailer_partial_vin" and
-        "trl_seq_num" are swapped in the data dictionary.
+        DVRPC NOTES:
+          - The order of the fields in the CSVs do not match the data dictionary; this is order in CSVs. 
 
         Notes from PennDOT's database primer:
         Information about the types and kind of trailers that were being towed by vehicles.
@@ -409,9 +420,9 @@ begin
     )$t7$, schema_name);
 
     /*
-        NOTE: The "hazmat_ind" field in the data dictionary is not included in the CSVs, and so is
-        commented out below. Additionally, the "tow_ind" field in the CSVs is not included in the
-        data dictionary, and so has been added here.
+        DVRPC NOTES:
+          - The order of the fields in the CSVs do not match the data dictionary; this is order in CSVs. 
+          - non_motorist field was added: not in data dictionary but is in CSVs.
 
         Notes from PennDOT's database primer:
         Information about all vehicles involved in the crash such as: Body Type, Commercial Vehicle,
@@ -427,7 +438,7 @@ begin
         dvr_pres_ind text references %1$s.dvr_pres_ind (code),  -- driver presence indicator (see column code) 
         emerg_veh_use_cd text references %1$s.emerg_veh_use_cd (code),  -- special vehicle use code– only for fatal crashes (see column code) 
         grade text references %1$s.grade (code),  -- grade code (see column code) 
-        -- hazmat_ind boolean,  -- indicates if this unit was carrying hazardous material
+        hazmat_ind boolean,  -- indicates if this unit was carrying hazardous material
         impact_point text references %1$s.impact_point (code),  -- initial impact point (see column code) 
         ins_ind boolean,  -- insurance indicator
         make_cd text references %1$s.veh_make (code),  -- make code (see vehicle make table)
@@ -439,6 +450,7 @@ begin
         nm_lighting boolean, -- non-motorist lighting (y=yes, n=no, u=unknown)
         nm_powered text references %1$s.non_motorist_powered_conveyance (code), -- non-motorist powered conveyance? (see column code) 
         nm_reflect boolean, -- non-motorist reflectors or reflective wear? (y=yes, n=no, u=unknown)
+        non_motorist boolean, 
         owner_driver text references %1$s.owner_driver (code),  -- was the vehicle owned by the driver? if not, who owns the vehicle? (see column code) 
         partial_vin text,  -- vehicle identification number (first eleven characters) 
         people_in_unit integer,  -- total people in unit

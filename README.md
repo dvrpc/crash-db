@@ -6,7 +6,6 @@ The Postgres user running this script must have been granted two roles: `pg_read
 
 ## TODO:
 
-- [ ] In 2022, the filename for the flag tables have a plural FLAGS, rather than FLAG as in 2023. If other years are like this, write a script to rename them. For now, I've just manually done it.
 - [ ] add help flag to show usage to setup_db.sh
 
 For either the pa or the dvrpc schema, add in "shape" for better geometry field, using this or something close to it (from Sean Lawrence):
@@ -57,11 +56,13 @@ The way these are invoked may change. At present, there's one script, at src/dif
 ### PennDOT
 
 Crash data:
-  - [Crash Database Primer](https://gis.penndot.gov/gishub/crashZip/OPEN%20DATA%20PORTAL%20Database%20Primer%2010-16.pdf)
-  - [Data dictionary](https://gis.penndot.gov/gishub/crashZip/Open%20Data%20Portal%20Data%20Dictionary%20(07-24).pdf)
-  - [Download data by county or entire state](https://pennshare.maps.arcgis.com/apps/webappviewer/index.html?id=8fdbf046e36e41649bbfd9d7dd7c7e7e)
+  - [2024 Crash Database Primer](https://gis.penndot.gov/gishub/crashZip/OPEN%20DATA%20PORTAL%20Database%20Primer%2010-16.pdf)
+  - [2024 data dictionary](https://gis.penndot.pa.gov/gishub/crashZip/Crash_Data_Dictionary_2025.pdf)
+  - [2024 data download](https://experience.arcgis.com/experience/51809b06e7b140208a4ed6fbad964990)
 
 #### Questions/Data Issues
+
+##### 2024
 
 ##### 2023
 

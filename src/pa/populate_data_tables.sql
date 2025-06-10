@@ -54,11 +54,7 @@ begin
         Copy the data into those temporary tables.
     */
     foreach db_table in array db_tables loop
-        execute format($q$copy temp_%I_%s from '%s/pa/%s/%s_BUCKS_%s.csv' with (format csv, header, force_null *)$q$, db_table, year, user_data_dir, year, upper(db_table), year);
-        execute format($q$copy temp_%I_%s from '%s/pa/%s/%s_CHESTER_%s.csv' with (format csv, header, force_null *)$q$, db_table, year, user_data_dir, year, upper(db_table), year);
-        execute format($q$copy temp_%I_%s from '%s/pa/%s/%s_DELAWARE_%s.csv' with (format csv, header, force_null *)$q$, db_table, year, user_data_dir, year, upper(db_table), year);
-        execute format($q$copy temp_%I_%s from '%s/pa/%s/%s_MONTGOMERY_%s.csv' with (format csv, header, force_null *)$q$, db_table, year, user_data_dir, year, upper(db_table), year);
-        execute format($q$copy temp_%I_%s from '%s/pa/%s/%s_PHILADELPHIA_%s.csv' with (format csv, header, force_null *)$q$, db_table, year, user_data_dir, year, upper(db_table), year);
+        execute format($q$copy temp_%I_%s from '%s/pa/district/%s_D06_%s.csv' with (format csv, header, force_null *)$q$, db_table, year, user_data_dir, upper(db_table), year);
     end loop;
 
     -- Clean data with year-specific handling.
