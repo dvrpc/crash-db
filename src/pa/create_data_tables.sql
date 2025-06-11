@@ -32,17 +32,17 @@ begin
         bus_count integer, -- total amount of buses involved 
         chldpas_death_count integer, -- total child passengers under the age of 8 killed in the crash 
         chldpas_susp_serious_inj_count integer, -- total child passengers under the age of 8 with suspected serious injuries 
-        collision_type text references %1$s.collision_type (code), --collision category that defines crash
+        collision_type text references pa_lookup.collision_type (code), --collision category that defines crash
         comm_veh_count integer, -- total commercial vehicles involved
         cons_zone_spd_lim integer, -- speed limit for the construction zone 
-        county text references %1$s.county (code), -- county code number where crash occurred 
+        county text references pa_lookup.county (code), -- county code number where crash occurred 
         crash_month text_month, -- month when the crash occurred
         crash_year text check (crash_year = '%2$s'), -- year when the crash occurred 
-        day_of_week text references %1$s.day_of_week (code), -- day of the week code when crash occurred (see column code)
+        day_of_week text references pa_lookup.day_of_week (code), -- day of the week code when crash occurred (see column code)
         dec_lat numeric(6, 4), -- decimal format of the latitude, latitude expressed in decimal degrees (e.g. 99.9999)
         dec_long numeric(6, 4), -- decimal format of the longitude, longitude expressed in decimal degrees (e.g. 99.9999)
         dispatch_tm text24hhmm, -- time police were dispatched to the scene (hhmm) 
-        district text references %1$s.district (code), -- district number where crash occurred (based on county) (see column code) 
+        district text references pa_lookup.district (code), -- district number where crash occurred (based on county) (see column code) 
         driver_count_16yr integer, -- total amount of 16-year-old drivers 
         driver_count_17yr integer, -- total amount of 17-year-old drivers 
         driver_count_18yr integer, -- total amount of 18-year-old drivers 
@@ -56,20 +56,20 @@ begin
         heavy_truck_count integer, -- total amount of heavy trucks involved 
         horse_buggy_count integer, -- total number of horse and buggy units involved in the crash 
         hour_of_day text00_23, -- the hour of day when the crash occurred (00 to 23)
-        illumination text references %1$s.illumination (code), -- code that defines lighting at crash scene (see column code) 
+        illumination text references pa_lookup.illumination (code), -- code that defines lighting at crash scene (see column code) 
         injury_count integer, -- total count of all injuries sustained
         intersection_related boolean, -- was this midblock crash related to a nearby intersection?
-        intersect_type text references %1$s.intersect_type (code), -- code that defines the intersection type (see column code) 
+        intersect_type text references pa_lookup.intersect_type (code), -- code that defines the intersection type (see column code) 
         lane_closed boolean, -- was there a lane closure?
         latitude text, -- gps latitude determined by penndot (dd mm:ss.ddd)
-        ln_close_dir text references %1$s.lane_closure_direction (code), -- direction of traffic in closed lane (s) (see column code) 
-        location_type text references %1$s.location_type (code), -- code that defines the crash location (see column code) 
+        ln_close_dir text references pa_lookup.lane_closure_direction (code), -- direction of traffic in closed lane (s) (see column code) 
+        location_type text references pa_lookup.location_type (code), -- code that defines the crash location (see column code) 
         longitude text, -- gps longitude determined by penndot (in negative degrees) (dd mm:ss.ddd)
-        max_severity_level text references %1$s.max_severity_level (code), -- injury severity level of the crash (see column code)
+        max_severity_level text references pa_lookup.max_severity_level (code), -- injury severity level of the crash (see column code)
         mcycle_death_count integer, -- total amount of motorcyclist fatalities 
         mcycle_susp_serious_inj_count integer, -- total amount of motorcyclist suspected serious injuries 
         motorcycle_count integer, -- total amount of motorcycles involved 
-        municipality text references %1$s.municipalities (code), -- municipality code, see municipality code 
+        municipality text references pa_lookup.municipalities (code), -- municipality code, see municipality code 
         nonmotr_count integer, -- total number of non-motorists involved in the crash 
         nonmotr_death_count integer, -- total number of non-motorists killed in the crash 
         nonmotr_susp_serious_inj_count integer, -- total number of non-motorists with suspected serious injures in the crash 
@@ -78,22 +78,22 @@ begin
         ped_death_count integer, -- total pedestrian fatalities 
         ped_susp_serious_inj_count integer, -- total pedestrians with an injury severity of “suspected serious injury” 
         person_count integer, -- total people involved 
-        police_agcy text references %1$s.police_agencies (code), -- code of the reporting police agency (see police agency code)
+        police_agcy text references pa_lookup.police_agencies (code), -- code of the reporting police agency (see police agency code)
         possible_inj_count integer, -- total number of people with an injury severity of “possible injury” 
-        rdwy_surf_type_cd text references %1$s.rdwy_surface_type (code), -- code for the roadway surface type –only for fatal crashes (see column code) 
-        relation_to_road text references %1$s.relation_to_road (code), -- code for the crash’s relativity to the road (see column code) 
+        rdwy_surf_type_cd text references pa_lookup.rdwy_surface_type (code), -- code for the roadway surface type –only for fatal crashes (see column code) 
+        relation_to_road text references pa_lookup.relation_to_road (code), -- code for the crash’s relativity to the road (see column code) 
         roadway_cleared text24hhmm, -- time the roadway was opened to traffic (0000-2359 or 9999)
-        road_condition text references %1$s.road_condition (code), -- roadway surface condition code (see column code) 
+        road_condition text references pa_lookup.road_condition (code), -- roadway surface condition code (see column code) 
         sch_bus_ind boolean, -- did the crash involve a school bus?
         sch_zone_ind boolean, -- did the crash occur in a school zone?
         secondary_crash boolean, -- was this crash caused at least in part to a prior crash?
         small_truck_count integer, -- total amount of small trucks involved 
-        spec_juris_cd text references %1$s.spec_juris_cd (code), -- code that defines any special jurisdiction – only for fatal crashes (see column code) 
+        spec_juris_cd text references pa_lookup.spec_juris_cd (code), -- code that defines any special jurisdiction – only for fatal crashes (see column code) 
         susp_minor_inj_count integer, -- total number of people with an injury severity of suspected minor injury 
         susp_serious_inj_count integer, -- total number of people with an injury severity of suspected serious injury 
         suv_count integer, -- total count of sport utility vehicles involved 
-        tcd_func_cd text references %1$s.tcd_func_cd (code), -- code for traffic control device state (see column code) 
-        tcd_type text references %1$s.tcd_type (code), -- code that defines the traffic control device (see column code) 
+        tcd_func_cd text references pa_lookup.tcd_func_cd (code), -- code for traffic control device state (see column code) 
+        tcd_type text references pa_lookup.tcd_type (code), -- code that defines the traffic control device (see column code) 
         tfc_detour_ind boolean, -- was traffic detoured?
         time_of_day text24hhmm, -- the time of day when the crash occurred (0000 through 2359)
         total_units integer, -- total count of all vehicles and pedestrians
@@ -106,12 +106,12 @@ begin
         urban_rural text, -- code to classify crash as urban or rural (1=rural, 2=urbanized, 3=urban) 
         van_count integer, -- total amount of vans involved 
         vehicle_count integer, -- total number of all motor vehicles involved in the crash 
-        weather1 text references %1$s.weather1 (code), -- code for the first weather condition at time of crash (see column code)
-        weather2 text references %1$s.weather2 (code), -- code for the second weather condition at time of crash (see column code) 
+        weather1 text references pa_lookup.weather1 (code), -- code for the first weather condition at time of crash (see column code)
+        weather2 text references pa_lookup.weather2 (code), -- code for the second weather condition at time of crash (see column code) 
         workers_pres boolean, -- were construction personnel present?
         work_zone_ind boolean, -- did the crash occur in a work zone
-        work_zone_loc text references %1$s.work_zone_loc (code), -- the work zone location code (see column code)
-        work_zone_type text references %1$s.work_zone_type (code), -- code to define the type of work zone (see column code)
+        work_zone_loc text references pa_lookup.work_zone_loc (code), -- the work zone location code (see column code)
+        work_zone_type text references pa_lookup.work_zone_type (code), -- code to define the type of work zone (see column code)
         wz_close_detour boolean, -- was traffic rerouted due to work zone?
         wz_flagger boolean, -- did work zone have a flagman? 
         wz_law_offcr_ind boolean, -- did work zone have a patrolman?
@@ -133,7 +133,7 @@ begin
     execute format($t2$create unlogged table %1$s.commveh (
         crn integer,  -- crash record number, database key field that identifies a unique crash case 
         axle_cnt integer,  -- number of axles on the vehicle
-        cargo_bd_type text references %1$s.cargo_bd_type (code),  -- code for the cargo carrier’s body type (see column code)
+        cargo_bd_type text references pa_lookup.cargo_bd_type (code),  -- code for the cargo carrier’s body type (see column code)
         carrier_addr1 text,  -- address of carrier 
         carrier_addr2 text,  -- address of carrier line
         carrier_city text,  -- city of carrier
@@ -142,10 +142,10 @@ begin
         carrier_nm text,  -- name of the carrier
         carrier_tel text,  -- telephone of carrier
         gvwr text,  -- gross vehicle weight rating 
-        hazmat_cd1 text references %1$s.hazmat_code (code),  -- hazmat code for material one onboard (see column code)
-        hazmat_cd2 text references %1$s.hazmat_code (code),  -- hazmat code for material two onboard (see column code)
-        hazmat_cd3 text references %1$s.hazmat_code (code),  -- hazmat code for material three onboard (see column code)
-        hazmat_cd4 text references %1$s.hazmat_code (code),  -- hazmat code for material four onboard (see column code)
+        hazmat_cd1 text references pa_lookup.hazmat_code (code),  -- hazmat code for material one onboard (see column code)
+        hazmat_cd2 text references pa_lookup.hazmat_code (code),  -- hazmat code for material two onboard (see column code)
+        hazmat_cd3 text references pa_lookup.hazmat_code (code),  -- hazmat code for material three onboard (see column code)
+        hazmat_cd4 text references pa_lookup.hazmat_code (code),  -- hazmat code for material four onboard (see column code)
         hazmat_ind boolean,  -- indicator for hazmat on board
         hazmat_rel_ind1 boolean,  -- indicator for hazmat one released
         hazmat_rel_ind2 boolean,  -- indicator for hazmat two released
@@ -156,14 +156,14 @@ begin
         -- partial_trailer_vin text,  -- first 11 characters of the trailer vin
         permitted boolean, -- (01 = non-permitted load, 02 = permitted load, 99 = unknown)
         puc_num text,  -- pa utility commission number
-        special_sizing1 text references %1$s.special_sizing (code), -- does this commercial unit have special sizing restrictions
-        special_sizing2 text references %1$s.special_sizing (code), 
-        special_sizing3 text references %1$s.special_sizing (code), 
-        special_sizing4 text references %1$s.special_sizing (code), 
-        type_of_carrier text references %1$s.type_of_carrier (code),  -- type of commercial carrier (see column code)
+        special_sizing1 text references pa_lookup.special_sizing (code), -- does this commercial unit have special sizing restrictions
+        special_sizing2 text references pa_lookup.special_sizing (code), 
+        special_sizing3 text references pa_lookup.special_sizing (code), 
+        special_sizing4 text references pa_lookup.special_sizing (code), 
+        type_of_carrier text references pa_lookup.type_of_carrier (code),  -- type of commercial carrier (see column code)
         unit_num integer,  -- unit number of the vehicle in the crash event 
         usdot_num text,  -- us dept of transportation number 
-        veh_config_cd text references %1$s.veh_config_cd (code)  -- vehicle configuration code (see column code)
+        veh_config_cd text references pa_lookup.veh_config_cd (code)  -- vehicle configuration code (see column code)
     )$t2$, schema_name);
 
     /*
@@ -183,7 +183,7 @@ begin
         mc_dvr_eyeprt_ind boolean, -- did motorcycle driver wear eye protection?
         mc_dvr_hlmtdot_ind boolean, -- was driver’s helmet penndot certified?
         mc_dvr_hlmton_ind boolean, -- did motorcycle driver wear helmet?
-        mc_dvr_hlmt_type text references %1$s.helmet_type (code), -- code for helmet type of the motorcycle driver (see column code)
+        mc_dvr_hlmt_type text references pa_lookup.helmet_type (code), -- code for helmet type of the motorcycle driver (see column code)
         mc_dvr_lngpnts_ind boolean, -- did motorcycle driver wear long pants?
         mc_dvr_lngslv_ind boolean, -- did motorcycle driver have long sleeves?
         mc_engine_size text, -- motorcycle engine size (cc)
@@ -192,7 +192,7 @@ begin
         mc_pas_eyeprt_ind boolean, -- did motorcycle passenger wear eye protection?
         mc_pas_hlmtdot_ind boolean, -- was passenger’s helmet penndot cert.?
         mc_pas_hlmton_ind boolean, -- did motorcycle passenger wear a helmet?
-        mc_pas_hlmt_type text references %1$s.helmet_type (code), -- code for helmet type of the motorcycle pass. (see column code)
+        mc_pas_hlmt_type text references pa_lookup.helmet_type (code), -- code for helmet type of the motorcycle pass. (see column code)
         mc_pas_lngpnts_ind boolean, -- did motorcycle passenger wear long pants?
         mc_pas_lngslv_ind boolean, -- did motorcycle passenger have long sleeves?
         mc_trail_ind boolean, -- did the motorcycle have trailer?
@@ -353,25 +353,25 @@ begin
     execute format($t5$create unlogged table %1$s.person (
         crn integer, -- crash record number, database key field that identifies a unique crash case 
         age integer, -- age of person (those under the age of 1 are listed as 1, those over the age of 98 are listed as 98 and 99 indicates an unknown age)
-        airbag1 text references %1$s.airbag (code), -- airbag(s) that were deployed for this person (see column code) 
-        airbag2 text references %1$s.airbag (code), -- airbag(s) that were deployed for this person (see column code) 
-        airbag3 text references %1$s.airbag (code), -- airbag(s) that were deployed for this person (see column code) 
-        airbag4 text references %1$s.airbag (code), -- airbag(s) that were deployed for this person (see column code) 
-        airbag_pads text references %1$s.airbag_pads (code), -- airbag deployment for motor vehicle occupant or bicycle/motorcycle protective gear (see column code) 
-        dvr_lic_state text references %1$s.state_code (code), -- state of licensed driver (see column code) 
-        dvr_ped_condition text references %1$s.dvr_ped_condition (code), -- driver pedestrian condition code (see column code) 
-        ejection_ind text references %1$s.ejection_ind (code), -- ejection indicator – only for vehicle occupants (see column code) 
-        eject_path_cd text references %1$s.eject_path_cd (code), -- ejection path code– only for vehicle occupants (see column code) 
-        extric_ind text references %1$s.extric_ind (code), -- extrication indicator– only for vehicle occupants (see column code) 
-        inj_severity text references %1$s.inj_severity (code), -- injury severity code (see column code) 
+        airbag1 text references pa_lookup.airbag (code), -- airbag(s) that were deployed for this person (see column code) 
+        airbag2 text references pa_lookup.airbag (code), -- airbag(s) that were deployed for this person (see column code) 
+        airbag3 text references pa_lookup.airbag (code), -- airbag(s) that were deployed for this person (see column code) 
+        airbag4 text references pa_lookup.airbag (code), -- airbag(s) that were deployed for this person (see column code) 
+        airbag_pads text references pa_lookup.airbag_pads (code), -- airbag deployment for motor vehicle occupant or bicycle/motorcycle protective gear (see column code) 
+        dvr_lic_state text references pa_lookup.state_code (code), -- state of licensed driver (see column code) 
+        dvr_ped_condition text references pa_lookup.dvr_ped_condition (code), -- driver pedestrian condition code (see column code) 
+        ejection_ind text references pa_lookup.ejection_ind (code), -- ejection indicator – only for vehicle occupants (see column code) 
+        eject_path_cd text references pa_lookup.eject_path_cd (code), -- ejection path code– only for vehicle occupants (see column code) 
+        extric_ind text references pa_lookup.extric_ind (code), -- extrication indicator– only for vehicle occupants (see column code) 
+        inj_severity text references pa_lookup.inj_severity (code), -- injury severity code (see column code) 
         non_motorist boolean, -- indicates if this person is a non-motorist
         person_num integer, -- person number – sequential per unit 
-        person_type text references %1$s.person_type (code), -- person type code (see column code) 
-        restraint_helmet text references %1$s.restraint_helmet (code), -- restraint or helmet (see column code) 
-        seat_position text references %1$s.seat_position (code), -- seat in unit where person sat (see column code) 
-        sex text references %1$s.sex (code), -- sex of this individual; (see column code) 
+        person_type text references pa_lookup.person_type (code), -- person type code (see column code) 
+        restraint_helmet text references pa_lookup.restraint_helmet (code), -- restraint or helmet (see column code) 
+        seat_position text references pa_lookup.seat_position (code), -- seat in unit where person sat (see column code) 
+        sex text references pa_lookup.sex (code), -- sex of this individual; (see column code) 
         transported boolean, -- transported to medical facility y/n
-        transported_by text references %1$s.transported_by (code), -- method by which the person was transported
+        transported_by text references pa_lookup.transported_by (code), -- method by which the person was transported
         unit_num integer, -- unit number of the vehicle (or pedestrian) assigned to this person 
         vulnerable_roadway_user boolean -- is this person classified as a vulnerable roadway user?
     )$t5$, schema_name); 
@@ -387,14 +387,14 @@ begin
     */
     execute format($t6$create unlogged table %1$s.roadway (
         crn integer, -- crash record number, database key field that identifies a unique crash case 
-        access_ctrl text references %1$s.access_ctrl (code), -- access control code– only for state roads (see column code) 
-        county text references %1$s.county (code), -- roadway county code (could differ from county of crash) (see column code) for county 
+        access_ctrl text references pa_lookup.access_ctrl (code), -- access control code– only for state roads (see column code) 
+        county text references pa_lookup.county (code), -- roadway county code (could differ from county of crash) (see column code) for county 
         lane_count text, -- travel lane count (both directions for non-divided roads. single direction for divided highways) 
         offset_ft text, -- offset (in feet) within the segment – only for state roads
         ramp boolean, -- the crash involved an interchange ramp
-        rdwy_orient text references %1$s.rdwy_orient (code), -- roadway orientation code (see column code) 
+        rdwy_orient text references pa_lookup.rdwy_orient (code), -- roadway orientation code (see column code) 
         rdwy_seq_num integer, -- crash roadway sequence number 
-        road_owner text references %1$s.road_owner (code), -- roadway maintained by state, local or private jurisdiction. (see column code) 
+        road_owner text references pa_lookup.road_owner (code), -- roadway maintained by state, local or private jurisdiction. (see column code) 
         route text, -- route number – only for state roads 
         segment text, -- segment number– only for state roads 
         speed_limit integer, -- speed limit 
@@ -412,10 +412,10 @@ begin
         crn integer,  -- crash record number, database key field that identifies a unique crash case 
         trailer_partial_vin text,  -- first 12 characters of the vin for this trailer 
         trl_seq_num integer,  -- trailer sequence number 
-        trl_veh_reg_state text references %1$s.state_code (code),  -- trailer registration state (see state codes)
+        trl_veh_reg_state text references pa_lookup.state_code (code),  -- trailer registration state (see state codes)
         trl_veh_tag_num text,  -- trailer registration tag number 
         trl_veh_tag_yr text_year,  -- trailer registration year 
-        trl_veh_type_cd text references %1$s.trl_veh_type_cd (code),  -- trailer type code (see column code) 
+        trl_veh_type_cd text references pa_lookup.trl_veh_type_cd (code),  -- trailer type code (see column code) 
         unit_num integer  -- unit number of the vehicle the trailer is associated with 
     )$t7$, schema_name);
 
@@ -431,46 +431,46 @@ begin
     */
     execute format($t8$create unlogged table %1$s.vehicle (
         crn integer,  -- crash record number, database key field that identifies a unique crash case 
-        avoid_man_cd text references %1$s.avoid_man_cd (code),  -- avoidance maneuver code - only for fatal crashes (see column code) 
-        body_type text references %1$s.body_type (code),  -- body type code (see column code) 
+        avoid_man_cd text references pa_lookup.avoid_man_cd (code),  -- avoidance maneuver code - only for fatal crashes (see column code) 
+        body_type text references pa_lookup.body_type (code),  -- body type code (see column code) 
         comm_veh boolean,  -- commercial vehicle indicator (n=no u=unknown y=yes)
-        damage_ind text references %1$s.damage_ind (code),  -- damage indicator (see column code) 
-        dvr_pres_ind text references %1$s.dvr_pres_ind (code),  -- driver presence indicator (see column code) 
-        emerg_veh_use_cd text references %1$s.emerg_veh_use_cd (code),  -- special vehicle use code– only for fatal crashes (see column code) 
-        grade text references %1$s.grade (code),  -- grade code (see column code) 
+        damage_ind text references pa_lookup.damage_ind (code),  -- damage indicator (see column code) 
+        dvr_pres_ind text references pa_lookup.dvr_pres_ind (code),  -- driver presence indicator (see column code) 
+        emerg_veh_use_cd text references pa_lookup.emerg_veh_use_cd (code),  -- special vehicle use code– only for fatal crashes (see column code) 
+        grade text references pa_lookup.grade (code),  -- grade code (see column code) 
         hazmat_ind boolean,  -- indicates if this unit was carrying hazardous material
-        impact_point text references %1$s.impact_point (code),  -- initial impact point (see column code) 
+        impact_point text references pa_lookup.impact_point (code),  -- initial impact point (see column code) 
         ins_ind boolean,  -- insurance indicator
-        make_cd text references %1$s.veh_make (code),  -- make code (see vehicle make table)
+        make_cd text references pa_lookup.veh_make (code),  -- make code (see vehicle make table)
         model_yr text_year,  -- model year of the vehicle 
         nm_at_intersection boolean, -- non-motorist at intersection? (y=yes, n=no, u=unknown)
-        nm_crossing_tcd text references %1$s.non_motorist_crossing_tcd (code), -- non-motorist crossing traffic control device (see column code) 
-        nm_distraction text references %1$s.non_motorist_distraction (code), -- non-motorist distraction (see column code) 
-        nm_in_crosswalk text references %1$s.non_motorist_in_crosswalk (code), -- non-motorist in crosswalk? (see column code) 
+        nm_crossing_tcd text references pa_lookup.non_motorist_crossing_tcd (code), -- non-motorist crossing traffic control device (see column code) 
+        nm_distraction text references pa_lookup.non_motorist_distraction (code), -- non-motorist distraction (see column code) 
+        nm_in_crosswalk text references pa_lookup.non_motorist_in_crosswalk (code), -- non-motorist in crosswalk? (see column code) 
         nm_lighting boolean, -- non-motorist lighting (y=yes, n=no, u=unknown)
-        nm_powered text references %1$s.non_motorist_powered_conveyance (code), -- non-motorist powered conveyance? (see column code) 
+        nm_powered text references pa_lookup.non_motorist_powered_conveyance (code), -- non-motorist powered conveyance? (see column code) 
         nm_reflect boolean, -- non-motorist reflectors or reflective wear? (y=yes, n=no, u=unknown)
         non_motorist boolean, 
-        owner_driver text references %1$s.owner_driver (code),  -- was the vehicle owned by the driver? if not, who owns the vehicle? (see column code) 
+        owner_driver text references pa_lookup.owner_driver (code),  -- was the vehicle owned by the driver? if not, who owns the vehicle? (see column code) 
         partial_vin text,  -- vehicle identification number (first eleven characters) 
         people_in_unit integer,  -- total people in unit
-        prin_imp_pt text references %1$s.impact_point (code),  -- principle impact point – only for fatal crashes (see column code for impact point) 
-        rdwy_alignment text references %1$s.rdwy_alignment (code),  -- roadway alignment code (see column code) 
-        special_usage text references %1$s.special_usage (code),  -- special usage of the vehicle (see column code)
+        prin_imp_pt text references pa_lookup.impact_point (code),  -- principle impact point – only for fatal crashes (see column code for impact point) 
+        rdwy_alignment text references pa_lookup.rdwy_alignment (code),  -- roadway alignment code (see column code) 
+        special_usage text references pa_lookup.special_usage (code),  -- special usage of the vehicle (see column code)
         tow_ind boolean, -- DVRPC addition (not in data dictionary but is in CSVs)
-        travel_direction text references %1$s.travel_direction (code),  -- travel direction of the vehicle (see column code) 
+        travel_direction text references pa_lookup.travel_direction (code),  -- travel direction of the vehicle (see column code) 
         travel_spd integer,  -- estimated travel speed 
         trl_veh_cnt integer,  -- trailing vehicle count 
-        under_ride_ind text references %1$s.under_ride_ind (code),  -- under ride damage indicator– only for fatal crashes (see column code) 
+        under_ride_ind text references pa_lookup.under_ride_ind (code),  -- under ride damage indicator– only for fatal crashes (see column code) 
         unit_num integer,  -- unit number assigned to the vehicle or pedestrian 
-        unit_type text references %1$s.unit_type (code),  -- unit type (see column code) 
-        veh_color_cd text references %1$s.veh_color_cd (code),  -- vehicle color code (see column code) 
-        veh_movement text references %1$s.veh_or_non_motorist_movement (code),  -- vehicle or non-motorist movement code (see column code) 
-        veh_position text references %1$s.veh_or_non_motorist_position (code),  -- vehicle or non-motorist position code (see column code) 
-        veh_reg_state text references %1$s.state_code (code),  -- vehicle registration state (see state codes)
-        veh_role text references %1$s.veh_role (code),  -- vehicle role (see column code) 
-        veh_type text references %1$s.veh_or_non_motorist_type (code),  -- vehicle or non-motorist type (see column code) 
-        vina_body_type_cd text references %1$s.vina_body_type_cd (code)  -- body type code interpreted by vina software (see column code) 
+        unit_type text references pa_lookup.unit_type (code),  -- unit type (see column code) 
+        veh_color_cd text references pa_lookup.veh_color_cd (code),  -- vehicle color code (see column code) 
+        veh_movement text references pa_lookup.veh_or_non_motorist_movement (code),  -- vehicle or non-motorist movement code (see column code) 
+        veh_position text references pa_lookup.veh_or_non_motorist_position (code),  -- vehicle or non-motorist position code (see column code) 
+        veh_reg_state text references pa_lookup.state_code (code),  -- vehicle registration state (see state codes)
+        veh_role text references pa_lookup.veh_role (code),  -- vehicle role (see column code) 
+        veh_type text references pa_lookup.veh_or_non_motorist_type (code),  -- vehicle or non-motorist type (see column code) 
+        vina_body_type_cd text references pa_lookup.vina_body_type_cd (code)  -- body type code interpreted by vina software (see column code) 
     )$t8$, schema_name);
 end;
 $body$

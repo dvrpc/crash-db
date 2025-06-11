@@ -60,29 +60,22 @@ Crash data:
   - [2024 data dictionary](https://gis.penndot.pa.gov/gishub/crashZip/Crash_Data_Dictionary_2025.pdf)
   - [2024 data download](https://experience.arcgis.com/experience/51809b06e7b140208a4ed6fbad964990)
 
-#### Questions/Data Issues
-
-##### 2024
-
-##### 2023
+#### 2024-version data issues and questions
 
 There are a number of discrepancies between the data dictionary and the CSVs. Those related to
-field order, extra fields, or missing fields are noted in src/pa/2023/create_data_tables.sql, in a comment above each table. Those about values can be found in src/pa/alter_temp_domains.sql (which identifies the data issues) and src/pa/clean_data.sql (which cleans it). Further questions are below.
+field order or missing fields are noted in src/pa/create_data_tables.sql, in a comment above each table. Those about values can be found in src/pa/alter_temp_domains.sql (which identifies the data issues) and src/pa/clean_data.sql (which cleans it). Further questions are below.
 
-For fields that can be represented as booleans, there are often values not described in the data dictionaries in data. 'U' and '9' can be fairly confidently assumed to be null. However, there are some that are not so straightforward:
-  - lane_closed (crash table) contains 0,1,2,9, and U; 2,9,U have been converted to nulls. Correct?
-  - hazmat_rel_ind1 through hazmat_rel_ind4 (commveh table) data contains 1,2,9 (no 0). Are assumptions (that is, 2=false and 9=unknown) correct?
-
-There are a number of "R" values for the "transported" field in the person CSVs - enough to suggest that this was intentional. However, field is supposed to be y/n. What would R mean? Converting to null for now.
-
-The crash table's "urban_rural" field lists (in comments only, not as separate lookup table) possible values 1=rural, 2=urbanized, 3=urban, but only values in field for all 2023 counties are 1 and 2. So should it be 1=rural, 2=urban? What is "urbanized"?
-
-The commveh table's "axle_cnt" doesn't have a lookup table, but obviously uses 99 for unknown. Converted to null. But what about 16 and 18? What's the highest number of axles a vehicle and trailers could have?
+Lookup tables:
+  - Some fields have values that aren't in their corresponding lookup tables; where obvious, unambiguous values could be added they were, others were were changed to null. See clean_data.sql and lookup_tables.sql.
+  - Some lookup tables were added, taken from explicit values listed in the data dictionary. See lookup_tables.sql.
+  - hazmat_rel_1 - hazmat_rel_4 in the commveh table: in the data dictionary, it lists "1=Y, 0=N" as the possible values, but then there is also a lookup table for it that contains "1 – No Release, 2 – Release occurred, 9 – Unknown". The latter is what is actually in the CSV files. This was converted to a boolean field.
 
 Primary keys:
   - "person" table: is crn/unit_num supposed to be primary key? Duplicate when attempted.
   - "trailveh" table: data dictionary says "The CRN, UNIT_NUM and define the unit that corresponds to the vehicle record". Assume "trl_seq_num" is the missing field here?
 
-##### 2022
-
+Misc:
+  - The crash table's "urban_rural" field lists (in comments only, not as separate lookup table) possible values 1=rural, 2=urbanized, 3=urban, but only values in field for all 2023 counties are 1 and 2. So should it be 1=rural, 2=urban? What is "urbanized"?
+  - The commveh table's "axle_cnt" doesn't have a lookup table, but seems to use 99 for unknown. Converted to null. But what about others that are very high? What's the highest number of axles a vehicle and trailers could have?
+  - The crash table's "lane_closed" field contains no data. I have not checked other fields but probably worthwhile to do so. I only happened across this by chance as the previous version of the data had bad values for this field (supposed to by Y/N but contained 0,1,2,9,U).
 
