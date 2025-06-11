@@ -181,9 +181,9 @@ begin
         mc_dvr_boots_ind boolean, -- did motorcycle driver wear boots?
         mc_dvr_edc_ind boolean, -- did motorcycle driver have safety training?
         mc_dvr_eyeprt_ind boolean, -- did motorcycle driver wear eye protection?
-        mc_dvr_hlmt_type text references %1$s.helmet_type (code), -- code for helmet type of the motorcycle driver (see column code)
         mc_dvr_hlmtdot_ind boolean, -- was driver’s helmet penndot certified?
         mc_dvr_hlmton_ind boolean, -- did motorcycle driver wear helmet?
+        mc_dvr_hlmt_type text references %1$s.helmet_type (code), -- code for helmet type of the motorcycle driver (see column code)
         mc_dvr_lngpnts_ind boolean, -- did motorcycle driver wear long pants?
         mc_dvr_lngslv_ind boolean, -- did motorcycle driver have long sleeves?
         mc_engine_size text, -- motorcycle engine size (cc)
