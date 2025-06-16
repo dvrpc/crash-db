@@ -120,13 +120,8 @@ create domain text_0_1_01_02_99_as_bool text check(value in ('0', '1', '01', '02
 create domain text_0_1_2_11_as_bool text check(value in ('0', '1', '2', '11'));
 create domain text_0_1_2_3_11_as_bool text check(value in ('0', '1', '2', '3', '11'));
 create domain text_0_1_2_3_7_11_as_bool text check(value in ('0', '1', '2', '3', '7', '11'));
--- create domain numeric_under_2_as_bool numeric(2,1) check(value < 2.0);
--- create domain textYNU_under_2_as_bool text check(value::numeric(2,1) < 2.0 or value in ('Y', 'N', 'U'));
 
 -- Domains merely for figuring out what values are contained in a field.
--- create domain text2 text check(value = '2');
--- create domain text19 text check(value in ('1', '9'));
--- create domain text9 text check(value = '9');
 create domain text029U text check(value in ('0', '2', '9', 'U'));
 
 -- Create schemas.

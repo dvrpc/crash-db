@@ -1,11 +1,19 @@
 #! /usr/bin/env bash
 
-usage="Usage: $(basename $0) <state_abbr> <year> [year2]
+usage="Usage:
+$(basename $0) <state_abbr> <year1> <year2>
 
 NOTE: Ensure that the data filenames are in format expected (TABLENAME_GEOGRAPHY_YEAR.csv) e.g. FLAG_D06_2023.csv
+
 "
 
+if [[ "${1}" = '-u' || "${1}" = 'u' ]]; then
+  echo "${usage}"
+  exit 0
+fi
+
 tables=('CRASH' 'COMMVEH' 'CYCLE' 'FLAG' 'PERSON' 'ROADWAY' 'TRAILVEH' 'VEHICLE')
+
 
 # Exit if we don't have requirement number of arguments.
 num_args_required=3

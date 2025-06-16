@@ -6,8 +6,6 @@ The Postgres user running this script must have been granted two roles: `pg_read
 
 ## TODO:
 
-- [ ] add help flag to show usage to setup_db.sh
-
 For either the pa or the dvrpc schema, add in "shape" for better geometry field, using this or something close to it (from Sean Lawrence):
 
 ```sql
@@ -49,7 +47,7 @@ The script assumes that data files (CSVs) are in data/ relative to the project d
 
 ### Utility Scripts
 
-The way these are invoked may change. At present, there's one script, at src/diff_headers.sh, which checks that all the headers in the data files are the same across each table/state/year. Run it with `./src/diff_headers.sh <state> <year>` from the project root.
+The way these are invoked may change. At present, there's one script, at src/diff_headers.sh, which checks that the headers in the data files are the same across each table/state/year. See usage with `./src/diff_headers.sh -u`.
 
 ## Data
 
