@@ -67,6 +67,7 @@ Lookup tables:
   - Some fields have values that aren't in their corresponding lookup tables; where obvious, unambiguous values could be added they were, others were were changed to null. See clean_data.sql and lookup_tables.sql.
   - Some lookup tables were added, taken from explicit values listed in the data dictionary. See lookup_tables.sql.
   - hazmat_rel_1 - hazmat_rel_4 in the commveh table: in the data dictionary, it lists "1=Y, 0=N" as the possible values, but then there is also a lookup table for it that contains "1 – No Release, 2 – Release occurred, 9 – Unknown". The latter is what is actually in the CSV files. This was converted to a boolean field.
+  - Some of the values between the pdf and the spreadsheet differ. This seems to be either in spelling, e.g. using "Twp" (pdf) or "Township" (spreadsheet), or zero-padding.
 
 Primary keys:
   - "person" table: is crn/unit_num supposed to be primary key? Duplicate when attempted.

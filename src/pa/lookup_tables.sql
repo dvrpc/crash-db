@@ -59,22 +59,23 @@ begin
         ('5', 'Steering and braking - evidence or stated'),
         ('6', 'Other avoidance maneuver'),
         ('7', 'Inconclusive');
+
     insert into pa_lookup.body_type (code, description) values
         ('01', 'Convertible'),
         ('02', '2-Door sedan, hardtop or coupe'),
         ('03', '3-Door hatch back'),
         ('04', '4-Door sedan or hardtop'),
         ('05', '5-Door sedan or hatch back'),
-        ('06', 'Station wagon. Excluding van and truck-based'),
+        ('06', 'Station wagon (excluding van and truck-based)'),
         ('08', 'Other automobile type'),
         ('09', 'Unknown automobile type'),
         ('10', 'Automobile-based pickup'),
         ('11', 'Automobile-based panel truck'),
-        ('12', 'Compact utility e.g. Tracker; Cherokee; etc.'),
+        ('12', 'Compact utility (e.g. Tracker, Cherokee, etc.)'),
         ('13', 'Large limousine'),
-        ('14', '3-wheel automobile or auto derivative '),
-        ('15', 'Large utility; Tahoe; Range Rover; Etc.'),
-        ('16', 'Utility Station Wagon'),
+        ('14', '3-wheel automobile or auto derivative'),
+        ('15', 'Large utility (e.g. Tahoe, Range Rover, etc.)'),
+        ('16', 'Utility station wagon'),
         ('19', 'Unknown utility style body type'),
         ('20', 'Motorcycle'),
         ('21', 'Moped'),
@@ -85,7 +86,7 @@ begin
         ('28', 'Other motorcycle type'),
         ('29', 'Unknown motorcycle type'),
         ('30', 'School bus'),
-        ('31', 'Cross country or inner-city bus  (i.e. Greyhound bus)'),
+        ('31', 'Cross country or inner-city bus (e.g. Greyhound bus)'),
         ('32', 'Transit bus'),
         ('38', 'Other bus'),
         ('39', 'Unknown bus'),
@@ -108,9 +109,9 @@ begin
         ('62', 'Light truck-based motor home'),
         ('68', 'Other light conventional truck'),
         ('69', 'Unknown light truck'),
-        ('70', 'Single unit straight truck (10000<=19500)'),
-        ('71', 'Single unit straight truck (19500<=26000)'),
-        ('72', 'Single unit straight truck (GVWR>26000)'),
+        ('70', 'Single unit straight truck (10,000 ≤ GVWR ≤ 19,500)'),
+        ('71', 'Single unit straight truck (19,500 ≤ GVWR ≤ 26,000)'),
+        ('72', 'Single unit straight truck (GVWR > 26,000)'),
         ('73', 'Single unit straight truck (GVWR unknown)'),
         ('74', 'Medium or heavy truck-based motor home'),
         ('75', 'Truck tractor with or without trailers'),
@@ -169,24 +170,15 @@ begin
         ('99', 'Unknown');
 
     insert into pa_lookup.county (code, description) values
-        ('01', 'ADAMS'), -- Added by DVRPC to account for zero-padded values in CSVs
-        ('02', 'ALLEGHENY'), -- Added by DVRPC to account for zero-padded values in CSVs
-        ('03', 'ARMSTRONG'), -- Added by DVRPC to account for zero-padded values in CSVs
-        ('04', 'BEAVER'), -- Added by DVRPC to account for zero-padded values in CSVs
-        ('05', 'BEDFORD'), -- Added by DVRPC to account for zero-padded values in CSVs
-        ('06', 'BERKS'), -- Added by DVRPC to account for zero-padded values in CSVs
-        ('07', 'BLAIR'), -- Added by DVRPC to account for zero-padded values in CSVs
-        ('08', 'BRADFORD'), -- Added by DVRPC to account for zero-padded values in CSVs
-        ('09', 'BUCKS'), -- Added by DVRPC to account for zero-padded values in CSVs
-        ('1', 'ADAMS'),
-        ('2', 'ALLEGHENY'),
-        ('3', 'ARMSTRONG'),
-        ('4', 'BEAVER'),
-        ('5', 'BEDFORD'),
-        ('6', 'BERKS'),
-        ('7', 'BLAIR'),
-        ('8', 'BRADFORD'),
-        ('9', 'BUCKS'),
+        ('01', 'ADAMS'), 
+        ('02', 'ALLEGHENY'),
+        ('03', 'ARMSTRONG'),
+        ('04', 'BEAVER'),
+        ('05', 'BEDFORD'),
+        ('06', 'BERKS'),
+        ('07', 'BLAIR'),
+        ('08', 'BRADFORD'),
+        ('09', 'BUCKS'),
         ('10', 'BUTLER'),
         ('11', 'CAMBRIA'),
         ('12', 'CAMERON'),
@@ -692,7 +684,6 @@ begin
         ('03', 'Illegally parked'),
         ('05', 'Hit and run vehicle'),
         ('06', 'Disabled from a previous crash'),
-        ('11', 'Non-motorized'),
         ('21', 'Train'),
         ('30', 'Non-Motorist'),
         ('33', 'Personal Delivery Device'),
@@ -866,7 +857,7 @@ begin
         ('MRC', 'Racer'),
         ('MRS', 'Road / Street'),
         ('MRT', 'Road / Trail'),
-        ('MT',  'Dirt'),
+        ('MT', 'Dirt'),
         ('MTL', 'Trail / Dirt'),
         ('MTR', 'Trail'),
         ('P2D', 'Sedan 2 Dr.'),
@@ -910,7 +901,7 @@ begin
         ('TCR', 'Crane'),
         ('TCS', 'Super Cab / Chassis Pickup'),
         ('TCU', 'Custom Pickup'),
-        ('TCV', 'Convertible (Jeep Commando, Suzuki Samurai,etc) '),
+        ('TCV', 'Convertible (Jeep Commando, Suzuki Samurai, etc)'),
         ('TCW', 'Crew Pickup'),
         ('TCY', 'Cargo Cutaway'),
         ('TDP', 'Dump'),
