@@ -134,18 +134,40 @@ create domain text029U text check(value in ('0', '2', '9', 'U'));
 \i src/pa/clean_data.sql
 \i src/pa/alter_temp_domains.sql
 
+-- Create and populate lookup tables if they don't already exist/aren't populated.
 call pa_create_and_populate_lookup_tables();
 
--- Create and populate PA 2024 tables.
-call pa_create_data_tables('2024');
-call pa_populate_data_tables('2024');
+-- Import PA data.
+do
+$import$
+declare
+    -- can put a single year here (i.e. generate_series(2020, 2020)) to go year-by-year 
+    years int[] := ARRAY(SELECT * FROM generate_series(2008, 2008));
+    year int;
+begin
+    foreach year in array years loop
+        raise info 'PA %', year;
 
--- Create and populate PA 2023 tables.
-call pa_create_data_tables('2023');
-call pa_populate_data_tables('2023');
+        raise info 'Create schema';
+        execute format($q$create schema if not exists pa_%s$q$, year);
 
--- Create and populate PA 2022 tables.
-call pa_create_data_tables('2022');
-call pa_populate_data_tables('2022');
+        raise info 'Create and populate data tables';
+        call pa_create_data_tables(year::text);
+        call pa_populate_data_tables(year::text);
+
+        raise info 'Add indexes to tables';
+        execute format($q$alter table pa_%s.crash add primary key(crn)$q$, year);
+        execute format($q$alter table pa_%s.commveh add primary key (crn, unit_num)$q$, year);
+        execute format($q$alter table pa_%s.cycle add primary key (crn, unit_num)$q$, year);
+        execute format($q$alter table pa_%s.flag add primary key(crn)$q$, year);
+        -- execute format($q$alter table pa_%s.person add primary key (crn, unit_num)$q$, year);
+        execute format($q$alter table pa_%s.trailveh add primary key(crn, unit_num, trl_seq_num)$q$, year);
+        execute format($q$alter table pa_%s.vehicle add primary key (crn, unit_num)$q$, year);
+
+    end loop;
+
+end;
+$import$
+language plpgsql;
 
 vacuum analyze

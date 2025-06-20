@@ -11,7 +11,6 @@ declare
     postgres_data_dir text := (select value from tmp_vars where name = 'postgres_data_dir');
     
 begin
-    raise info '%', year;
     raise info 'Create temporary tables for cleaning data.';
     foreach db_table in array db_tables loop
         execute format($tt$create temporary table temp_%I_%s (like pa_%s.%I including all)$tt$, db_table, year, year, db_table);
@@ -55,13 +54,5 @@ begin
         execute format($q$copy pa_%s.%I from '%s/%I.csv' with (format csv, header, force_null *)$q$, year, db_table, postgres_data_dir, db_table); 
     end loop;
 
-    raise info 'Add indexes to tables.';
-    execute format($q$alter table pa_%s.crash add primary key(crn)$q$, year);
-    execute format($q$alter table pa_%s.commveh add primary key (crn, unit_num)$q$, year);
-    execute format($q$alter table pa_%s.cycle add primary key (crn, unit_num)$q$, year);
-    execute format($q$alter table pa_%s.flag add primary key(crn)$q$, year);
-    -- execute format($q$alter table pa_%s.person add primary key (crn, unit_num)$q$, year);
-    execute format($q$alter table pa_%s.trailveh add primary key(crn, unit_num, trl_seq_num)$q$, year);
-    execute format($q$alter table pa_%s.vehicle add primary key (crn, unit_num)$q$, year);
 end;
 $body$
