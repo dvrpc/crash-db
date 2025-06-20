@@ -1,4 +1,5 @@
 set client_min_messages = error;
+
 -- Create and populate a table to pass through variables from shell to sql scripts.
 create temporary table tmp_vars( 
     name text,
@@ -97,8 +98,8 @@ create domain text_month text check(value::int between 1 and 12);
 create domain text24hhmm_9999 text check(value::int <= 2359 or value::int = 9999);
 create domain text00_23_99 text check(value::int between 0 and 23 or value::int = 99);
 
--- Domain to allow years < 1900 through before being cleaned.
-create domain text_year_greater_than_0 text check(value::int > 0);
+-- Domain to allow any positive integer through before being cleaned.
+create domain text_as_pos_int text check(value::int >= 0);
 
 /*
     Boolean domains, using text as the base.
@@ -124,6 +125,7 @@ create domain text_0_1_2_3_7_11_as_bool text check(value in ('0', '1', '2', '3',
 
 -- Domains merely for figuring out what values are contained in a field.
 create domain text029U text check(value in ('0', '2', '9', 'U'));
+create domain text2 text check(value = '2');
 
 -- Create schemas.
 \i src/create_schemas.sql
