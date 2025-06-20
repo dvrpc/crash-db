@@ -20,7 +20,7 @@ begin
           - When: Date, Time, Day of Week, Hour of Day, Month of Year
           - Item Counts: People, Vehicles, Unbelted, Fatal, etc.
     */
-    execute format($t1$create unlogged table %1$s.crash (
+    execute format($t1$create unlogged table if not exists %1$s.crash (
         crn integer, -- crash record number, database key field that identifies a unique crash case 
         arrival_tm text24hhmm, --time police arrived at the scene (hhmm)
         automobile_count integer, -- total amount of automobiles involved
@@ -130,7 +130,7 @@ begin
         Information about commercial vehicles, such as carrier information, the cargo body type,
         Hazmat information, and official agency registration numbers.
     */
-    execute format($t2$create unlogged table %1$s.commveh (
+    execute format($t2$create unlogged table if not exists %1$s.commveh (
         crn integer,  -- crash record number, database key field that identifies a unique crash case 
         axle_cnt integer,  -- number of axles on the vehicle
         cargo_bd_type text references pa_lookup.cargo_bd_type (code),  -- code for the cargo carrier’s body type (see column code)
@@ -175,7 +175,7 @@ begin
         attire and other accessories such as side bags
     */
 
-    execute format($t3$create unlogged table %1$s.cycle (
+    execute format($t3$create unlogged table if not exists %1$s.cycle (
         crn integer, -- crash record number, database key field that identifies a unique crash case 
         mc_bag_ind boolean, -- did the motorcycle have side bags?
         mc_dvr_boots_ind boolean, -- did motorcycle driver wear boots?
@@ -208,7 +208,7 @@ begin
         as: Drinking Driver, Use of a Cell Phone, Fatal Crash, Motorcycle involved, and over 60
         other crash defining items.
     */
-    execute format($t4$create unlogged table %1$s.flag (
+    execute format($t4$create unlogged table if not exists %1$s.flag (
         crn integer, -- crash record number – identifies a unique crash, database key field that identifies a unique crash case 
         aggressive_driving boolean, -- at least one aggressive driver action
         alcohol_related boolean, -- at least one driver or pedestrian with reported or suspected alcohol use
@@ -350,7 +350,7 @@ begin
         alcohol results, Where they sat and in which vehicle, Were they ejected from the vehicle?
         etc.
     */
-    execute format($t5$create unlogged table %1$s.person (
+    execute format($t5$create unlogged table if not exists %1$s.person (
         crn integer, -- crash record number, database key field that identifies a unique crash case 
         age integer, -- age of person (those under the age of 1 are listed as 1, those over the age of 98 are listed as 98 and 99 indicates an unknown age)
         airbag1 text references pa_lookup.airbag (code), -- airbag(s) that were deployed for this person (see column code) 
@@ -385,7 +385,7 @@ begin
         Information about all the roadways involved in the crash such as: Route number or name,
         Segment, Offset, Type of Roadway, Rating, and many other Roadway defining elements.
     */
-    execute format($t6$create unlogged table %1$s.roadway (
+    execute format($t6$create unlogged table if not exists %1$s.roadway (
         crn integer, -- crash record number, database key field that identifies a unique crash case 
         access_ctrl text references pa_lookup.access_ctrl (code), -- access control code– only for state roads (see column code) 
         county text references pa_lookup.county (code), -- roadway county code (could differ from county of crash) (see column code) for county 
@@ -408,7 +408,7 @@ begin
         Notes from PennDOT's database primer:
         Information about the types and kind of trailers that were being towed by vehicles.
     */
-    execute format($t7$create unlogged table %1$s.trailveh (
+    execute format($t7$create unlogged table if not exists %1$s.trailveh (
         crn integer,  -- crash record number, database key field that identifies a unique crash case 
         trailer_partial_vin text,  -- first 12 characters of the vin for this trailer 
         trl_seq_num integer,  -- trailer sequence number 
@@ -429,7 +429,7 @@ begin
         Movement, Position, Unit number in the crash and other vehicle related information. Non-
         motorist units are also kept in this table.
     */
-    execute format($t8$create unlogged table %1$s.vehicle (
+    execute format($t8$create unlogged table if not exists %1$s.vehicle (
         crn integer,  -- crash record number, database key field that identifies a unique crash case 
         avoid_man_cd text references pa_lookup.avoid_man_cd (code),  -- avoidance maneuver code - only for fatal crashes (see column code) 
         body_type text references pa_lookup.body_type (code),  -- body type code (see column code) 
