@@ -11,9 +11,9 @@ declare
     postgres_data_dir text := (select value from tmp_vars where name = 'postgres_data_dir');
     
 begin
-    raise info 'Create temporary tables for cleaning data.';
+    raise info '.Create temporary tables for cleaning data';
     foreach db_table in array db_tables loop
-        execute format($tt$create temporary table temp_%I_%s (like pa_%s.%I including all)$tt$, db_table, year, year, db_table);
+        execute format($tt$create temporary table temp_%I_%s (like pa_%s.%I including all) on commit drop$tt$, db_table, year, year, db_table);
     end loop;
 
     /*
@@ -21,7 +21,7 @@ begin
         For those that will be booleans, use the broadest domain that can be unambiguously converted
         to booleans (in cleaning data fn).
     */
-    raise info 'Change field types in temp tables';
+    raise info '.Change field types in temp tables';
     foreach db_table in array db_tables loop
     	for col_name, dat_type in select column_name, data_type from information_schema.columns where table_name = 'temp_' || db_table || '_' || year and data_type != 'text' loop
             if dat_type = 'boolean' then
@@ -33,21 +33,26 @@ begin
     end loop;
 
     /*
-      If data population into the temp tables failed because of a bad value, alter the type to
-      determine what it is, so it can be inserted and then cleaned later.
+      If data population into the temp tables failed (below) because of a bad value, alter the
+      type to determine what it is, so it can be inserted and then cleaned later.
     */
-    raise info 'Alter domains';
+    raise info '.Alter domains';
     call pa_alter_temp_domains(year);
 
-    raise info 'Copy data into temporary tables';
+    raise info '.Copy data into temporary tables';
     foreach db_table in array db_tables loop
         execute format($q$copy temp_%I_%s from '%s/pa/district/%s_D06_%s.csv' with (format csv, header, force_null *)$q$, db_table, year, user_data_dir, upper(db_table), year);
     end loop;
 
-    raise info 'Clean bad values';
+    -- Run analyze on temporary tables, which should improve performance on queries on them.
+    foreach db_table in array db_tables loop
+        execute format($a$ analyze temp_%I_%s$a$, db_table, year);
+    end loop;
+
+    raise info '.Clean bad values';
     call pa_clean_data(year);
 
-    raise info 'Copy from temp to non-temp tables';
+    raise info '.Copy from temp to non-temp tables';
     -- Copy the data from the temp tables into the non-temp tables, by exporting to file and then reimporting. Easiest way to go from text types in temp tables to types in non-temp tables.
     foreach db_table in array db_tables loop
         execute format($q$copy temp_%I_%s to '%s/%I.csv' with (format csv, header)$q$, db_table, year, postgres_data_dir, db_table);
