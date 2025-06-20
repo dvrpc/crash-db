@@ -10,49 +10,10 @@ declare
     tbl_name text;
     tbl_name2 text;
     cons_name text;
-    db_tables text[] := '{crash, commveh, cycle, flag, person, roadway, trailveh, vehicle}';
-    db_table text;
 begin
 
     -- Cleaning that applies to all years comes first; below that is year-specific cleaning.
 
-    -- Remove decimals from values in fields that reference lookup tables.'
-    << rm_decimals_text_lookup >>
-    for tbl_name, col_name in select table_name, column_name from information_schema.key_column_usage where constraint_name in (
-        select ccu.constraint_name
-            from information_schema.constraint_column_usage ccu
-            join information_schema.table_constraints tc on tc.constraint_name = ccu.constraint_name
-            where ccu.constraint_schema = 'pa_' || year and tc.constraint_type = 'FOREIGN KEY'
-    ) loop
-        begin
-            execute format($q$update temp_%I_%s set %I = floor(%I::numeric)::text$q$, tbl_name, year, col_name, col_name);
-        exception 
-            when invalid_text_representation then
-                null;
-        end;
-    end loop;
-
-    -- Add zero padding for columns using it.'
-    << zero_pad_lookup_table_codes >>
-    -- Get the lookup tables that use zero padding in their values.
-    for tbl_name in select name from pa_lookup_table_names where zero_padded = true loop
-        -- Use the table name to get name of the foreign key constraints referencing it.
-        for cons_name in select ccu.constraint_name from information_schema.constraint_column_usage ccu join information_schema.table_constraints tc on tc.constraint_name = ccu.constraint_name where ccu.table_schema = 'pa_lookup' and ccu.table_name = tbl_name and tc.constraint_type = 'FOREIGN KEY' loop
-            -- Use the constraint name to get the table/column it is used in.
-            for tbl_name2, col_name2 in select table_name, column_name from information_schema.key_column_usage where constraint_name = cons_name loop
-                execute format($q$update temp_%I_%s set %I = lpad(%I, 2, '0')$q$, tbl_name2, year, col_name2, col_name2);
-            end loop;
-        end loop;
-    end loop;
-
-    -- Remove decimals from values in fields that will be integers.'
-    << rm_decimals_int >>
-    foreach db_table in array db_tables loop
-        for col_name in select column_name from information_schema.columns where table_name = db_table and table_schema = 'pa_' || year and data_type = 'integer' loop
-            execute format($q$update temp_%I_%s set %I = floor(%I::numeric)::int$q$, db_table, year, col_name, col_name);
-        end loop;
-    end loop;
-    
     /* start lookup -> bool */
     -- Convert fields that use lookup tables to represent boolean values into booleans.
     -- First, alter domain to allow 0, then change values.
@@ -134,26 +95,79 @@ begin
 
     end if;
 
+    -- Remove decimals from values in fields that reference lookup tables.'
+    raise info '..Remove decimals from lookup table values';
+    << rm_decimals_text_lookup >>
+    for tbl_name, col_name in
+        select kcu.table_name, kcu.column_name
+            from information_schema.key_column_usage kcu
+            join information_schema.constraint_column_usage ccu
+                on kcu.constraint_name = ccu.constraint_name
+                and kcu.constraint_schema = ccu.constraint_schema
+            where ccu.table_schema = 'pa_lookup' and kcu.table_schema = 'pa_' || year
+    loop
+        begin
+            execute format($q$update temp_%I_%s set %I = floor(%I::numeric)::text$q$, tbl_name, year, col_name, col_name);
+        exception 
+            when invalid_text_representation then
+                null;
+        end;
+    end loop;
+
+    -- Add zero padding for columns using it.'
+    raise info '..Zeropad lookup values requiring it';
+    << zero_pad_lookup_table_codes >>
+    -- Get the lookup tables that use zero padding in their values.
+    for tbl_name in select name from pa_lookup_table_names where zero_padded = true
+    loop
+        -- Use the table name to get name of the foreign key constraints referencing it.
+        for cons_name in
+            select constraint_name
+            from information_schema.constraint_column_usage
+            where constraint_schema = 'pa_' || year
+                and table_schema = 'pa_lookup'
+                and table_name = tbl_name
+        loop
+            -- Use the constraint name to get the table/column it is used in.
+            for tbl_name2, col_name2 in
+                select table_name, column_name
+                    from information_schema.key_column_usage
+                    where constraint_name = cons_name and constraint_schema = 'pa_' || year
+            loop
+                execute format($q$update temp_%I_%s set %I = lpad(%I, 2, '0')$q$, tbl_name2, year, col_name2, col_name2);
+            end loop;
+        end loop;
+    end loop;
+
+    -- Remove decimals from values in fields that will be integers.'
+    raise info '..Remove decimals from values that will be integers';
+    << rm_decimals_int >>
+    for col_name, tbl_name in select column_name, table_name from information_schema.columns where table_schema = 'pa_' || year and data_type = 'integer' loop
+        execute format($q$update temp_%I_%s set %I = floor(%I::numeric)::int$q$, tbl_name, year, col_name, col_name);
+    end loop;
+
     -- Alter the values of the fields in the temp tables that will end up being booleans.
     << bool_conversion >>
-    foreach db_table in array db_tables loop
-        for col_name in select column_name from information_schema.columns where table_name = db_table and table_schema = 'pa_' || year and data_type = 'boolean' loop
-            -- Change certain values to null.
-            execute format($q$update temp_%I_%s set %I = null where %I in ('U', ' ', '9')$q$, db_table, year, col_name, col_name);
-            -- Remove any decimals.
-            begin
-                execute format($q$update temp_%I_%s set %I = floor(%I::numeric)::int$q$, db_table, year, col_name, col_name);
-            exception
-                when invalid_text_representation then
-                    /* No need to do anything here - if it can't be cast as int, that's fine.
-                       If the value is Y or N they will be accepted as booleans when data is copied
-                       from temp tables, and if not, that step will raise an error. */
-                    null; 
-                when others then
-                    -- If there are other errors, raise notice showing code.
-                    raise notice '%', SQLSTATE;
-            end;
-        end loop;
+    for col_name, tbl_name in
+        select column_name, table_name
+            from information_schema.columns
+            where table_schema = 'pa_' || year and data_type = 'boolean'
+    loop
+        -- Change certain values to null.
+        execute format($q$update temp_%I_%s set %I = null where %I in ('U', ' ', '9')$q$, tbl_name, year, col_name, col_name);
+        -- Remove any decimals.
+        begin
+            execute format($q$update temp_%I_%s set %I = floor(%I::numeric)::int$q$, tbl_name, year, col_name, col_name);
+        exception
+            when invalid_text_representation then
+                /* No need to do anything here - if it can't be cast as int, that's fine.
+                   If the value is Y or N they will be accepted as booleans when data is copied
+                   from temp tables, and if not, that step will raise an error. */
+                null; 
+            when others then
+                -- If there are other errors, raise notice showing code.
+                raise info '%', SQLSTATE;
+        end;
     end loop;
 end;
 $body$
