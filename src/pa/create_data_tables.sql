@@ -414,7 +414,7 @@ begin
         trl_seq_num integer,  -- trailer sequence number 
         trl_veh_reg_state text references pa_lookup.state_code (code),  -- trailer registration state (see state codes)
         trl_veh_tag_num text,  -- trailer registration tag number 
-        trl_veh_tag_yr text_year,  -- trailer registration year 
+        trl_veh_tag_yr text,  -- trailer registration year 
         trl_veh_type_cd text references pa_lookup.trl_veh_type_cd (code),  -- trailer type code (see column code) 
         unit_num integer  -- unit number of the vehicle the trailer is associated with 
     )$t7$, schema_name);

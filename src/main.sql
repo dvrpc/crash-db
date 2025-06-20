@@ -126,6 +126,7 @@ create domain text_0_1_2_3_7_11_as_bool text check(value in ('0', '1', '2', '3',
 -- Domains merely for figuring out what values are contained in a field.
 create domain text029U text check(value in ('0', '2', '9', 'U'));
 create domain text2 text check(value = '2');
+create domain text02 text check(value in ('0', '2'));
 
 -- Create schemas.
 \i src/create_schemas.sql
@@ -139,13 +140,14 @@ create domain text2 text check(value = '2');
 
 -- Create and populate lookup tables if they don't already exist/aren't populated.
 call pa_create_and_populate_lookup_tables();
+commit;
 
 -- Import PA data.
 do
 $import$
 declare
     -- can put a single year here (i.e. generate_series(2020, 2020)) to go year-by-year 
-    years int[] := ARRAY(SELECT * FROM generate_series(2008, 2008));
+    years int[] := ARRAY(SELECT * FROM generate_series(2005, 2024));
     year int;
 begin
     foreach year in array years loop
@@ -167,6 +169,7 @@ begin
         execute format($q$alter table pa_%s.trailveh add primary key(crn, unit_num, trl_seq_num)$q$, year);
         execute format($q$alter table pa_%s.vehicle add primary key (crn, unit_num)$q$, year);
 
+        commit;
     end loop;
 
 end;

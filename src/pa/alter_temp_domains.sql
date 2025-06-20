@@ -32,18 +32,41 @@ begin
     -- transported FAILED broad text_as_bool (contains R).
     execute format($q$alter table temp_person_%s alter transported type textYNR_as_bool using transported::textYNR_as_bool$q$, year);
 
-    -- domain text_year FAILED (contains 999)
-    execute format($q$alter table temp_trailveh_%s alter trl_veh_tag_yr type text_as_pos_int using trl_veh_tag_yr::text_as_pos_int$q$, year);
+    /*
+    -- -- domain text_year FAILED (contains 999)
+    -- execute format($q$alter table temp_trailveh_%s alter trl_veh_tag_yr type text_as_pos_int using trl_veh_tag_yr::text_as_pos_int$q$, year);
+    */
+    
     -- domain text_year FAILED (contains 0000)
     execute format($q$alter table temp_vehicle_%s alter model_yr type text_as_pos_int using model_yr::text_as_pos_int$q$, year);
 
     if year = '2007' then
         -- broad text as boolean domain FAILED for lane_closed (contains 2)
         -- set it to only 2 to see what else it contains
-        execute format($q$ alter table temp_crash_%s alter lane_closed type text2 using lane_closed::text2$q$, year);
+        -- execute format($q$ alter table temp_crash_%s alter lane_closed type text2 using lane_closed::text2$q$, year);
         -- FAILED (contains 1)
-        execute format($q$ alter table temp_crash_%s alter lane_closed type text12_as_bool using lane_closed::text12_as_bool$q$, year);
+        -- execute format($q$ alter table temp_crash_%s alter lane_closed type text12_as_bool using lane_closed::text12_as_bool$q$, year);
         -- FAILED (contains 0)
+        execute format($q$ alter table temp_crash_%s alter lane_closed type text012_as_bool using lane_closed::text012_as_bool$q$, year);
+        -- succeeded. Created condition in clean_data to turn 2 into null.
+    end if;
+    if year = '2006' then
+        -- broad text as boolean domain FAILED for lane_closed (contains 2)
+        -- set it to only 2 to see what else it contains
+        -- execute format($q$ alter table temp_crash_%s alter lane_closed type text2 using lane_closed::text2$q$, year);
+        -- FAILED (contains 0)
+        -- execute format($q$ alter table temp_crash_%s alter lane_closed type text02 using lane_closed::text02$q$, year);
+        -- FAILED (contains 1)
+        execute format($q$ alter table temp_crash_%s alter lane_closed type text012_as_bool using lane_closed::text012_as_bool$q$, year);
+        -- succeeded. Created condition in clean_data to turn 2 into null.
+    end if;
+    if year = '2005' then
+        -- broad text as boolean domain FAILED for lane_closed (contains 2)
+        -- set it to only 2 to see what else it contains
+        -- execute format($q$ alter table temp_crash_%s alter lane_closed type text2 using lane_closed::text2$q$, year);
+        -- FAILED (contains 0)
+        -- execute format($q$ alter table temp_crash_%s alter lane_closed type text02 using lane_closed::text02$q$, year);
+        -- FAILED (contains 1)
         execute format($q$ alter table temp_crash_%s alter lane_closed type text012_as_bool using lane_closed::text012_as_bool$q$, year);
         -- succeeded. Created condition in clean_data to turn 2 into null.
     end if;

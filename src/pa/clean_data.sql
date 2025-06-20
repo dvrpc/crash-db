@@ -12,7 +12,6 @@ declare
     cons_name text;
 begin
 
-  
     raise info '..Fix miscellaneous issues';
     -- Cleaning that applies to all years comes first; below that is year-specific cleaning.
 
@@ -58,30 +57,40 @@ begin
     execute format($q$update temp_person_%s set transported = null where transported = 'R'$q$, year);
 
     -- Make invalid years null.
-    execute format($q$update temp_trailveh_%s set trl_veh_tag_yr = null where trl_veh_tag_yr::int < 1900$q$, year);
-
+    execute format($q$update temp_vehicle_%s set model_yr = null where model_yr::int < 1900$q$, year);
+    begin
+        execute format($q$update temp_trailveh_%s set trl_veh_tag_yr = null where trl_veh_tag_yr::int < 1900$q$, year);
+    exception 
+        when invalid_text_representation then
+            null;
+    end;
+    
     -- Make values not in lookup tables null.
-    execute format($q$update temp_crash_%s set police_agcy = null where police_agcy in ('00000', '02336', '15601', '30601', '46601', '51601', '68000', '68K00', '68Z99')$q$, year);
-    execute format($q$update temp_person_%s set airbag_pads = null where airbag_pads in ('10', '12')$q$, year);
+    execute format($q$update temp_crash_%s set police_agcy = null where police_agcy in ('00000', '02336', '15601', '30601', '46601', '51601', '68000', '68K00', '68S01', '68S02', '68Z99')$q$, year);
+    execute format($q$update temp_person_%s set airbag_pads = null where airbag_pads in ('10', '10.0', '12', '12.0')$q$, year);
     execute format($q$update temp_person_%s set airbag1 = null where airbag1 = 'M'$q$, year);
-    execute format($q$update temp_person_%s set dvr_lic_state = null where dvr_lic_state in ('GU', 'NT', 'QR')$q$, year);
+    execute format($q$update temp_person_%s set dvr_lic_state = null where dvr_lic_state in ('GU', 'NT', 'QR', 'PQ')$q$, year);
     execute format($q$update temp_person_%s set extric_ind = null where extric_ind = '9'$q$, year);
-    execute format($q$update temp_person_%s set restraint_helmet = null where restraint_helmet in ('13', '14')$q$, year);
+    execute format($q$update temp_person_%s set restraint_helmet = null where restraint_helmet in ('13', '13.0', '14', '14.0')$q$, year);
     execute format($q$update temp_person_%s set seat_position = null where seat_position in ('16', '17', '18', '19', '20')$q$, year);
     execute format($q$update temp_person_%s set transported_by = null where transported_by = '03'$q$, year);
     execute format($q$update temp_roadway_%s set county = null where county = '68'$q$, year);
     execute format($q$update temp_roadway_%s set rdwy_orient = null where rdwy_orient = 'B'$q$, year);
-    execute format($q$update temp_trailveh_%s set trl_veh_reg_state = null where trl_veh_reg_state in ('??', '0', '1', '99', 'A', 'DO', 'E', 'F', 'GQ', 'HA', 'HW', 'I', 'IC', 'J', 'K', 'M', 'MZ', 'PY', 'T', 'VJ', 'W', 'WL', 'Y', 'Z')$q$, year);
+    execute format($q$update temp_trailveh_%s set trl_veh_reg_state = null where trl_veh_reg_state in ('??', '0', '1', '99', 'A', 'AA', 'AD', 'B', 'BB', 'BG', 'BQ', 'DO', 'E', 'EB', 'EE', 'F', 'FI', 'G', 'GQ', 'H', 'HA', 'HW', 'HY', 'I', 'IC', 'II', 'IJ', 'PB', 'IU', 'J', 'JB', 'JJ', 'JI', 'JL', 'JO', 'JP', 'JY', 'K', 'KI', 'L', 'M', 'MZ', 'NG', 'NI', 'NT', 'O', 'OY', 'P', 'PM', 'PY', 'Q', 'QB', 'R', 'RA', 'RB', 'RE', 'T', 'TF', 'U', 'UN', 'VJ', 'VN', 'W', 'WL', 'WP', 'X', 'Y', 'YW', 'YX', 'Z', 'ZJ')$q$, year);
     execute format($q$update temp_vehicle_%s set avoid_man_cd = null where avoid_man_cd = '9'$q$, year);
     execute format($q$update temp_vehicle_%s set make_cd = null where make_cd in ('BLUI', 'DGEN', 'ENGF', 'FREF', 'ICBU', 'KALM', 'KNNW', 'TRIU')$q$, year);
     execute format($q$update temp_vehicle_%s set make_cd = 'BMW' where make_cd = 'BMW1'$q$, year);
-    execute format($q$update temp_vehicle_%s set model_yr = null where model_yr::int < 1900$q$, year);
     execute format($q$update temp_vehicle_%s set veh_position = null where veh_position = '00'$q$, year);
-    execute format($q$update temp_vehicle_%s set veh_reg_state = null where veh_reg_state in ('04', '08', '09', '12', '99', 'A', 'AF', 'AP', 'FA', 'NT', 'P', 'P-', 'PS', 'PZ', 'UK', 'UN', 'US', 'XN', 'XX', 'Z')$q$, year);
-    execute format($q$update temp_vehicle_%s set vina_body_type_cd = null where vina_body_type_cd in ('''', '4C', 'C', 'M', 'P', 'P2W', 'P3D', 'P3P', 'P4C', 'P4D', 'P4H', 'P4L', 'P4P', 'PBU', 'PC4', 'PCC', 'PCG', 'PCU', 'PDS', 'PFW', 'PGS', 'PNX', 'PRS', 'PSD', 'PSV', 'PSW', 'PUT', 'PVN', 'PYY', 'T', 'T2W')$q$, year);
+    execute format($q$update temp_vehicle_%s set veh_reg_state = null where veh_reg_state in ('04', '08', '09', '12', '99', 'A', 'AF', 'AP', 'FA', 'KA', 'NT', 'P', 'P-', 'PQ', 'PS', 'PZ', 'UK', 'UN', 'US', 'XN', 'XX', 'Z')$q$, year);
+    execute format($q$update temp_vehicle_%s set vina_body_type_cd = null where vina_body_type_cd in ('''', '4C', 'C', 'M', 'P', 'P2C', 'P2W', 'P3D', 'P3P', 'P4C', 'P4D', 'P4H', 'P4L', 'P4P', 'P4T', 'PBU', 'PC4', 'PCC', 'PCG', 'PCU', 'PDS', 'PFW', 'PGS', 'PNX', 'PRS', 'PSD', 'PSV', 'PSW', 'PUT', 'PVN', 'PWC', 'PYY', 'T', 'T2W')$q$, year);
     
     /* Year-specific. */
     -- If anything here occurs in more than one year, move above to apply to all years.
+    if year = '2007' or year = '2006' or year = '2005' then
+        execute format($q$update temp_crash_%s set lane_closed = null where lane_closed = '2'$q$, year);
+        execute format($q$update temp_person_%s set dvr_ped_condition = null where dvr_ped_condition = '8.0'$q$, year);
+    end if;
+    
     if year = '2024' then
     elseif year = '2023' then
         -- Make values not in lookup tables null.
@@ -104,8 +113,6 @@ begin
     elseif year = '2008' then
         execute format($q$update temp_vehicle_%s set travel_spd = null where travel_spd = 'UNK'$q$, year);
     elseif year = '2007' then
-        execute format($q$update temp_crash_%s set lane_closed = null where lane_closed = '2'$q$, year);
-        execute format($q$update temp_person_%s set dvr_ped_condition = null where dvr_ped_condition LIKE '%%8%%'$q$, year);
     end if;
 
     -- Remove decimals from values in fields that reference lookup tables.'
