@@ -1,3 +1,4 @@
+set client_min_messages = error;
 -- Create and populate a table to pass through variables from shell to sql scripts.
 create temporary table tmp_vars( 
     name text,

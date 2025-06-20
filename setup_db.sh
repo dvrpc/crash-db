@@ -45,4 +45,4 @@ mkdir -p "${user_data_dir}"
 cp -r data/* "${user_data_dir}"
 
 # Run the sql.
-psql -p "${port}" -d "${db}" -v user_data_dir="${user_data_dir}" -v postgres_data_dir="${postgres_data_dir}" < src/main.sql 
+psql -q -p "${port}" -d "${db}" -v user_data_dir="${user_data_dir}" -v postgres_data_dir="${postgres_data_dir}" < src/main.sql 
