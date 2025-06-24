@@ -76,6 +76,6 @@ Primary keys:
 Misc:
   - The crash table's "urban_rural" field lists (in comments only, not as separate lookup table) possible values 1=rural, 2=urbanized, 3=urban, but only values in field for all 2023 counties are 1 and 2. So should it be 1=rural, 2=urban? What is "urbanized"?
   - The commveh table's "axle_cnt" doesn't have a lookup table, but seems to use 99 for unknown. Converted to null. But what about others that are very high? What's the highest number of axles a vehicle and trailers could have?
-  - The crash table's "lane_closed" field contains no data. I have not checked other fields but probably worthwhile to do so. I only happened across this by chance as the previous version of the data had bad values for this field (supposed to by Y/N but contained 0,1,2,9,U).
-  - In 2007, lane_closed (boolean) contained '2'. Converted to null.
+  - The crash table's "lane_closed" field contains no data for years 2008-2024. I have not checked other fields but probably worthwhile to do so. I only happened across this by chance as the previous version of the data had bad values for this field (supposed to by Y/N but contained 0,1,2,9,U).
+  - In 2005-2007, lane_closed (boolean) contained '2'. Converted to null.
 
