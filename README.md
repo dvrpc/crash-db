@@ -79,3 +79,10 @@ Misc:
   - The crash table's "lane_closed" field contains no data for years 2008-2024. I have not checked other fields but probably worthwhile to do so. I only happened across this by chance as the previous version of the data had bad values for this field (supposed to by Y/N but contained 0,1,2,9,U).
   - In 2005-2007, lane_closed (boolean) contained '2'. Converted to null.
 
+## NJDOT
+
+Main site: <https://dot.nj.gov/transportation/refdata/accident/>
+Data dictionaries: <https://dot.nj.gov/transportation/refdata/accident/masterfile.shtm>
+Data: <https://dot.nj.gov/transportation/refdata/accident/rawdata01-current.shtm>
+
+A shell script at src/nj/download_nj_data.sh will download all tables for our four counties for specified years set in the script.
