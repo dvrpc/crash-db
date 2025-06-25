@@ -7,8 +7,8 @@ declare
     dat_type text;
     db_tables text[] := '{crash, commveh, cycle, flag, person, roadway, trailveh, vehicle}';
     db_table text;
-    user_data_dir text := (select value from tmp_vars where name = 'user_data_dir');
-    postgres_data_dir text := (select value from tmp_vars where name = 'postgres_data_dir');
+    user_data_dir text = current_setting('myvars.user_data_dir');
+    postgres_data_dir text = current_setting('myvars.postgres_data_dir');
     
 begin
     raise info '.Create temporary tables for cleaning data';
