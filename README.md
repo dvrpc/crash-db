@@ -1,8 +1,28 @@
 # Crash Database
 
-The database is constructed via a number of shell and sql scripts. The main entry point is setup_db.sh.
+The database is constructed via a number of shell and sql scripts. The main entry point is setup_db.sh. If it is not already executable, make it so with `chmod 755 setup_db.sh` and then invoke with `./setup_db.sh -u` to show usage details.
+
+The script assumes that data files (CSVs) are in data/ relative to the project directory, which are then copied to appropriate folders (configurable via environment variables if necessary) to ease access by Postgres's <a href="https://www.postgresql.org/docs/17/sql-copy.html">COPY</a>.
 
 The Postgres user running this script must have been granted two roles: `pg_read_server_files` and `pg_write_server_files`. As a superuser, run `grant pg_read_server_files, pg_write_server_files to <user>`.
+
+A `port` environment variable is required, and others can be used but are optional. Create a .env file in the project directory to set them:
+
+```sh
+port=5437
+# If you want something other than default of "crash":
+db="crash2"
+# If you want something other than default of /tmp/crash-data:
+# NOTE: the system user you run the script/create the db as needs to read/write from this directory.
+user_data_dir="/tmp/somewhere"
+# If you want something other than default of /var/lib/postgresql:
+# NOTE: the postgres system user needs to be able to read/write from this directory.
+postgres_data_dir="/var/lib/postgresql/data" 
+```
+
+## Utility Scripts
+
+Utility scripts that can be run independently are in src/utils. Make them executable and run with the `-u` option to see usage.
 
 ## TODO:
 
@@ -23,31 +43,6 @@ select
 from 
   crash -- will need schema specified
 ```
-
-## Environment Variables
-
-Create a .env file. `port` is required but others should be optional, depending on your OS.
-```sh
-port=5437
-# If you want something other than default of "crash":
-db="crash2"
-# If you want something other than default of /tmp/crash-data:
-# NOTE: the system user you run the script/create the db as needs to read/write from this directory.
-user_data_dir="/tmp/somewhere"
-# If you want something other than default of /var/lib/postgresql:
-# NOTE: the postgres system user needs to be able to read/write from this directory.
-postgres_data_dir="/var/lib/postgresql/data" 
-```
-
-## Usage
-
-The database is created and populated via the setup.sh bash script. If it is not already executable, make it so with `chmod 755 setup_db.sh` and then invoke with `./setup_db.sh`. You can optionally drop and recreate the existing database with the `-r` flag: `./setup_db.sh -r`, which will also terminate any existing connections in order to do so.
-
-The script assumes that data files (CSVs) are in data/ relative to the project directory, which are then copied to appropriate folders (configurable via environment variables if necessary) to ease access by Postgres's <a href="https://www.postgresql.org/docs/17/sql-copy.html">COPY</a>.
-
-### Utility Scripts
-
-The way these are invoked may change. At present, there's one script, at src/diff_headers.sh, which checks that the headers in the data files are the same across each table/state/year. See usage with `./src/diff_headers.sh -u`.
 
 ## Data
 
@@ -79,7 +74,7 @@ Misc:
   - The crash table's "lane_closed" field contains no data for years 2008-2024. I have not checked other fields but probably worthwhile to do so. I only happened across this by chance as the previous version of the data had bad values for this field (supposed to by Y/N but contained 0,1,2,9,U).
   - In 2005-2007, lane_closed (boolean) contained '2'. Converted to null.
 
-## NJDOT
+### NJDOT
 
 Main site: <https://dot.nj.gov/transportation/refdata/accident/>
 Data dictionaries: <https://dot.nj.gov/transportation/refdata/accident/masterfile.shtm>

@@ -1,6 +1,9 @@
 #! /usr/bin/env bash
 
-usage="Usage:
+usage="
+Check that the headers in the data files are the same across each table/state/year.
+
+Usage:
 $(basename $0) <state_abbr> <year1> <year2>
 
 NOTE: Ensure that the data filenames are in format expected (TABLENAME_GEOGRAPHY_YEAR.csv) e.g. FLAG_D06_2023.csv
