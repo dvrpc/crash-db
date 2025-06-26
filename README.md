@@ -80,4 +80,4 @@ Main site: <https://dot.nj.gov/transportation/refdata/accident/>
 Data dictionaries: <https://dot.nj.gov/transportation/refdata/accident/masterfile.shtm>
 Data: <https://dot.nj.gov/transportation/refdata/accident/rawdata01-current.shtm>
 
-A shell script at src/nj/download_nj_data.sh will download all tables for our four counties for specified years set in the script.
+A shell script at src/utils/download_nj_data.sh will download all tables for our four counties.
