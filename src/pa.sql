@@ -76,7 +76,7 @@ insert into pa_lookup_table_names (name, zero_padded) values
     ('veh_make', false);
 
 
--- Load functions.
+-- Import functions.
 \i src/pa/lookup_tables.sql
 \i src/pa/create_data_tables.sql
 \i src/pa/populate_data_tables.sql
