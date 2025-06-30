@@ -82,7 +82,7 @@ while getopts ":unpr" opt; do
   esac
 done
 
-if [[ $pa != true || $nj != true ]]; then
+if test ${pa} = false && test ${nj} = false ; then
   echo "You must choose at least one state. Quitting."
   echo "${usage}"
   exit
