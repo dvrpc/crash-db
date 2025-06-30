@@ -80,4 +80,21 @@ Main site: <https://dot.nj.gov/transportation/refdata/accident/>
 Data dictionaries: <https://dot.nj.gov/transportation/refdata/accident/masterfile.shtm>
 Data: <https://dot.nj.gov/transportation/refdata/accident/rawdata01-current.shtm>
 
+Lookup tables:
+  <https://dot.nj.gov/transportation/refdata/accident/codes.shtm>
+  <https://dot.nj.gov/transportation/refdata/accident/crash_detail_summary.shtm>
+  <https://dot.nj.gov/transportation/refdata/accident/forms.shtm>
+
+  2017:
+    <https://dot.nj.gov/transportation/refdata/accident/pdf/NJTR-1_Overlays.pdf>
+  2006-2016:
+    <https://dot.nj.gov/transportation/refdata/accident/pdf/NJTR-1.pdf>
+  2001-2005:
+    <https://dot.nj.gov/transportation/refdata/accident/pdf/NJTR-1_2001.pdf>
+
+
+  
+
+  
+
 A shell script at src/utils/download_nj_data.sh will download all tables for our four counties.
