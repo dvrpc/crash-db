@@ -29,6 +29,7 @@ begin
             data in the temporary tables, it should be used first. If the values in a field fail it, the
             ones below, starting from most restrictive to least, should then be used.
         */
+        create domain text019YNTFUspace_as_bool text check(trim(value) in ('0', '0.0', '1', '1.0', 'Y', 'N', 'T', 'F', 'U', '9', '9.0', ' ', ''));
         create domain text019YNUspace_as_bool text check(value in ('0', '0.0', '1', '1.0', 'Y', 'N', 'U', '9', '9.0', ' '));
         create domain text01_as_bool text check(value in ('0', '1'));
         create domain text012_as_bool text check(value in ('0', '1', '2'));

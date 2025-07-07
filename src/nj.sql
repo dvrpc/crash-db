@@ -2,8 +2,8 @@
 \i src/nj/lookup_tables.sql
 \i src/nj/create_data_tables.sql
 \i src/nj/populate_data_tables.sql
-\i src/nj/clean_data.sql
-\i src/nj/alter_temp_domains.sql
+-- \i src/nj/clean_data.sql
+-- \i src/nj/alter_temp_domains.sql
 
 -- Create and populate lookup tables if they don't already exist/aren't populated.
 create schema if not exists nj_2017_lookup; 
@@ -27,7 +27,7 @@ begin
 
         raise info 'Create and populate data tables';
         call nj_create_data_tables(year::text);
-        -- call nj_populate_data_tables(year::text);
+        call nj_populate_data_tables(year::text);
 
         raise info 'Add indexes to tables';
         -- ?

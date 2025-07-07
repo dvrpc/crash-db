@@ -92,9 +92,10 @@ Lookup tables:
   2001-2005:
     <https://dot.nj.gov/transportation/refdata/accident/pdf/NJTR-1_2001.pdf>
 
-
-  
-
-  
-
 A shell script at src/utils/download_nj_data.sh will download all tables for our four counties.
+
+#### Data issues
+
+Misc:
+  - In the Burlington 2022 Drivers table, there was a literal carriage return in the middle of line 108 (found via error message from Postgres's COPY). I verified it using `bat` (`bat -A Burlington2022Drivers.txt`), then opened with text editor and replaced it with a space.
+  - Unicode symbol/characters found in Burlington2022Accidents.txt, on line 3592. Replaced with '-'.

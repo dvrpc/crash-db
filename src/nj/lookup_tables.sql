@@ -3,7 +3,7 @@ language plpgsql
 as
 $body$
 declare
-    table_names text[] := '{airbag_deployment, cargo_body_type, contrib_circ, crash_type, dir_of_travel, driven_left_towed, ejection, environmental_condition, extent_of_damage, light_condition, location_of_most_severe_injury, position_in_veh, police_dept, pre_crash_action, road_divided_by, road_grade, road_horizontal_alignment, road_suffix, road_surface_condition, road_surface_type, road_system, safety_equipment, sequence_of_events, severity, special_function_vehicles, temp_traffic_control_zone, traffic_controls, type_of_most_severe_injury, veh_color, veh_impact_area, veh_type, veh_use}';
+    table_names text[] := '{airbag_deployment, cargo_body_type, contrib_circ, crash_type, dir_of_travel, driven_left_towed, ejection, environmental_condition, extent_of_damage, light_condition, location_of_most_severe_injury, oversized_overweight_permit, position_in_veh, police_dept, pre_crash_action, refused_med_attn, road_divided_by, road_grade, road_horizontal_alignment, road_suffix, road_surface_condition, road_surface_type, road_system, safety_equipment, sequence_of_events, severity, special_function_vehicles, temp_traffic_control_zone, traffic_controls, type_of_most_severe_injury, veh_color, veh_impact_area, veh_type, veh_use}';
     table_name text;
 begin
 
@@ -197,16 +197,12 @@ begin
             ('12', 'Entire Body'),
             ('99', 'Other');
 
-        -- This is called "physical condition" on the police form.
-        insert into nj_2017_lookup.severity (code, description) values
+        insert into nj_2017_lookup.oversized_overweight_permit (code, description) values
             ('00', 'Unknown'),
-            ('01', 'Fatal Injury'),
-            ('02', 'Suspected Serious Injury'),
-            ('03', 'Suspected Minor Injury'),
-            ('04', 'Possible Injury'),
-            ('05', 'No Apparent Injury'),
+            ('01', 'Yes'),
+            ('02', 'No'),
             ('99', 'Other');
-            
+
         insert into nj_2017_lookup.position_in_veh (code, description) values
             ('00', 'Unknown'),
             ('01', 'Driver'),
@@ -273,6 +269,12 @@ begin
             ('45', 'Crossing at "Marked" Crosswalk at Mid-Block'),
             ('46', 'Deliberate Action'),
             ('49', 'Other Pedestrian Action');
+
+        insert into nj_2017_lookup.refused_med_attn (code, description) values
+            ('00', 'Unknown'),
+            ('01', 'Yes'),
+            ('02', 'No'),
+            ('99', 'Other');
 
         insert into nj_2017_lookup.road_divided_by (code, description) values
             ('00', 'Unknown'),
@@ -419,8 +421,19 @@ begin
             ('60', 'Tree'),
             ('61', 'Mailbox'),
             ('62', 'Fire Hydrant'),
-            ('69', 'Other Fixed Object');
+            ('69', 'Other Fixed Object'),
+            ('99', 'Other');
         
+        -- This is called "physical condition" on the police form.
+        insert into nj_2017_lookup.severity (code, description) values
+            ('00', 'Unknown'),
+            ('01', 'Fatal Injury'),
+            ('02', 'Suspected Serious Injury'),
+            ('03', 'Suspected Minor Injury'),
+            ('04', 'Possible Injury'),
+            ('05', 'No Apparent Injury'),
+            ('99', 'Other');
+            
         insert into nj_2017_lookup.special_function_vehicles (code, description) values
             ('00', 'Unknown'),
             ('01', 'Work Equipment'),
