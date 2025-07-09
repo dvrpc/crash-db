@@ -102,7 +102,7 @@ if [[ $pa = true ]]; then
     echo
       if [[ $REPLY =~ ^[Yy]$ ]]; then
         psql -p "${port}" -c "SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE datname='${db}';"
-        psql -q -p "${port}" -d "${db}" -f src/pa/drop.sql
+        psql -qb -p "${port}" -d "${db}" -f src/pa/drop.sql
       else
         echo 'Aborting.'
         exit
@@ -110,7 +110,7 @@ if [[ $pa = true ]]; then
   fi
 
 
-  psql -q -p "${port}" -d "${db}" -v user_data_dir="${user_data_dir}" -v postgres_data_dir="${postgres_data_dir}" -f src/init_vars.sql -f src/pa.sql
+  psql -qb -p "${port}" -d "${db}" -v user_data_dir="${user_data_dir}" -v postgres_data_dir="${postgres_data_dir}" -f src/init_vars.sql -f src/pa.sql
 fi
 
 if [[ $nj = true ]]; then
@@ -118,13 +118,13 @@ if [[ $nj = true ]]; then
     read -p "Are you sure want to reset the NJ database? (Press y to reset it, any other key to abort.) " -n 1 -r
     echo
       if [[ $REPLY =~ ^[Yy]$ ]]; then
-        psql -p "${port}" -c "SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE datname='${db}';"
-        psql -q -p "${port}" -d "${db}" -f src/nj/drop.sql
+        psql -qb -p "${port}" -c "SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE datname='${db}';"
+        psql -qb -p "${port}" -d "${db}" -f src/nj/drop.sql
       else
         echo 'Aborting.'
         exit
       fi
   fi
 
-  psql -q -p "${port}" -d "${db}" -v user_data_dir="${user_data_dir}" -v postgres_data_dir="${postgres_data_dir}" -f src/init_vars.sql -f src/nj.sql
+  psql -qb -p "${port}" -d "${db}" -v user_data_dir="${user_data_dir}" -v postgres_data_dir="${postgres_data_dir}" -f src/init_vars.sql -f src/nj.sql
 fi  
