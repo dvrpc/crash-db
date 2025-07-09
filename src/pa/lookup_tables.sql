@@ -7,7 +7,7 @@ declare
     table_name text;
 begin
 
-    raise info 'Creating and populating lookup tables.';
+    raise info 'Creating and populating lookup tables';
     -- Create lookup tables.
     foreach table_name in ARRAY table_names LOOP
         execute format($create_query$create unlogged table if not exists pa_lookup.%I (code text not null unique, description text not null)$create_query$, table_name);

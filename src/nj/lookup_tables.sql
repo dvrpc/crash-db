@@ -3,11 +3,11 @@ language plpgsql
 as
 $body$
 declare
-    table_names text[] := '{airbag_deployment, cargo_body_type, contrib_circ, crash_type, dir_of_travel, driven_left_towed, ejection, environmental_condition, extent_of_damage, light_condition, location_of_most_severe_injury, oversized_overweight_permit, position_in_veh, police_dept, pre_crash_action, refused_med_attn, road_divided_by, road_grade, road_horizontal_alignment, road_suffix, road_surface_condition, road_surface_type, road_system, safety_equipment, sequence_of_events, severity, special_function_vehicles, temp_traffic_control_zone, traffic_controls, type_of_most_severe_injury, veh_color, veh_impact_area, veh_type, veh_use}';
+    table_names text[] := '{airbag_deployment, cargo_body_type, contrib_circ, crash_type, dir_of_travel, driven_left_towed, ejection, environmental_condition, extent_of_damage, light_condition, location_of_most_severe_injury, oversized_overweight_permit, position_in_veh, police_dept, pre_crash_action, refused_med_attn, road_divided_by, road_grade, road_horizontal_alignment, road_surface_condition, road_surface_type, road_system, route_suffix, safety_equipment, sequence_of_events, severity, special_function_vehicles, temp_traffic_control_zone, traffic_controls, type_of_most_severe_injury, veh_color, veh_impact_area, veh_type, veh_use}';
     table_name text;
 begin
 
-    raise info 'Creating and populating lookup tables.';
+    raise info 'Creating and populating lookup tables';
     -- Create lookup tables.
     foreach table_name in ARRAY table_names LOOP
         execute format($create_query$create unlogged table if not exists nj_2017_lookup.%I (code text not null unique, description text not null)$create_query$, table_name);
@@ -218,7 +218,8 @@ begin
             ('11', 'Riding/Hanging on Outside'),
             ('12', 'Bus Seating'),
             ('99', 'Other');
-            
+
+        -- From <https://dot.nj.gov/transportation/refdata/accident/codes.shtm>
         insert into nj_2017_lookup.police_dept (code, description) values
             ('00', 'Unknown'),
             ('01', 'Municipal Police'),
@@ -300,20 +301,6 @@ begin
             ('02', 'Curved Left'),
             ('03', 'Curved Right'),
             ('99', 'Other');
-         
-        insert into nj_2017_lookup.road_suffix (code, description) values
-            ('00', 'Unknown'),
-            ('A', 'Alternate'),
-            ('B', 'Business'),
-            ('C', 'Freeway'),
-            ('M', 'Mercer Alignment (I-95 Only)'),
-            ('P', 'Pennsylvania Extension (NJTPK Only)'),
-            ('S', 'Spur (County Routes Only)'),
-            ('T', 'Truck (Route 1 & 9 Only)'),
-            ('U', 'Upper (State Route 139 Only)'),
-            ('L', 'Lower (State Route 139 Only)'),
-            ('W', 'Western Alignment (NJTPK, Route 9 & Route 173)'),
-            ('99', 'Other');
 
         insert into nj_2017_lookup.road_surface_condition (code, description) values
             ('00', 'Unknown'),
@@ -351,6 +338,21 @@ begin
             ('10', 'US Govt Property'),
             ('99', 'Other');
         
+        -- From <https://dot.nj.gov/transportation/refdata/accident/codes.shtm>
+        insert into nj_2017_lookup.route_suffix (code, description) values
+            ('00', 'Unknown'),
+            ('A', 'Alternate'),
+            ('B', 'Business'),
+            ('C', 'Freeway'),
+            ('M', 'Mercer Alignment (I-95 Only)'),
+            ('P', 'Pennsylvania Extension (NJTPK Only)'),
+            ('S', 'Spur (County Routes Only)'),
+            ('T', 'Truck (Route 1 & 9 Only)'),
+            ('U', 'Upper (State Route 139 Only)'),
+            ('L', 'Lower (State Route 139 Only)'),
+            ('W', 'Western Alignment (NJTPK, Route 9 & Route 173)'),
+            ('99', 'Other');
+
         insert into nj_2017_lookup.safety_equipment (code, description) values
             ('00', 'Unknown'),
             ('01', 'None'),
