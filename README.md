@@ -77,8 +77,9 @@ Misc:
 ### NJDOT
 
 Main site: <https://dot.nj.gov/transportation/refdata/accident/>
-Data dictionaries: <https://dot.nj.gov/transportation/refdata/accident/masterfile.shtm>
 Data: <https://dot.nj.gov/transportation/refdata/accident/rawdata01-current.shtm>
+Data dictionaries: <https://dot.nj.gov/transportation/refdata/accident/masterfile.shtm>
+Crash report manual found at <https://dot.nj.gov/transportation/refdata/accident/publications.shtm>.
 
 Lookup tables:
   <https://dot.nj.gov/transportation/refdata/accident/codes.shtm>
@@ -99,3 +100,5 @@ A shell script at src/utils/download_nj_data.sh will download all tables for our
 Misc:
   - In the Burlington 2022 Drivers table, there was a literal carriage return in the middle of line 108 (found via error message from Postgres's COPY). I verified it using `bat` (`bat -A Burlington2022Drivers.txt`), then opened with text editor and replaced it with a space.
   - Unicode symbol/characters found in Burlington2022Accidents.txt, on line 3592. Replaced with '-'.
+  - police_station field in crash table seems to often just be the same as dept_case_number, other times it's text
+
