@@ -90,8 +90,10 @@ fi
 
 # Copy data files in data/ to location accessible by server, for easier use in COPY, which
 # requires absolute paths/certain permissions.
-# mkdir -p "${user_data_dir}"
-# cp -r data/* "${user_data_dir}"
+mkdir -p "${user_data_dir}"
+mkdir -p "${user_data_dir}"/nj
+cp -r data/pa/* "${user_data_dir}"
+cp -r data/nj/*-utf8.txt "${user_data_dir}/nj/"
 
 ## Create custom domains.
 psql -q -p "${port}" -d "${db}" < src/domains.sql
