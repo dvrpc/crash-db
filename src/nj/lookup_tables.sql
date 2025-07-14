@@ -15,6 +15,7 @@ begin
 
     -- Populate lookup tables.
     begin
+        -- Found in 2017 crash report manual, p. 58
         insert into nj_2017_lookup.airbag_deployment (code, description) values
             ('00', 'Unknown'),
             ('01', 'Front'),
@@ -102,7 +103,9 @@ begin
             ('77', 'Walking in Road when Sidewalks Present'),
             ('78', 'Running/Darting Across Traffic'),
             ('85', 'None'),
-            ('89', 'Other Pedestrian Factors');
+            ('89', 'Other Pedestrian Factors'),
+            --
+            ('99', 'Other');
 
         insert into nj_2017_lookup.crash_type (code, description) values
             ('00', 'Unknown'),
@@ -132,13 +135,13 @@ begin
             ('04', 'West');
         
         insert into nj_2017_lookup.driven_left_towed (code, description) values
-            ('00', 'Unknown'),
+            -- ('00', 'Unknown'),
             ('1', 'Driven'),
             ('2', 'Left at Scene'),
             ('3', 'Towed Disabled'),
             ('4', 'Towed Impounded'),
-            ('5', 'Towed Disabled & Impounded'),
-            ('99', 'Other');
+            ('5', 'Towed Disabled & Impounded');
+            -- ('99', 'Other');
 
         insert into nj_2017_lookup.ejection (code, description) values
             ('00', 'Unknown'),
@@ -269,7 +272,9 @@ begin
             ('44', 'Crossing at "Unmarked" Crosswalk at Intersection'),
             ('45', 'Crossing at "Marked" Crosswalk at Mid-Block'),
             ('46', 'Deliberate Action'),
-            ('49', 'Other Pedestrian Action');
+            ('49', 'Other Pedestrian Action'),
+            --
+            ('99', 'Other');
 
         insert into nj_2017_lookup.refused_med_attn (code, description) values
             ('00', 'Unknown'),
@@ -501,24 +506,24 @@ begin
         
         insert into nj_2017_lookup.veh_color (code, description) values
             ('BG', 'Beige'),
-            ('Black', 'BK'),
-            ('Blue', 'BL'),
-            ('Brown', 'BN'),
-            ('Coral', 'CL'),
-            ('Cream', 'CM'),
-            ('Gold', 'GD'),
-            ('Gray', 'GY'),
-            ('Green', 'GN'),
-            ('Maroon', 'MN'),
-            ('Orange', 'OG'),
-            ('Pink', 'PK'),
-            ('Purple', 'PL'),
-            ('Red', 'RD'),
-            ('Silver', 'SL'),
-            ('Tan', 'TN'),
-            ('Turquoise', 'TQ'),
-            ('White', 'WT'),
-            ('Yellow', 'YL');
+            ('BK', 'Black'),
+            ('BL', 'Blue'),
+            ('BN', 'Brown'),
+            ('CL', 'Coral'),
+            ('CM', 'Cream'),
+            ('GD', 'Gold'),
+            ('GY', 'Gray'),
+            ('GN', 'Green'),
+            ('MN', 'Maroon'),
+            ('OG', 'Orange'),
+            ('PK', 'Pink'),
+            ('PL', 'Purple'),
+            ('RD', 'Red'), 
+            ('SL', 'Silver'),
+            ('TN', 'Tan'), 
+            ('TQ', 'Turquoise'),
+            ('WT', 'White'),
+            ('YL', 'Yellow');
             
         insert into nj_2017_lookup.veh_impact_area (code, description) values
             ('00', 'Unknown'),
@@ -574,7 +579,9 @@ begin
             ('30', 'Bus/Large Van/Limo (9-15 Seats)'),
             ('31', 'Bus (More than 15 Seats)'),
             -- Other Non Pass (40)
-            ('40', 'Equipment/Machinery');
+            ('40', 'Equipment/Machinery'),
+            --
+            ('99', 'Other');
         
         insert into nj_2017_lookup.veh_use (code, description) values
             ('00', 'Unknown'),
