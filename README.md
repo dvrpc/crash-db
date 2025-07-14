@@ -46,6 +46,12 @@ from
 
 ## Data
 
+### Obtaining and Pre-processing
+
+As there are only a handful of files for PA, these can be downloaded manually and placed in data/pa/district/.
+
+For NJ, one shell script (src/utils/download_nj_data.sh) downloads the files (to data/nj) and another (src/utils/convert_nj_encoding.sh) converts the encoding from win1252/cp1252 encoding to UTF8. The latter extracts the text files from the zip files (overwriting any existing ones), and uses the program `iconv` convert the encoding, creating new files ending in "-utf8.txt". setup_db.sh takes those files and copies them to the /tmp folder in order to extract the data from them. Postgres's `COPY`, even using the `encoding 'WIN1252'` option, was not able to decipher the encoding from the original files correctly and would add odd symbols, replacing one character with multiple characters, and thus break the specification that NJ uses. This utility has not been integrated into the setup_db.sh script because further issues have been found in the files that require manually cleanup (or at least are limited enough so far that a more automated solution has not yet been sought - see below).
+
 ### PennDOT
 
 Crash data:
@@ -98,7 +104,8 @@ A shell script at src/utils/download_nj_data.sh will download all tables for our
 #### Data issues
 
 Misc:
-  - In the Burlington 2022 Drivers table, there was a literal carriage return in the middle of line 108 (found via error message from Postgres's COPY). I verified it using `bat` (`bat -A Burlington2022Drivers.txt`), then opened with text editor and replaced it with a space.
-  - Unicode symbol/characters found in Burlington2022Accidents.txt, on line 3592. Replaced with '-'.
+  - In the Burlington 2022 Drivers table, there was a literal carriage return in the middle of line 108 (found via error message from Postgres's COPY) (even after utf8 conversion). I verified it using `bat` (`bat -A Burlington2022Drivers-utf8.txt`), then opened with text editor and replaced it with a space.
+  - In the Camden and Mercer 2022 Vehicles tables, blackslashes (in the vehicle description field) interrupted parsing. They were replaced with spaces.
   - police_station field in crash table seems to often just be the same as dept_case_number, other times it's text
+  - In the Drivers and Pedestrians tables, DOB is an empty field, having 0 characters. This makes all of the subsequent from/to/length values incorrect in the  corresponding table layout pdf. These fields were removed from our version of the table.
 
