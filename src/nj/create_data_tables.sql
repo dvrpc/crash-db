@@ -7,10 +7,7 @@ declare
 begin
     execute format($t1$create unlogged table if not exists %1$s.crash (
         year text_year,
-        -- lookup table for county_code and municipality code:
-        -- <https://dot.nj.gov/transportation/refdata/accident/pdf/CountyMunicipalCodes1-13-17.pdf>
-        county_code text, -- TODO: add lookup table
-        municipality_code text, -- TODO: add lookup table
+        ncic_code text references nj_2017_lookup.ncic (code),
         dept_case_num text,
         county text,
         municipality text,
@@ -76,8 +73,7 @@ begin
 
     execute format($t1$create unlogged table if not exists %1$s.driver (
         year text_year,
-        county_code text,
-        municipality_code text,
+        ncic_code text references nj_2017_lookup.ncic (code),
         dept_case_num text,
         veh_num integer,
         driver_city text,
@@ -104,8 +100,7 @@ begin
 
     execute format($t1$create unlogged table if not exists %1$s.occupant (
         year text_year,
-        county_code text,
-        municipality_code text,
+        ncic_code text references nj_2017_lookup.ncic (code),
         dept_case_num text,
         veh_num integer,
         occupant_num integer,
@@ -125,8 +120,7 @@ begin
 
     execute format($t1$create unlogged table if not exists %1$s.pedestrian (
         year text_year,
-        county_code text,
-        municipality_code text,
+        ncic_code text references nj_2017_lookup.ncic (code),
         dept_case_num text,
         pedestrian_num integer,
         physical_condition text references nj_2017_lookup.severity (code),
@@ -165,8 +159,7 @@ begin
 
     execute format($t1$create unlogged table if not exists %1$s.vehicle (
         year text_year,
-        county_code text,
-        municipality_code text,
+        ncic_code text references nj_2017_lookup.ncic (code),
         dept_case_num text,
         veh_num integer,
         insurance_co_code text,
