@@ -11,6 +11,7 @@ begin
         create domain text00_23 text check(value::int between 0 and 23);
         create domain text_year text check(value::int >= 1900);
         create domain text_month text check(value::int between 1 and 12);
+        create domain text_direction text check(value in ('N', 'E', 'S', 'W'));
 
         /*
             Temporary domains - used in order to get invalid data into temporary tables', which will
@@ -22,6 +23,11 @@ begin
         -- Domain to allow any positive integer through before being cleaned.
         create domain text_as_pos_int text check(value::int >= 0);
 
+        -- Domain to allow 00-04 through for dir_of_travel in the NJ pedestrian
+        -- and vehicle tables. Since they get changed to cardinal directions during cleaning,
+        -- also allow those.
+        create domain text_00_04_direction text check(value in ('00', '01', '02', '03', '04', 'N', 'E', 'S', 'W'));
+
         /*
             Boolean domains, using text as the base.
             The first one is the broadest that can be successfully and unambiguously
@@ -29,7 +35,7 @@ begin
             data in the temporary tables, it should be used first. If the values in a field fail it, the
             ones below, starting from most restrictive to least, should then be used.
         */
-        create domain text019YNTFUspace_as_bool text check(trim(value) in ('0', '0.0', '1', '1.0', 'Y', 'N', 'T', 'F', 'U', '9', '9.0', ' ', ''));
+        create domain text019YNTFUspace_as_bool text check(value in ('0', '0.0', '1', '1.0', 'Y', 'N', 'T', 'F', 'U', '9', '9.0', ' '));
         create domain text019YNUspace_as_bool text check(value in ('0', '0.0', '1', '1.0', 'Y', 'N', 'U', '9', '9.0', ' '));
         create domain text01_as_bool text check(value in ('0', '1'));
         create domain text012_as_bool text check(value in ('0', '1', '2'));

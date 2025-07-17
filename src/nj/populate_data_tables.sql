@@ -61,7 +61,7 @@ begin
       type to determine what it is, so it can be inserted and then cleaned later.
     */
     raise info '.Alter domains';
-    -- call nj_alter_temp_domains(year);
+    call nj_alter_temp_domains(year);
 
     raise info '.Parse columns from spec & insert into second set of temporary tables';
     foreach db_table in array db_tables loop

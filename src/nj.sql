@@ -3,7 +3,7 @@
 \i src/nj/create_data_tables.sql
 \i src/nj/populate_data_tables.sql
 \i src/nj/clean_data.sql
--- \i src/nj/alter_temp_domains.sql
+\i src/nj/alter_temp_domains.sql
 
 -- Create and populate lookup tables if they don't already exist/aren't populated.
 create schema if not exists nj_2017_lookup; 

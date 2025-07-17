@@ -3,7 +3,7 @@ language plpgsql
 as
 $body$
 declare
-    table_names text[] := '{airbag_deployment, cargo_body_type, contrib_circ, crash_type, dir_of_travel, driven_left_towed, ejection, environmental_condition, extent_of_damage, light_condition, location_of_most_severe_injury, ncic, oversized_overweight_permit, position_in_veh, police_dept, pre_crash_action, refused_med_attn, road_divided_by, road_grade, road_horizontal_alignment, road_surface_condition, road_surface_type, road_system, route_suffix, safety_equipment, sequence_of_events, severity, special_function_vehicles, temp_traffic_control_zone, traffic_controls, type_of_most_severe_injury, veh_color, veh_impact_area, veh_type, veh_use}';
+    table_names text[] := '{airbag_deployment, cargo_body_type, contrib_circ, crash_type, driven_left_towed, ejection, environmental_condition, extent_of_damage, light_condition, location_of_most_severe_injury, ncic, oversized_overweight_permit, position_in_veh, police_dept, pre_crash_action, refused_med_attn, road_divided_by, road_grade, road_horizontal_alignment, road_surface_condition, road_surface_type, road_system, route_suffix, safety_equipment, sequence_of_events, severity, special_function_vehicles, temp_traffic_control_zone, traffic_controls, type_of_most_severe_injury, veh_color, veh_impact_area, veh_type, veh_use}';
     table_name text;
 begin
 
@@ -126,13 +126,6 @@ begin
             ('15', 'Non-Fixed Object'),
             ('16', 'Railcar - Vehicle'),
             ('99', 'Other');
-        
-        insert into nj_2017_lookup.dir_of_travel (code, description) values
-            ('00', 'Unknown'),
-            ('01', 'North'),
-            ('02', 'East'),
-            ('03', 'South'),
-            ('04', 'West');
         
         insert into nj_2017_lookup.driven_left_towed (code, description) values
             -- ('00', 'Unknown'),
