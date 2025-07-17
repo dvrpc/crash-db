@@ -6,8 +6,12 @@ $body$
 begin
 
     begin
-        -- Domains that data should ultimately conform to.
-        create domain text24hhmm text check(value::int <= 2359);
+        /* Domains that data should ultimately conform to. */
+        
+        -- NJ explicitly gives range of 0001 to 2400 (p. 18 of 2017 NJ Crash Report Manual)
+        -- I had previously assumed PA was 00:00-23:59, but not sure. Allowing up to 2400 for both.
+        create domain text24hhmm text check(value::int <= 2400);
+
         create domain text00_23 text check(value::int between 0 and 23);
         create domain text_year text check(value::int >= 1900);
         create domain text_month text check(value::int between 1 and 12);
