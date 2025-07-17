@@ -16,6 +16,7 @@ begin
         create domain text_year text check(value::int >= 1900);
         create domain text_month text check(value::int between 1 and 12);
         create domain text_direction text check(value in ('N', 'E', 'S', 'W'));
+        create domain text_direction_bound text check(value in ('NB', 'EB', 'SB', 'WB'));
 
         /*
             Temporary domains - used in order to get invalid data into temporary tables', which will
