@@ -104,7 +104,11 @@ A shell script at src/utils/download_nj_data.sh will download all tables for our
 #### Data issues
 
 Misc:
-  - In the Burlington 2022 Drivers table, there was a literal carriage return in the middle of line 108 (found via error message from Postgres's COPY) (even after utf8 conversion). I verified it using `bat` (`bat -A Burlington2022Drivers-utf8.txt`), then opened with text editor and replaced it with a space.
+  - literal carriage return (break to next line) in various files, which need to be replaced with a space. These are, so far, always after any text in the charges columns.
+    - Burlington 2022 Drivers, line 108
+    - Burlington 2021 Drivers, 676, 5674, 6633, 12669, 17095
+    - Camden 2021 Drivers, 17689
+    - Gloucseter 2021 Drivers, 2107, 2167, 2277, 2329 (two of them), 2926, 6575, 12686
   - In the Camden and Mercer 2022 Vehicles tables, blackslashes (in the vehicle description field) interrupted parsing. They were replaced with spaces.
   - police_station field in crash table seems to often just be the same as dept_case_number, other times it's text
   - In the Drivers and Pedestrians tables, DOB is an empty field, having 0 characters. This makes all of the subsequent from/to/length values incorrect in the  corresponding table layout pdf. These fields were removed from our version of the table.

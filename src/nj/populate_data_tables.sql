@@ -26,11 +26,11 @@ begin
         -- The data files use "Accident" but the table name is "crash".
         if db_table = 'crash' then
             foreach county in array counties loop
-                execute format($q$copy temp_crash_%s_one_column from '%s/nj/%s%sAccidents-utf8.txt' with (format text)$q$, year, user_data_dir, county, year);
+                execute format($q$copy temp_%s_%s_one_column from '%s/nj/%s%sAccidents-utf8-escaped.txt' with (format text)$q$, db_table, year, user_data_dir, county, year);
             end loop;
         else
             foreach county in array counties loop
-                execute format($q$copy temp_%s_%s_one_column from '%s/nj/%s%s%ss-utf8.txt' with (format text)$q$, db_table, year, user_data_dir, county, year, initcap(db_table));
+                execute format($q$copy temp_%s_%s_one_column from '%s/nj/%s%s%ss-utf8-escaped.txt' with (format text)$q$, db_table, year, user_data_dir, county, year, initcap(db_table));
             end loop;
         end if;
     end loop;
