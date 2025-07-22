@@ -2,9 +2,6 @@
 
 # Unzip all the downloaded files, overwriting any existing .txt files.
 unzip -o data/nj/\*.zip -d data/nj/
-# for file in $(ls data/nj/*.zip); do
-#   unzip -o ${file} > "${file%.*}.txt"
-# done
 
 # Convert encoding from win1252/cp1252 to UTF8 and write to new file.
 # (Postgres's `COPY`, even using the `encoding 'WIN1252'` option, was not able to decipher the
@@ -13,12 +10,10 @@ unzip -o data/nj/\*.zip -d data/nj/
 for file in $(ls data/nj/*.txt); do
   # iconv doesn't do in-place conversion, so first output to a new file name and then replace it
   iconv -f WINDOWS-1252 -t UTF-8 -o "${file}.new" "${file}" && mv -f "${file}.new" "${file}"
-  # iconv -f WINDOWS-1252 -t UTF-8 "${file}" -o "${file%.*}_utf8.txt"
 done
 
 # Convert from dos to unix formatting (CRLF -> LF).
 for file in $(ls data/nj/*.txt); do
-  # dos2unix --newfile "${file}" "${file%.*}.txt"
   dos2unix "${file}"
 done
 

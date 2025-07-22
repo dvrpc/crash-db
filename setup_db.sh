@@ -90,9 +90,9 @@ fi
 
 # Copy data files in data/ to location accessible by server, for easier use in COPY, which
 # requires absolute paths/certain permissions.
-mkdir -p "${user_data_dir}"
+mkdir -p "${user_data_dir}/pa"
 mkdir -p "${user_data_dir}"/nj
-cp -r data/pa/* "${user_data_dir}"
+cp -r data/pa/* "${user_data_dir}/pa"
 cp -r data/nj/*.txt "${user_data_dir}/nj/"
 
 ## Create custom domains.
