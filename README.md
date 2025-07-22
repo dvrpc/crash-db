@@ -50,7 +50,7 @@ from
 
 As there are only a handful of files for PA, these can be downloaded manually and placed in data/pa/district/.
 
-For NJ, one shell script (src/utils/download_nj_data.sh) downloads the files (to data/nj) and another (src/utils/convert_nj_encoding.sh) converts the encoding from win1252/cp1252 encoding to UTF8. The latter extracts the text files from the zip files (overwriting any existing ones), and uses the program `iconv` convert the encoding, creating new files ending in "-utf8.txt". setup_db.sh takes those files and copies them to the /tmp folder in order to extract the data from them. Postgres's `COPY`, even using the `encoding 'WIN1252'` option, was not able to decipher the encoding from the original files correctly and would add odd symbols, replacing one character with multiple characters, and thus break the specification that NJ uses. This utility has not been integrated into the setup_db.sh script because further issues have been found in the files that require manually cleanup (or at least are limited enough so far that a more automated solution has not yet been sought - see below).
+For NJ, one shell script (src/utils/nj_download_data.sh) downloads the compressed (.zip) files (to data/nj) and another (src/utils/nj_pre_process_files.sh) extracts and pre-processes them so they can be properly imported into Postgres (see comments in that latter script for additional details). 
 
 ### PennDOT
 
@@ -104,12 +104,8 @@ A shell script at src/utils/download_nj_data.sh will download all tables for our
 #### Data issues
 
 Misc:
-  - literal carriage return (break to next line) in various files, which need to be replaced with a space. These are, so far, always after any text in the charges columns.
-    - Burlington 2022 Drivers, line 108
-    - Burlington 2021 Drivers, 676, 5674, 6633, 12669, 17095
-    - Camden 2021 Drivers, 17689
-    - Gloucseter 2021 Drivers, 2107, 2167, 2277, 2329 (two of them), 2926, 6575, 12686
-  - In the Camden and Mercer 2022 Vehicles tables, blackslashes (in the vehicle description field) interrupted parsing. They were replaced with spaces.
+  - Backslashes found in various files. These break Postgres's COPY. They are escaped (with another backslash) via src/utils/nj_pre_process_files.sh. 
+  - Literal carriage returns (break to next line) were found in various files. These break the line specification. They are replaced with a space via src/utils/nj_pre_process_files.sh.
   - police_station field in crash table seems to often just be the same as dept_case_number, other times it's text
-  - In the Drivers and Pedestrians tables, DOB is an empty field, having 0 characters. This makes all of the subsequent from/to/length values incorrect in the  corresponding table layout pdf. These fields were removed from our version of the table.
+  - In the Drivers and Pedestrians tables, DOB is an empty field, having 0 characters. This makes all of the subsequent from/to/length values incorrect in the corresponding table layout pdf. These fields were removed from our version of the table.
 
