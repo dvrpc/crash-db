@@ -63,6 +63,10 @@ begin
     raise info '.Alter domains';
     call nj_alter_temp_domains(year);
 
+    /* NOTE: The Drivers and Pedestrians tables in the 2021 and 2022 files do no match the 
+    file specification: DOB has length of 0 rather than 10, so there is a condition for those
+    tables to check the year and handle appropriately.
+    */
     raise info '.Parse columns from spec & insert into second set of temporary tables';
     foreach db_table in array db_tables loop
         for line in execute format($q1$select one_column from temp_%s_%s_one_column$q1$, db_table, year) loop
@@ -122,31 +126,62 @@ begin
                     nullif(trim(substring(%3$s from 465 for 5)), '')   -- reporting badge no
                 )$q2$, db_table, year, quote_nullable(line));
             elseif db_table = 'driver' then
-                execute format($q2$insert into temp_%1$s_%2$s values (
-                    nullif(trim(substring(%3$s from 1 for 4)), ''),    -- year
-                    nullif(trim(substring(%3$s from 5 for 4)), ''),    -- ncic (county & muni) code
-                    nullif(trim(substring(%3$s from 9 for 23)), ''),   -- dept case no
-                    nullif(trim(substring(%3$s from 33 for 2)), ''),   -- veh num
-                    nullif(trim(substring(%3$s from 36 for 25)), ''),  -- driver city
-                    nullif(trim(substring(%3$s from 62 for 2)), ''),   -- driver state
-                    nullif(trim(substring(%3$s from 65 for 5)), ''),   -- driver zip code
-                    nullif(trim(substring(%3$s from 71 for 2)), ''),   -- driver license state
-                    nullif(trim(substring(%3$s from 75 for 1)), ''),   -- driver sex
-                    nullif(trim(substring(%3$s from 77 for 1)), ''),   -- alcohol test given
-                    nullif(trim(substring(%3$s from 79 for 2)), ''),   -- alcohol test type
-                    nullif(trim(substring(%3$s from 82 for 3)), ''),   -- alcohol test results
-                    nullif(trim(substring(%3$s from 86 for 30)), ''),  -- charge 1
-                    nullif(trim(substring(%3$s from 117 for 30)), ''), -- summons 1
-                    nullif(trim(substring(%3$s from 148 for 30)), ''), -- charge 2
-                    nullif(trim(substring(%3$s from 179 for 30)), ''), -- summons 2 
-                    nullif(trim(substring(%3$s from 210 for 30)), ''), -- charge 3
-                    nullif(trim(substring(%3$s from 241 for 30)), ''), -- summons 3
-                    nullif(trim(substring(%3$s from 272 for 30)), ''), -- charge 4
-                    nullif(trim(substring(%3$s from 303 for 30)), ''), -- summons 4
-                    nullif(trim(substring(%3$s from 334 for 1)), ''),  -- multi charge flag
-                    nullif(trim(substring(%3$s from 336 for 2)), ''),  -- driver physical status 1
-                    nullif(trim(substring(%3$s from 339 for 2)), '')   -- driver physical status 2
-                )$q2$, db_table, year, quote_nullable(line));
+                -- 2021 and 2022 not to spec, use null for DOB
+                if year in ('2021', '2022') then
+                    execute format($q2$insert into temp_%1$s_%2$s values (
+                        nullif(trim(substring(%3$s from 1 for 4)), ''),    -- year
+                        nullif(trim(substring(%3$s from 5 for 4)), ''),    -- ncic (county & muni) code
+                        nullif(trim(substring(%3$s from 9 for 23)), ''),   -- dept case no
+                        nullif(trim(substring(%3$s from 33 for 2)), ''),   -- veh num
+                        nullif(trim(substring(%3$s from 36 for 25)), ''),  -- driver city
+                        nullif(trim(substring(%3$s from 62 for 2)), ''),   -- driver state
+                        nullif(trim(substring(%3$s from 65 for 5)), ''),   -- driver zip code
+                        nullif(trim(substring(%3$s from 71 for 2)), ''),   -- driver license state
+                        null,                                              -- driver DOB
+                        nullif(trim(substring(%3$s from 75 for 1)), ''),   -- driver sex
+                        nullif(trim(substring(%3$s from 77 for 1)), ''),   -- alcohol test given
+                        nullif(trim(substring(%3$s from 79 for 2)), ''),   -- alcohol test type
+                        nullif(trim(substring(%3$s from 82 for 3)), ''),   -- alcohol test results
+                        nullif(trim(substring(%3$s from 86 for 30)), ''),  -- charge 1
+                        nullif(trim(substring(%3$s from 117 for 30)), ''), -- summons 1
+                        nullif(trim(substring(%3$s from 148 for 30)), ''), -- charge 2
+                        nullif(trim(substring(%3$s from 179 for 30)), ''), -- summons 2 
+                        nullif(trim(substring(%3$s from 210 for 30)), ''), -- charge 3
+                        nullif(trim(substring(%3$s from 241 for 30)), ''), -- summons 3
+                        nullif(trim(substring(%3$s from 272 for 30)), ''), -- charge 4
+                        nullif(trim(substring(%3$s from 303 for 30)), ''), -- summons 4
+                        nullif(trim(substring(%3$s from 334 for 1)), ''),  -- multi charge flag
+                        nullif(trim(substring(%3$s from 336 for 2)), ''),  -- driver physical status 1
+                        nullif(trim(substring(%3$s from 339 for 2)), '')   -- driver physical status 2
+                    )$q2$, db_table, year, quote_nullable(line));
+                else
+                    execute format($q2$insert into temp_%1$s_%2$s values (
+                        nullif(trim(substring(%3$s from 1 for 4)), ''),    -- year
+                        nullif(trim(substring(%3$s from 5 for 4)), ''),    -- ncic (county & muni) code
+                        nullif(trim(substring(%3$s from 9 for 23)), ''),   -- dept case no
+                        nullif(trim(substring(%3$s from 33 for 2)), ''),   -- veh num
+                        nullif(trim(substring(%3$s from 36 for 25)), ''),  -- driver city
+                        nullif(trim(substring(%3$s from 62 for 2)), ''),   -- driver state
+                        nullif(trim(substring(%3$s from 65 for 5)), ''),   -- driver zip code
+                        nullif(trim(substring(%3$s from 71 for 2)), ''),   -- driver license state
+                        nullif(trim(substring(%3$s from 74 for 10)), ''),  -- driver DOB
+                        nullif(trim(substring(%3$s from 85 for 1)), ''),   -- driver sex
+                        nullif(trim(substring(%3$s from 87 for 1)), ''),   -- alcohol test given
+                        nullif(trim(substring(%3$s from 89 for 2)), ''),   -- alcohol test type
+                        nullif(trim(substring(%3$s from 92 for 3)), ''),   -- alcohol test results
+                        nullif(trim(substring(%3$s from 96 for 30)), ''),  -- charge 1
+                        nullif(trim(substring(%3$s from 127 for 30)), ''), -- summons 1
+                        nullif(trim(substring(%3$s from 158 for 30)), ''), -- charge 2
+                        nullif(trim(substring(%3$s from 189 for 30)), ''), -- summons 2 
+                        nullif(trim(substring(%3$s from 220 for 30)), ''), -- charge 3
+                        nullif(trim(substring(%3$s from 251 for 30)), ''), -- summons 3
+                        nullif(trim(substring(%3$s from 282 for 30)), ''), -- charge 4
+                        nullif(trim(substring(%3$s from 313 for 30)), ''), -- summons 4
+                        nullif(trim(substring(%3$s from 344 for 1)), ''),  -- multi charge flag
+                        nullif(trim(substring(%3$s from 346 for 2)), ''),  -- driver physical status 1
+                        nullif(trim(substring(%3$s from 349 for 2)), '')   -- driver physical status 2
+                    )$q2$, db_table, year, quote_nullable(line));
+                end if;
             elseif db_table = 'occupant' then
                 execute format($q2$insert into temp_%1$s_%2$s values (
                     nullif(trim(substring(%3$s from 1 for 4)), ''),    -- year
@@ -168,44 +203,88 @@ begin
                     nullif(trim(substring(%3$s from 72 for 4)), '')    -- hospital code
                 )$q2$, db_table, year, quote_nullable(line));
             elseif db_table = 'pedestrian' then
-                execute format($q2$insert into temp_%1$s_%2$s values (
-                    nullif(trim(substring(%3$s from 1 for 4)), ''),    -- year
-                    nullif(trim(substring(%3$s from 5 for 4)), ''),    -- ncic (county & muni) code
-                    nullif(trim(substring(%3$s from 9 for 23)), ''),   -- dept case no
-                    nullif(trim(substring(%3$s from 33 for 2)), ''),   -- pedestrian num
-                    nullif(trim(substring(%3$s from 36 for 2)), ''),   -- physical condition
-                    nullif(trim(substring(%3$s from 39 for 25)), ''),  -- address city
-                    nullif(trim(substring(%3$s from 65 for 2)), ''),   -- address state
-                    nullif(trim(substring(%3$s from 68 for 5)), ''),   -- address zip
-                    nullif(trim(substring(%3$s from 75 for 3)), ''),   -- age
-                    nullif(trim(substring(%3$s from 79 for 1)), ''),   -- sex
-                    nullif(trim(substring(%3$s from 81 for 1)), ''),   -- alcohol test given
-                    nullif(trim(substring(%3$s from 83 for 2)), ''),   -- alcohol test type
-                    nullif(trim(substring(%3$s from 86 for 3)), ''),   -- alcohol test results
-                    nullif(trim(substring(%3$s from 90 for 30)), ''),  -- charge1
-                    nullif(trim(substring(%3$s from 121 for 30)), ''), -- summons1
-                    nullif(trim(substring(%3$s from 152 for 30)), ''), -- charge2
-                    nullif(trim(substring(%3$s from 183 for 30)), ''), -- summons2
-                    nullif(trim(substring(%3$s from 214 for 30)), ''), -- charge3
-                    nullif(trim(substring(%3$s from 245 for 30)), ''), -- summons3
-                    nullif(trim(substring(%3$s from 276 for 30)), ''), -- charge4
-                    nullif(trim(substring(%3$s from 307 for 30)), ''), -- summons4
-                    nullif(trim(substring(%3$s from 338 for 1)), ''),  -- multi-charge flag
-                    nullif(trim(substring(%3$s from 340 for 2)), ''),  -- traffic controls
-                    nullif(trim(substring(%3$s from 343 for 2)), ''),  -- contrib circumstances 1
-                    nullif(trim(substring(%3$s from 346 for 2)), ''),  -- contrib circumstances 2
-                    nullif(trim(substring(%3$s from 349 for 2)), ''),  -- direction of travel
-                    nullif(trim(substring(%3$s from 352 for 2)), ''),   -- pre-crash action
-                    nullif(trim(substring(%3$s from 355 for 2)), ''),   -- location of most severe injury
-                    nullif(trim(substring(%3$s from 358 for 2)), ''),   -- type of most severe injury
-                    nullif(trim(substring(%3$s from 361 for 2)), ''),   -- refused medical attn
-                    nullif(trim(substring(%3$s from 364 for 2)), ''),   -- safety equipment used
-                    nullif(trim(substring(%3$s from 367 for 4)), ''),   -- hospital code
-                    nullif(trim(substring(%3$s from 372 for 2)), ''),   -- physical status 1
-                    nullif(trim(substring(%3$s from 375 for 2)), ''),   -- physical status 2
-                    nullif(trim(substring(%3$s from 378 for 1)), ''),   -- is bicyclist?
-                    nullif(trim(substring(%3$s from 380 for 1)), '')    -- is other?
-                )$q2$, db_table, year, quote_nullable(line));
+                -- 2021 and 2022 not to spec, use null for DOB
+                if year in ('2021', '2022') then
+                    execute format($q2$insert into temp_%1$s_%2$s values (
+                        nullif(trim(substring(%3$s from 1 for 4)), ''),    -- year
+                        nullif(trim(substring(%3$s from 5 for 4)), ''),    -- ncic (county & muni) code
+                        nullif(trim(substring(%3$s from 9 for 23)), ''),   -- dept case no
+                        nullif(trim(substring(%3$s from 33 for 2)), ''),   -- pedestrian num
+                        nullif(trim(substring(%3$s from 36 for 2)), ''),   -- physical condition
+                        nullif(trim(substring(%3$s from 39 for 25)), ''),  -- address city
+                        nullif(trim(substring(%3$s from 65 for 2)), ''),   -- address state
+                        nullif(trim(substring(%3$s from 68 for 5)), ''),   -- address zip
+                        null,                                              -- DOB
+                        nullif(trim(substring(%3$s from 75 for 3)), ''),   -- age
+                        nullif(trim(substring(%3$s from 79 for 1)), ''),   -- sex
+                        nullif(trim(substring(%3$s from 81 for 1)), ''),   -- alcohol test given
+                        nullif(trim(substring(%3$s from 83 for 2)), ''),   -- alcohol test type
+                        nullif(trim(substring(%3$s from 86 for 3)), ''),   -- alcohol test results
+                        nullif(trim(substring(%3$s from 90 for 30)), ''),  -- charge1
+                        nullif(trim(substring(%3$s from 121 for 30)), ''), -- summons1
+                        nullif(trim(substring(%3$s from 152 for 30)), ''), -- charge2
+                        nullif(trim(substring(%3$s from 183 for 30)), ''), -- summons2
+                        nullif(trim(substring(%3$s from 214 for 30)), ''), -- charge3
+                        nullif(trim(substring(%3$s from 245 for 30)), ''), -- summons3
+                        nullif(trim(substring(%3$s from 276 for 30)), ''), -- charge4
+                        nullif(trim(substring(%3$s from 307 for 30)), ''), -- summons4
+                        nullif(trim(substring(%3$s from 338 for 1)), ''),  -- multi-charge flag
+                        nullif(trim(substring(%3$s from 340 for 2)), ''),  -- traffic controls
+                        nullif(trim(substring(%3$s from 343 for 2)), ''),  -- contrib circumstances 1
+                        nullif(trim(substring(%3$s from 346 for 2)), ''),  -- contrib circumstances 2
+                        nullif(trim(substring(%3$s from 349 for 2)), ''),  -- direction of travel
+                        nullif(trim(substring(%3$s from 352 for 2)), ''),   -- pre-crash action
+                        nullif(trim(substring(%3$s from 355 for 2)), ''),   -- location of most severe injury
+                        nullif(trim(substring(%3$s from 358 for 2)), ''),   -- type of most severe injury
+                        nullif(trim(substring(%3$s from 361 for 2)), ''),   -- refused medical attn
+                        nullif(trim(substring(%3$s from 364 for 2)), ''),   -- safety equipment used
+                        nullif(trim(substring(%3$s from 367 for 4)), ''),   -- hospital code
+                        nullif(trim(substring(%3$s from 372 for 2)), ''),   -- physical status 1
+                        nullif(trim(substring(%3$s from 375 for 2)), ''),   -- physical status 2
+                        nullif(trim(substring(%3$s from 378 for 1)), ''),   -- is bicyclist?
+                        nullif(trim(substring(%3$s from 380 for 1)), '')    -- is other?
+                    )$q2$, db_table, year, quote_nullable(line));
+                else 
+                    execute format($q2$insert into temp_%1$s_%2$s values (
+                        nullif(trim(substring(%3$s from 1 for 4)), ''),    -- year
+                        nullif(trim(substring(%3$s from 5 for 4)), ''),    -- ncic (county & muni) code
+                        nullif(trim(substring(%3$s from 9 for 23)), ''),   -- dept case no
+                        nullif(trim(substring(%3$s from 33 for 2)), ''),   -- pedestrian num
+                        nullif(trim(substring(%3$s from 36 for 2)), ''),   -- physical condition
+                        nullif(trim(substring(%3$s from 39 for 25)), ''),  -- address city
+                        nullif(trim(substring(%3$s from 65 for 2)), ''),   -- address state
+                        nullif(trim(substring(%3$s from 68 for 5)), ''),   -- address zip
+                        nullif(trim(substring(%3$s from 74 for 10)), ''),  -- DOB
+                        nullif(trim(substring(%3$s from 85 for 3)), ''),   -- age
+                        nullif(trim(substring(%3$s from 89 for 1)), ''),   -- sex
+                        nullif(trim(substring(%3$s from 91 for 1)), ''),   -- alcohol test given
+                        nullif(trim(substring(%3$s from 93 for 2)), ''),   -- alcohol test type
+                        nullif(trim(substring(%3$s from 96 for 3)), ''),   -- alcohol test results
+                        nullif(trim(substring(%3$s from 100 for 30)), ''),  -- charge1
+                        nullif(trim(substring(%3$s from 131 for 30)), ''), -- summons1
+                        nullif(trim(substring(%3$s from 162 for 30)), ''), -- charge2
+                        nullif(trim(substring(%3$s from 193 for 30)), ''), -- summons2
+                        nullif(trim(substring(%3$s from 224 for 30)), ''), -- charge3
+                        nullif(trim(substring(%3$s from 255 for 30)), ''), -- summons3
+                        nullif(trim(substring(%3$s from 286 for 30)), ''), -- charge4
+                        nullif(trim(substring(%3$s from 317 for 30)), ''), -- summons4
+                        nullif(trim(substring(%3$s from 348 for 1)), ''),  -- multi-charge flag
+                        nullif(trim(substring(%3$s from 350 for 2)), ''),  -- traffic controls
+                        nullif(trim(substring(%3$s from 353 for 2)), ''),  -- contrib circumstances 1
+                        nullif(trim(substring(%3$s from 356 for 2)), ''),  -- contrib circumstances 2
+                        nullif(trim(substring(%3$s from 359 for 2)), ''),  -- direction of travel
+                        nullif(trim(substring(%3$s from 362 for 2)), ''),   -- pre-crash action
+                        nullif(trim(substring(%3$s from 365 for 2)), ''),   -- location of most severe injury
+                        nullif(trim(substring(%3$s from 368 for 2)), ''),   -- type of most severe injury
+                        nullif(trim(substring(%3$s from 371 for 2)), ''),   -- refused medical attn
+                        nullif(trim(substring(%3$s from 374 for 2)), ''),   -- safety equipment used
+                        nullif(trim(substring(%3$s from 377 for 4)), ''),   -- hospital code
+                        nullif(trim(substring(%3$s from 382 for 2)), ''),   -- physical status 1
+                        nullif(trim(substring(%3$s from 385 for 2)), ''),   -- physical status 2
+                        nullif(trim(substring(%3$s from 388 for 1)), ''),   -- is bicyclist?
+                        nullif(trim(substring(%3$s from 390 for 1)), '')    -- is other?
+                    )$q2$, db_table, year, quote_nullable(line));
+                end if;
             elseif db_table = 'vehicle' then
                 execute format($q2$insert into temp_%1$s_%2$s values (
                     nullif(trim(substring(%3$s from 1 for 4)), ''),    -- year
@@ -251,7 +330,7 @@ begin
                     nullif(trim(substring(%3$s from 221 for 50)), ''), -- carrier name
                     nullif(trim(substring(%3$s from 272 for 1)), '')   -- hit & run driver flag
                 )$q2$, db_table, year, quote_nullable(line));
-             end if;
+            end if;
         end loop;
     end loop;
 

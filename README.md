@@ -106,3 +106,6 @@ Lookup tables:
   - police_station field in crash table seems to often just be the same as dept_case_number, other times it's text
   - In 2021 and 2022, in the Drivers and Pedestrians tables, DOB is an empty field with a length of zero, while the specification indicates it should have a length of ten. This makes all of the subsequent from/to/length values incorrect in the corresponding table layout pdf. These fields were removed from our version of the table for these years. All prior years (2001-2020) do have a length of 10 for this field. Is there a problem with the 2021 and 2022 tables? Has the specification changed started in 2021? Will this field be included going forward?
   - See src/nj/create_data_tables.sql for questions about fields that appear to be lookup tables but whose values cannot be located and src/nj/lookup_tables.sql for questions about exact order/values in tables. Each is highlighted by a preceding "TODO" item in a comment.
+  - literal line feed character in line that was removed manually/characters adjusted within field where the lf was. Not yet sure how to handle programmatically.
+    - 2020 Burlington Drivers table, line 59-60
+    - 2020 Camden Drivers table, line 4019-20, line 17425-6,
