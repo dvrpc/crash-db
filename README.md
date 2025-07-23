@@ -48,9 +48,9 @@ from
 
 ### Obtaining and Pre-processing
 
-As there are only a handful of files for PA, these can be downloaded manually and placed in data/pa/district/.
+As there are only a handful of files for PA, these can be downloaded manually and placed in data/pa/district/. No pre-processing prior to sql scripts called by Postgres is done on these files.
 
-For NJ, one shell script (src/utils/nj_download_data.sh) downloads the compressed (.zip) files (to data/nj) and another (src/utils/nj_pre_process_files.sh) extracts and pre-processes them so they can be properly imported into Postgres (see comments in that latter script for additional details). 
+For NJ, one shell script (src/utils/nj_download_data.sh) downloads the compressed (.zip) files (to data/nj) and another (src/utils/nj_pre_process_files.sh) extracts and pre-processes them so they can be properly imported into Postgres (see comments in that latter script for additional details).
 
 ### PennDOT
 
@@ -107,5 +107,5 @@ Misc:
   - Backslashes found in various files. These break Postgres's COPY. They are escaped (with another backslash) via src/utils/nj_pre_process_files.sh. 
   - Literal carriage returns (break to next line) were found in various files. These break the line specification. They are replaced with a space via src/utils/nj_pre_process_files.sh.
   - police_station field in crash table seems to often just be the same as dept_case_number, other times it's text
-  - In the Drivers and Pedestrians tables, DOB is an empty field, having 0 characters. This makes all of the subsequent from/to/length values incorrect in the corresponding table layout pdf. These fields were removed from our version of the table.
-
+  - In 2021 and 2022, in the Drivers and Pedestrians tables, DOB is an empty field with a length of zero, while the specification indicates it should have a length of ten. This makes all of the subsequent from/to/length values incorrect in the corresponding table layout pdf. These fields were removed from our version of the table for these years. All prior years (2001-2020) do have a length of 10 for this field. Is there a problem with the 2021 and 2022 tables? Has the specification changed started in 2021? Will this field be included going forward?
+  - See src/nj/create_data_tables.sql for questions about fields that appear to be lookup tables but whose values cannot be located and src/nj/lookup_tables.sql for questions about exact order/values in tables. Each is highlighted by a preceding "TODO" item in a comment.
