@@ -1,5 +1,22 @@
 #! /usr/bin/env bash
 
+usage="
+This script pre-processes NJ data files in order to make them importable by Postgres. Specifically:
+  - unzips all .zip files in the data/nj directory
+  - converts encoding of the resulting .txt files from win1252/cp1252 to utf8
+  - converts formatting from dos to unix
+  - escapes backslashes characters
+  - replaces carriage returns (\r) with spaces
+
+Usage:
+$(basename $0)
+"
+
+if [[ "${1}" = '-u' || "${1}" = 'u' ]]; then
+  echo "${usage}"
+  exit 0
+fi
+
 # Unzip all the downloaded files, overwriting any existing .txt files.
 unzip -o data/nj/\*.zip -d data/nj/
 
