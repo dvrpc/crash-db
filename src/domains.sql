@@ -3,6 +3,9 @@ set client_min_messages = error;
 
 do
 $body$
+declare
+    max_hhmm integer = 2400;
+
 begin
 
     begin
@@ -10,7 +13,7 @@ begin
         
         -- NJ explicitly gives range of 0001 to 2400 (p. 18 of 2017 NJ Crash Report Manual)
         -- I had previously assumed PA was 00:00-23:59, but not sure. Allowing up to 2400 for both.
-        create domain text24hhmm text check(value::int <= 2400);
+        execute format($q$create domain text24hhmm text check(value::int <= %s)$q$, max_hhmm);
 
         create domain text00_23 text check(value::int between 0 and 23);
         create domain text_year text check(value::int >= 1900);
@@ -22,7 +25,7 @@ begin
             Temporary domains - used in order to get invalid data into temporary tables', which will
             then be cleaned before going into the non-temp tables.
         */
-        create domain text24hhmm_9999 text check(value::int <= 2359 or value::int = 9999);
+        execute format($q$create domain text24hhmm_9999 text check(value::int <= %s or value::int = 9999)$q$, max_hhmm);
         create domain text00_23_99 text check(value::int between 0 and 23 or value::int = 99);
 
         -- Domain to allow any positive integer through before being cleaned.

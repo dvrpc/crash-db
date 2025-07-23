@@ -10,6 +10,8 @@ declare
     tbl_name text;
     tbl_name2 text;
     cons_name text;
+    max_hhmm integer = 2400;
+    max_hh integer = 2400 / 100;
 begin
 
     raise info '..Fix miscellaneous issues';
@@ -43,15 +45,15 @@ begin
     /* end lookup -> bool */
 
     -- Make invalid HHMM values null.
-    execute format($q$ update temp_crash_%s set roadway_cleared = null where roadway_cleared > 2359$q$, year);
-    execute format($q$ update temp_crash_%s set arrival_tm = null where arrival_tm::int > 2359$q$, year);
-    execute format($q$ update temp_crash_%s set dispatch_tm = null where dispatch_tm::int > 2359$q$, year);
-    execute format($q$ update temp_crash_%s set time_of_day = null where time_of_day::int > 2359$q$, year);
-    execute format($q$ update temp_crash_%s set est_hrs_closed = null where est_hrs_closed::int > 2359$q$, year);
+    execute format($q$update temp_crash_%s set roadway_cleared = null where roadway_cleared > %s$q$, year, max_hhmm);
+    execute format($q$update temp_crash_%s set arrival_tm = null where arrival_tm::int > %s$q$, year, max_hhmm);
+    execute format($q$update temp_crash_%s set dispatch_tm = null where dispatch_tm::int > %s$q$, year, max_hhmm);
+    execute format($q$update temp_crash_%s set time_of_day = null where time_of_day::int > %s$q$, year, max_hhmm);
+    execute format($q$update temp_crash_%s set est_hrs_closed = null where est_hrs_closed::int > %s$q$, year, max_hhmm);
 
     -- Make invalid hours null.
-    execute format($q$ update temp_crash_%s set hour_of_day = null where hour_of_day::int > 23$q$, year);
-    execute format($q$update temp_crash_%s set est_hrs_closed = null where est_hrs_closed::int > 2359$q$, year);
+    execute format($q$update temp_crash_%s set hour_of_day = null where hour_of_day::int > %s$q$, year, max_hh);
+    execute format($q$update temp_crash_%s set est_hrs_closed = null where est_hrs_closed::int > %s$q$, year, max_hhmm);
 
     -- A boolean change, but which seems unique to this field and possibly meant to be something else.
     execute format($q$update temp_person_%s set transported = null where transported = 'R'$q$, year);
