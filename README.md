@@ -109,3 +109,7 @@ Lookup tables:
   - literal line feed character in line that was removed manually/characters adjusted within field where the lf was. Not yet sure how to handle programmatically.
     - 2020 Burlington Drivers table, line 59-60
     - 2020 Camden Drivers table, line 4019-20, line 17425-6,
+    - 2019 Burlington Accidents table, lines (after fixing) 8333, 8337, 9896, 10714
+    - 2019 Camden Accidents table, line 6165
+    - 2019 Camden Drivers table, line 14349
+    - 2019 Mercer Drivers table, line 7177
