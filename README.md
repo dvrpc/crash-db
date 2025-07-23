@@ -99,11 +99,8 @@ Lookup tables:
   2001-2005:
     <https://dot.nj.gov/transportation/refdata/accident/pdf/NJTR-1_2001.pdf>
 
-A shell script at src/utils/download_nj_data.sh will download all tables for our four counties.
-
 #### Data issues
 
-Misc:
   - Backslashes found in various files. These break Postgres's COPY. They are escaped (with another backslash) via src/utils/nj_pre_process_files.sh. 
   - Literal carriage returns (break to next line) were found in various files. These break the line specification. They are replaced with a space via src/utils/nj_pre_process_files.sh.
   - police_station field in crash table seems to often just be the same as dept_case_number, other times it's text
