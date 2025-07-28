@@ -7,6 +7,7 @@ This script pre-processes NJ data files in order to make them importable by Post
   - converts formatting from dos to unix
   - escapes backslashes characters
   - replaces carriage returns (\r) with spaces
+  - removes misplaced line feeds (\n) in middle of lines, even if there is more than one
 
 Usage:
 $(basename $0)
@@ -55,8 +56,51 @@ for file in $(ls data/nj/*.txt); do
   # fields are supposed to be.
   sed -i 's;\\;\\\\;g' "${file}"
 
-  # Also replace any stray carriage returns with a space, as otherwise they add a break mid-line,
+  # Replace any stray carriage returns with a space, as otherwise they add a break mid-line,
   # breaking spec.
   sed -i 's;\r; ;g' "${file}"
 done
 
+# Remove new lines that have been mistakenly entered into the middle of the line.
+# 
+# Here are the locations of some that had been previously found and manually removed prior to using
+# the sed command below to clean them automatically, if for some reason we need this information in
+# the future:
+#  - 2020 Burlington Drivers table, line 59-60
+#  - 2020 Camden Drivers table, line 4019-20, line 17425-6,
+#  - 2019 Burlington Accidents table, lines (after fixing) 8333, 8337, 9896, 10714
+#  - 2019 Camden Accidents table, line 6165
+#  - 2019 Camden Drivers table, line 14349
+#  - 2019 Mercer Drivers table, line 7177
+# 
+# What the sed command does is:
+#  - `/.\351\}/!`: match lines that don't (`!`) have 351 characters (or whatever they should have)
+#  - `{ ... }'` these mark the beginning and end of a list of commands 
+#  - `N;`: read the next line into the pattern space
+#  - `s/\n/ /;`: replaces the new line/line feed/"\n" character with a space
+#  - `:1 and b1`: first set a label, and then at the end go to it to test the line again (this
+#     addresses the case when there are multiple incorrect line breaks within the same line)
+echo 'Remove extra/misplaced new lines'
+for file in $(ls data/nj/*.txt); do
+  # The characters per line vary by both file and year, so need to check filename.
+	case "${file}" in 
+	  *2017* | *2018* | *2019* | *2020* | *2021* | *2022*)
+	  	case "${file}" in
+	  		*Accidents*)
+	  		  sed -i ':1 /.\{469\}/!{ N; s/\n/ / ;b1}' "${file}"
+			    ;;
+	  		*Drivers*)
+	  		  sed -i ':1 /.\{350\}/!{ N; s/\n/ / ;b1}' "${file}"
+		    	;;
+	  		*Occupants*)
+	  		  sed -i ':1 /.\{75\}/!{ N; s/\n/ / ;b1}' "${file}"
+		    	;;
+	  		*Pedestrians*)
+	  		  sed -i ':1 /.\{390\}/!{ N; s/\n/ / ;b1}' "${file}"
+		    	;;
+	  		*Vehicles*)
+	  		  sed -i ':1 /.\{272\}/!{ N; s/\n/ / ;b1}' "${file}"
+		    	;;
+		  esac
+	esac
+done    
