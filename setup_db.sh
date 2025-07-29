@@ -8,6 +8,7 @@ $(basename $0) -p -n [ -r ] | -u
 -p: Import PA data.
 -n: Import NJ data.
 -r: Reset database (drop and recreate all objects), by state.
+-d: Dump existing database to file.
 -u: Show usage (this message) and exit. Other options will be ignored.
 
 e.g.
@@ -59,7 +60,7 @@ nj=false
 reset=false
 
 # Parse and handle command line options.
-while getopts ":unpr" opt; do
+while getopts ":urpnd" opt; do
   case $opt in
     u)
       echo "${usage}"
@@ -73,6 +74,10 @@ while getopts ":unpr" opt; do
       ;;
     n)
       nj=true
+      ;;
+    d)
+      pg_dump -O -p "${port}" "${db}" > "data/crash_$(date +%F_%I-%M).dump"
+      exit 0
       ;;
     \?)
       echo "Invalid option -${OPTARG}. Quitting."
