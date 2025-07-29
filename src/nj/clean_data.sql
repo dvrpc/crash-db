@@ -33,6 +33,8 @@ begin
     /* Year-specific. */
     if year = '2022' then
         execute format($q$update temp_occupant_%s set airbag_deployment = null where airbag_deployment in ('05', '06')$q$, year);
+    elseif year = '2017' then
+        execute format($q$update temp_vehicle_%s set veh_color = 'WT' where veh_color = 'WHI'$q$, year);
     end if;
 
 end;
