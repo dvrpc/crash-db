@@ -71,9 +71,27 @@ while getopts ":urpnd" opt; do
       ;;
     p)
       pa=true
+      # check that start/end year env vars are set
+      if ! test -v pa_start_year; then
+        echo "Please include a value for 'pa_start_year' in the .env file."
+        exit 1
+      fi
+      if ! test -v pa_end_year; then
+        echo "Please include a value for 'pa_end_year' in the .env file."
+        exit 1
+      fi
       ;;
     n)
       nj=true
+      # check that start/end year env vars are set
+      if ! test -v nj_start_year; then
+        echo "Please include a value for 'nj_start_year' in the .env file."
+        exit 1
+      fi
+      if ! test -v nj_end_year; then
+        echo "Please include a value for 'nj_end_year' in the .env file."
+        exit 1
+      fi
       ;;
     d)
       pg_dump -O -p "${port}" "${db}" > "data/crash_$(date +%F_%I-%M).dump"
@@ -87,6 +105,7 @@ while getopts ":urpnd" opt; do
   esac
 done
 
+# The rest of the script deals only with importing data and so one of the state options is required.
 if test ${pa} = false && test ${nj} = false ; then
   echo "You must choose at least one state. Quitting."
   echo "${usage}"
@@ -96,8 +115,8 @@ fi
 # Copy data files in data/ to location accessible by server, for easier use in COPY, which
 # requires absolute paths/certain permissions.
 mkdir -p "${user_data_dir}/pa"
-mkdir -p "${user_data_dir}"/nj
-cp -r data/pa/* "${user_data_dir}/pa"
+mkdir -p "${user_data_dir}/nj"
+cp -r data/pa/*.csv "${user_data_dir}/pa"
 cp -r data/nj/*.txt "${user_data_dir}/nj/"
 
 ## Create custom domains.
@@ -117,7 +136,7 @@ if [[ $pa = true ]]; then
   fi
 
 
-  psql -qb -p "${port}" -d "${db}" -v user_data_dir="${user_data_dir}" -v postgres_data_dir="${postgres_data_dir}" -f src/init_vars.sql -f src/pa.sql
+  psql -qb -p "${port}" -d "${db}" -v user_data_dir="${user_data_dir}" -v postgres_data_dir="${postgres_data_dir}" -v pa_start_year="${pa_start_year}" -v pa_end_year="${pa_end_year}" -f src/init_vars.sql -f src/pa/init_vars.sql -f src/pa.sql
 fi
 
 if [[ $nj = true ]]; then
@@ -133,5 +152,5 @@ if [[ $nj = true ]]; then
       fi
   fi
 
-  psql -qb -p "${port}" -d "${db}" -v user_data_dir="${user_data_dir}" -v postgres_data_dir="${postgres_data_dir}" -f src/init_vars.sql -f src/nj.sql
+  psql -qb -p "${port}" -d "${db}" -v user_data_dir="${user_data_dir}" -v postgres_data_dir="${postgres_data_dir}" -v nj_start_year="${nj_start_year}" -v nj_end_year="${nj_end_year}" -f src/init_vars.sql -f src/nj/init_vars.sql -f src/nj.sql
 fi  

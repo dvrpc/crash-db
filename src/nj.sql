@@ -8,14 +8,15 @@
 -- Create and populate lookup tables if they don't already exist/aren't populated.
 create schema if not exists nj_2017_lookup; 
 call nj_create_and_populate_2017_lookup_tables();
-commit;
+-- commit;
 
 -- Import NJ data.
 do
 $import$
 declare
-    -- can put a single year here (i.e. generate_series(2020, 2020)) to go year-by-year 
-    years int[] := ARRAY(SELECT * FROM generate_series(2017, 2022));
+    start_year int = current_setting('myvars.nj_start_year');
+    end_year int = current_setting('myvars.nj_end_year');
+    years int[] := ARRAY(SELECT * FROM generate_series(start_year, end_year));
     year int;
 begin
     raise info 'In NJ script';

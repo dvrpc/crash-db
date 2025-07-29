@@ -41,7 +41,7 @@ begin
 
     raise info '.Copy data into temporary tables';
     foreach db_table in array db_tables loop
-        execute format($q$copy temp_%I_%s from '%s/pa/district/%s_D06_%s.csv' with (format csv, header, force_null *)$q$, db_table, year, user_data_dir, upper(db_table), year);
+        execute format($q$copy temp_%I_%s from '%s/pa/%s_D06_%s.csv' with (format csv, header, force_null *)$q$, db_table, year, user_data_dir, upper(db_table), year);
     end loop;
 
     -- Run analyze on temporary tables, which should improve performance on queries on them.

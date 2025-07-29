@@ -92,8 +92,9 @@ commit;
 do
 $import$
 declare
-    -- can put a single year here (i.e. generate_series(2020, 2020)) to go year-by-year 
-    years int[] := ARRAY(SELECT * FROM generate_series(2021, 2022));
+    start_year int = current_setting('myvars.pa_start_year');
+    end_year int = current_setting('myvars.pa_end_year');
+    years int[] := ARRAY(SELECT * FROM generate_series(start_year, end_year));
     year int;
 begin
 

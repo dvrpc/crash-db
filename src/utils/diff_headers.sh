@@ -37,8 +37,8 @@ error=0
 if [ "${state}" = 'pa' ]; then
   # Check the tables between the years.
   for table in "${tables[@]}"; do
-    first_file="data/${state}/district/${table}_D06_${year}.csv"
-    next_file="data/${state}/district/${table}_D06_${year2}.csv"
+    first_file="data/${state}/${table}_D06_${year}.csv"
+    next_file="data/${state}/${table}_D06_${year2}.csv"
     echo "${first_file} vs ${next_file}"
     difft --color always --exit-code <(head -n1 ${first_file}) <(head -n1 ${next_file})
 
