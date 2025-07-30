@@ -102,5 +102,25 @@ for file in $(ls data/nj/*.txt); do
 	  		  sed -i ':1 /.\{272\}/!{ N; s/\n/ / ;b1}' "${file}"
 		    	;;
 		  esac
+			;;
+	  *2006* | *2007* | *2008* | *2009* | *2010* | *2011* | *2012* | *2013* | *2014* | *2015* | *2016*)
+	  	case "${file}" in
+	  		*Accidents*)
+	  		  sed -i ':1 /.\{458\}/!{ N; s/\n/ / ;b1}' "${file}"
+			    ;;
+	  		*Drivers*)
+	  		  sed -i ':1 /.\{161\}/!{ N; s/\n/ / ;b1}' "${file}"
+		    	;;
+	  		*Occupants*)
+	  		  sed -i ':1 /.\{74\}/!{ N; s/\n/ / ;b1}' "${file}"
+		    	;;
+	  		*Pedestrians*)
+	  		  sed -i ':1 /.\{200\}/!{ N; s/\n/ / ;b1}' "${file}"
+		    	;;
+	  		*Vehicles*)
+	  		  sed -i ':1 /.\{240\}/!{ N; s/\n/ / ;b1}' "${file}"
+		    	;;
+		  esac
+			;;
 	esac
 done    

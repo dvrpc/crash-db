@@ -1,45 +1,46 @@
-create or replace procedure nj_create_and_populate_2017_lookup_tables()
+create or replace procedure nj_v2017_create_and_populate_lookup_tables()
 language plpgsql
 as
 $body$
 declare
-    table_names text[] := '{airbag_deployment, alcohol_test_given, alcohol_test_type, cargo_body_type, contrib_circ, crash_type, driven_left_towed, ejection, environmental_condition, extent_of_damage, hazmat_status, light_condition, location_of_most_severe_injury, ncic, oversized_overweight_permit, physical_condition, physical_status, position_in_veh, police_dept, pre_crash_action, refused_med_attn, removed_by, road_divided_by, road_grade, road_horizontal_alignment, road_surface_condition, road_surface_type, road_system, route_suffix, safety_equipment, sequence_of_events, special_function_vehicles, unit_of_measure, temp_traffic_control_zone, traffic_controls, type_of_most_severe_injury, veh_color, veh_impact_area, veh_type, veh_use, veh_weight_rating}';
+    lookup_schema text = 'nj_2017_lookup';
     table_name text;
+    table_names text[] := '{airbag_deployment, alcohol_test_given, alcohol_test_type, cargo_body_type, contrib_circ, crash_type, driven_left_towed, ejection, environmental_condition, extent_of_damage, hazmat_status, light_condition, location_of_most_severe_injury, ncic, oversized_overweight_permit, physical_condition, physical_status, position_in_veh, police_dept, pre_crash_action, refused_med_attn, removed_by, road_divided_by, road_grade, road_horizontal_alignment, road_surface_condition, road_surface_type, road_system, route_suffix, safety_equipment, sequence_of_events, special_function_vehicles, unit_of_measure, temp_traffic_control_zone, traffic_controls, type_of_most_severe_injury, veh_color, veh_impact_area, veh_type, veh_use, veh_weight_rating}';
 begin
 
-    raise info 'Creating and populating lookup tables';
+    raise info 'Creating and populating % tables', lookup_schema;
     -- Create lookup tables.
     foreach table_name in ARRAY table_names LOOP
-        execute format($create_query$create unlogged table if not exists nj_2017_lookup.%I (code text not null unique, description text not null)$create_query$, table_name);
+        execute format($create_query$create unlogged table if not exists %I.%I (code text not null unique, description text not null)$create_query$, lookup_schema, table_name);
     end loop;
 
     -- Populate lookup tables.
     begin
         -- 2017 Crash Report Manual, p. 58.
-        insert into nj_2017_lookup.airbag_deployment (code, description) values
+        execute format($q1$insert into %I.airbag_deployment (code, description) values
             ('00', 'Unknown'),
             ('01', 'Front'),
             ('02', 'Side'),
             ('03', 'Other (Knee, Airbelt, etc)'),
             ('04', 'Combination'),
-            ('99', 'Other');
+            ('99', 'Other')$q1$, lookup_schema);
 
         -- 2017 NJTR-1 form has boxes for each of these options;
         -- data is truncated down to one letter.
-        insert into nj_2017_lookup.alcohol_test_given (code, description) values
+        execute format($q1$insert into %I.alcohol_test_given (code, description) values
             ('Y', 'Yes'),
             ('N', 'No'),
-            ('R', 'Refused');
+            ('R', 'Refused')$q1$, lookup_schema);
 
         -- 2017 NJTR-1 form has boxes for each of these options;
         -- data is truncated down to two letters.
-        insert into nj_2017_lookup.alcohol_test_type (code, description) values
+        execute format($q1$insert into %I.alcohol_test_type (code, description) values
             ('BL', 'Blood'),
             ('BR', 'Breath'),
-            ('UR', 'Urine');
+            ('UR', 'Urine')$q1$, lookup_schema);
 
         -- 2017 Crash Report Manual, p. 76.
-        insert into nj_2017_lookup.cargo_body_type (code, description) values
+        execute format($q1$insert into %I.cargo_body_type (code, description) values
             ('00', 'Unknown'),
             ('01', 'Bus (9-15 seats)'),
             ('02', 'Bus (> 15 seats)'),
@@ -55,10 +56,10 @@ begin
             ('12', 'Intermodal Chassis'),
             ('13', 'No Cargo Body'),
             ('14', 'Veh Towing Another Veh'),
-            ('99', 'Other');
+            ('99', 'Other')$q1$, lookup_schema);
 
         -- 2017 Crash Report Manual, pp 80-4.
-        insert into nj_2017_lookup.contrib_circ (code, description) values
+        execute format($q1$ insert into %I.contrib_circ (code, description) values
             ('00', 'Unknown'),
             -- Driver/Pedalcycleist Actions (01-29)
             ('01', 'Unsafe Speed'),
@@ -99,7 +100,7 @@ begin
             -- Road/Environ Factors (51-69)
             ('51', 'Road Surface Condition'),
             ('52', 'Obstruction/Debris in Road'),
-            ('53', 'Rusts, Holes, Bumps'),
+            ('53', 'Ruts, Holes, Bumps'),
             ('54', 'Control Device Defective or Missing'),
             ('55', 'Improper Work Zone'),
             ('56', 'Physical Obstructions (viewing, etc)'),
@@ -121,10 +122,10 @@ begin
             ('85', 'None'),
             ('89', 'Other Pedestrian Factors'),
             --
-            ('99', 'Other');
+            ('99', 'Other')$q1$, lookup_schema);
 
         -- 2017 Crash Report Manual, p. 67.
-        insert into nj_2017_lookup.crash_type (code, description) values
+        execute format($q1$ insert into %I.crash_type (code, description) values
             ('00', 'Unknown'),
             -- With other moving vehicle as first event
             ('01', 'Same Direction (Rear End)'),
@@ -144,28 +145,28 @@ begin
             ('14', 'Pedalcyclist'),
             ('15', 'Non-Fixed Object'),
             ('16', 'Railcar - Vehicle'),
-            ('99', 'Other');
+            ('99', 'Other')$q1$, lookup_schema);
 
         -- TODO: confirm order
         -- 2017 Crash Report Manual, p. 42 (numbers assumed from order given).        
-        insert into nj_2017_lookup.driven_left_towed (code, description) values
+        execute format($q1$ insert into %I.driven_left_towed (code, description) values
             ('1', 'Driven'),
             ('2', 'Left at Scene'),
             ('3', 'Towed Disabled'),
             ('4', 'Towed Impounded'),
-            ('5', 'Towed Disabled & Impounded');
+            ('5', 'Towed Disabled & Impounded')$q1$, lookup_schema);
 
         -- 2017 Crash Report Manual, p. 51.
-        insert into nj_2017_lookup.ejection (code, description) values
+        execute format($q1$ insert into %I.ejection (code, description) values
             ('00', 'Unknown'),
             ('01', 'Not Ejected'),
             ('02', 'Partial Ejection'),
             ('03', 'Ejected'),
             ('04', 'Trapped'),
-            ('99', 'Other');
+            ('99', 'Other')$q1$, lookup_schema);
 
         -- 2017 Crash Report Manual, p. 65.
-        insert into nj_2017_lookup.environmental_condition (code, description) values
+        execute format($q1$ insert into %I.environmental_condition (code, description) values
             ('00', 'Unknown'),
             ('01', 'Clear'),
             ('02', 'Rain'),
@@ -177,26 +178,26 @@ begin
             ('08', 'Blowing Snow'),
             ('09', 'Blowing Sand/Dirt'),
             ('10', 'Severe Crosswinds'),
-            ('99', 'Other');
+            ('99', 'Other')$q1$, lookup_schema);
 
         -- 2017 Crash Report Manual, p. 96.
-        insert into nj_2017_lookup.extent_of_damage (code, description) values
+        execute format($q1$ insert into %I.extent_of_damage (code, description) values
             ('00', 'Unknown'),
             ('01', 'None'),
             ('02', 'Minor'),
             ('03', 'Moderate/Functional'),
             ('04', 'Disabling'),
-            ('99', 'Other');
+            ('99', 'Other')$q1$, lookup_schema);
 
         -- TODO: confirm
         -- Assumed from NJTR-1 form, box 49.
-        insert into nj_2017_lookup.hazmat_status (code, description) values
+        execute format($q1$ insert into %I.hazmat_status (code, description) values
             ('N', 'None'),
             ('O', 'On Board'),
-            ('S', 'Spill');
+            ('S', 'Spill')$q1$, lookup_schema);
 
         -- 2017 Crash Report Manual, p. 62.
-        insert into nj_2017_lookup.light_condition (code, description) values
+        execute format($q1$ insert into %I.light_condition (code, description) values
             ('00', 'Unknown'),
             ('01', 'Daylight'),
             ('02', 'Dawn'),
@@ -205,10 +206,10 @@ begin
             ('05', 'Dark (no street lights)'),
             ('06', 'Dark (street lights on, continuous lighting)'),
             ('07', 'Dark (street lights on, spot lighting)'),
-            ('99', 'Other');
+            ('99', 'Other')$q1$, lookup_schema);
 
         -- 2017 Crash Report Manual, p. 54.
-        insert into nj_2017_lookup.location_of_most_severe_injury (code, description) values
+        execute format($q1$ insert into %I.location_of_most_severe_injury (code, description) values
             ('00', 'Unknown'),
             ('01', 'Head'),
             ('02', 'Face'),
@@ -222,7 +223,7 @@ begin
             ('10', 'Hip/Upper Leg'),
             ('11', 'Knee/Lower Leg/Foot'),
             ('12', 'Entire Body'),
-            ('99', 'Other');
+            ('99', 'Other')$q1$, lookup_schema);
 
         /*
         This is in all tables, but split between county code and municipality code.
@@ -233,7 +234,7 @@ begin
         than two.
         NJ available at <https://dot.nj.gov/transportation/refdata/accident/pdf/CountyMunicipalCodes1-13-17.pdf>
         */
-        insert into nj_2017_lookup.ncic (code, description) values
+        execute format($q1$ insert into %I.ncic (code, description) values
             -- 03 is Burlington County
             ('0301', 'Bass River Twp'),
             ('0302', 'Beverly City'),
@@ -352,17 +353,17 @@ begin
             ('1111', 'Trenton City'),
             ('1112', 'Robbinsville Twp'),
             ('1113', 'West Windsor Twp'),
-            ('1114', 'Princeton');
+            ('1114', 'Princeton')$q1$, lookup_schema);
 
         -- 2017 Crash Report Manual, p. 71.
-        insert into nj_2017_lookup.oversized_overweight_permit (code, description) values
+        execute format($q1$ insert into %I.oversized_overweight_permit (code, description) values
             ('00', 'Unknown'),
             ('01', 'Yes'),
             ('02', 'No'),
-            ('99', 'Other');
+            ('99', 'Other')$q1$, lookup_schema);
 
         -- 2017 Crash Report Manual, p. 50.
-        insert into nj_2017_lookup.position_in_veh (code, description) values
+        execute format($q1$ insert into %I.position_in_veh (code, description) values
             ('00', 'Unknown'),
             ('01', 'Driver'),
             ('02', 'Passenger'),
@@ -376,21 +377,21 @@ begin
             ('10', 'Cargo Area'),
             ('11', 'Riding/Hanging on Outside'),
             ('12', 'Bus Seating'),
-            ('99', 'Other');
+            ('99', 'Other')$q1$, lookup_schema);
 
         -- 2017 Crash Report Manual, p. 17.
         -- NJTR-1 form, Box 2. 
-        insert into nj_2017_lookup.police_dept (code, description) values
+        execute format($q1$ insert into %I.police_dept (code, description) values
             ('00', 'Unknown'),
             ('01', 'Municipal Police'),
             ('02', 'State Police'),
             ('03', 'County Police'),
             ('04', 'Port Authority Police'),
             ('05', 'County Sheriff'),
-            ('99', 'Other Police');
+            ('99', 'Other Police')$q1$, lookup_schema);
 
         -- 2017 Crash Report Manual, p. 86.
-        insert into nj_2017_lookup.pre_crash_action (code, description) values
+        execute format($q1$ insert into %I.pre_crash_action (code, description) values
             ('00', 'Unknown'),
             -- Vehicle/Pedalcyclist Action (01-29)
             ('01', 'Going Straight Ahead'),
@@ -432,53 +433,53 @@ begin
             ('46', 'Deliberate Action'),
             ('49', 'Other Pedestrian Action'),
             --
-            ('99', 'Other');
+            ('99', 'Other')$q1$, lookup_schema);
 
         -- 2017 Crash Report Manual, p. 56.
-        insert into nj_2017_lookup.refused_med_attn (code, description) values
+        execute format($q1$ insert into %I.refused_med_attn (code, description) values
             ('00', 'Unknown'),
             ('01', 'Yes'),
             ('02', 'No'),
-            ('99', 'Other');
+            ('99', 'Other')$q1$, lookup_schema);
 
         -- TODO: confirm these are correct
         -- 2017 Crash Report Manual (p. 43) and the NJTR-1 form have a box for each of these
         -- values to be checked, but the corresponding number isn't explicitly listed.
-        insert into nj_2017_lookup.removed_by (code, description) values
+        execute format($q1$ insert into %I.removed_by (code, description) values
             ('1', 'Owner'),
             ('2', 'Driver'),
-            ('3', 'Police');
+            ('3', 'Police')$q1$, lookup_schema);
 
         -- 2017 Crash Report Manual, p. 61.
-        insert into nj_2017_lookup.road_divided_by (code, description) values
+        execute format($q1$ insert into %I.road_divided_by (code, description) values
             ('00', 'Unknown'),
             ('01', 'Barrier Median'),
             ('02', 'Curbed Median'),
             ('03', 'Grass Median'),
             ('04', 'Painted Median'),
             ('05', 'None'),
-            ('99', 'Other');
+            ('99', 'Other')$q1$, lookup_schema);
 
         -- 2017 Crash Report Manual, p. 63.
-        insert into nj_2017_lookup.road_grade (code, description) values
+        execute format($q1$ insert into %I.road_grade (code, description) values
             ('00', 'Unknown'),
             ('04', 'Level'),
             ('05', 'Down Hill'),
             ('06', 'Up Hill'),
             ('07', 'Hill Crest'),
             ('08', 'Sag (Bottom)'),
-            ('99', 'Other');
+            ('99', 'Other')$q1$, lookup_schema);
 
         -- 2017 Crash Report Manual, p. 63.
-        insert into nj_2017_lookup.road_horizontal_alignment (code, description) values
+        execute format($q1$ insert into %I.road_horizontal_alignment (code, description) values
             ('00', 'Unknown'),
             ('01', 'Straight'),
             ('02', 'Curved Left'),
             ('03', 'Curved Right'),
-            ('99', 'Other');
+            ('99', 'Other')$q1$, lookup_schema);
 
         -- 2017 Crash Report Manual, p. 65.
-        insert into nj_2017_lookup.road_surface_condition (code, description) values
+        execute format($q1$ insert into %I.road_surface_condition (code, description) values
             ('00', 'Unknown'),
             ('01', 'Dry'),
             ('02', 'Wet'),
@@ -489,20 +490,20 @@ begin
             ('07', 'Sand'),
             ('08', 'Oil/Fuel'),
             ('09', 'Mud, Dirt, Gravel'),
-            ('99', 'Other');
+            ('99', 'Other')$q1$, lookup_schema);
 
         -- 2017 Crash Report Manual, p. 64.
-        insert into nj_2017_lookup.road_surface_type (code, description) values
+        execute format($q1$ insert into %I.road_surface_type (code, description) values
             ('00', 'Unknown'),
             ('01', 'Concrete'),
             ('02', 'Blacktop'),
             ('03', 'Gravel'),
             ('04', 'Steel Grid'),
             ('05', 'Dirt'),
-            ('99', 'Other');
+            ('99', 'Other')$q1$, lookup_schema);
 
         -- 2017 Crash Report Manual, p. 63.
-        insert into nj_2017_lookup.road_system (code, description) values
+        execute format($q1$ insert into %I.road_system (code, description) values
             ('00', 'Unknown'),
             ('01', 'Interstate'),
             ('02', 'State Highway'),
@@ -514,10 +515,10 @@ begin
             ('08', 'Mun Auth, Park or Inst'),
             ('09', 'Private Property'),
             ('10', 'US Govt Property'),
-            ('99', 'Other');
+            ('99', 'Other')$q1$, lookup_schema);
         
         -- From <https://dot.nj.gov/transportation/refdata/accident/codes.shtm>
-        insert into nj_2017_lookup.route_suffix (code, description) values
+        execute format($q1$ insert into %I.route_suffix (code, description) values
             ('00', 'Unknown'),
             ('A', 'Alternate'),
             ('B', 'Business'),
@@ -529,10 +530,10 @@ begin
             ('U', 'Upper (State Route 139 Only)'),
             ('L', 'Lower (State Route 139 Only)'),
             ('W', 'Western Alignment (NJTPK, Route 9 & Route 173)'),
-            ('99', 'Other');
+            ('99', 'Other')$q1$, lookup_schema);
 
         -- 2017 Crash Report Manual, p. 57.
-        insert into nj_2017_lookup.safety_equipment (code, description) values
+        execute format($q1$ insert into %I.safety_equipment (code, description) values
             ('00', 'Unknown'),
             ('01', 'None'),
             ('02', 'Lap Belt'),
@@ -546,10 +547,10 @@ begin
             ('10', 'Airbag'),
             ('11', 'Airbag & Seatbelts'),
             ('12', 'Safety Vest (Ped only)'),
-            ('99', 'Other');
+            ('99', 'Other')$q1$, lookup_schema);
 
         -- 2017 Crash Report Manual, pp 90-3.
-        insert into nj_2017_lookup.sequence_of_events (code, description) values
+        execute format($q1$ insert into %I.sequence_of_events (code, description) values
             ('00', 'Unknown'),
             -- Non-Collision (01-19)
             ('01', 'Overturn/Rollover'),
@@ -604,22 +605,22 @@ begin
             ('61', 'Mailbox'),
             ('62', 'Fire Hydrant'),
             ('69', 'Other Fixed Object'),
-            ('99', 'Other');
+            ('99', 'Other')$q1$, lookup_schema);
 
         -- 2017 Crash Report Manual, pp 52-3.
         -- NJTR-1 form, Box 86
-        insert into nj_2017_lookup.physical_condition (code, description) values
+        execute format($q1$ insert into %I.physical_condition (code, description) values
             ('00', 'Unknown'),
             ('01', 'Fatal Injury'),
             ('02', 'Suspected Serious Injury'),
             ('03', 'Suspected Minor Injury'),
             ('04', 'Possible Injury'),
             ('05', 'No Apparent Injury'),
-            ('99', 'Other');
+            ('99', 'Other')$q1$, lookup_schema);
 
         -- 2017 Crash Report Manual, p. 85.
         -- Box 120/121 on form.
-        insert into nj_2017_lookup.physical_status (code, description) values
+        execute format($q1$ insert into %I.physical_status (code, description) values
             ('00', 'Unknown'),
             ('01', 'Apparently Normal'),
             ('02', 'Alcohol Use'),
@@ -630,10 +631,10 @@ begin
             ('07', 'Illness'),
             ('08', 'Fatigue'),
             ('09', 'Fell Asleep'),
-            ('99', 'Other');
+            ('99', 'Other')$q1$, lookup_schema);
 
         -- 2017 Crash Report Manual, p. 75.
-        insert into nj_2017_lookup.special_function_vehicles (code, description) values
+        execute format($q1$ insert into %I.special_function_vehicles (code, description) values
             ('00', 'Unknown'),
             ('01', 'Work Equipment'),
             ('02', 'Police'),
@@ -655,27 +656,27 @@ begin
             ('18', 'Farm Vehicle'),
             ('19', 'Construction/Off Road Equip'),
             ('20', 'Rental Truck (Over 10,000 lbs)'),
-            ('99', 'Other');
+            ('99', 'Other')$q1$, lookup_schema);
 
         -- Assumed from NJTR-1 form, box 15.
-        insert into nj_2017_lookup.unit_of_measure (code, description) values
+        execute format($q1$ insert into %I.unit_of_measure (code, description) values
             ('FE', 'Feet'),
             ('MI', 'Miles'),
-            ('AT', 'At Intersection With');
+            ('AT', 'At Intersection With')$q1$, lookup_schema);
 
         
         -- 2017 Crash Report Manual, p. 61.
-        insert into nj_2017_lookup.temp_traffic_control_zone (code, description) values
+        execute format($q1$ insert into %I.temp_traffic_control_zone (code, description) values
             ('00', 'Unknown'),
             ('01', 'No'),
             ('02', 'Yes - Construction Zone'),
             ('03', 'Yes - Maintenance Zone'),
             ('04', 'Yes - Utility Zone'),
             ('05', 'Yes - Incident Zone'),
-            ('99', 'Other');
+            ('99', 'Other')$q1$, lookup_schema);
 
         -- 2017 Crash Report Manual, p. 89.
-        insert into nj_2017_lookup.traffic_controls (code, description) values
+        execute format($q1$ insert into %I.traffic_controls (code, description) values
             ('00', 'Unknown'),
             ('01', 'Police Officer'),
             ('02', 'RR Watchmen, Gates, etc'),
@@ -691,10 +692,10 @@ begin
             ('12', 'Flashing Traffic Control'),
             ('13', 'School Zone (Signs/Controls)'),
             ('14', 'Adult Crossing Guard'),
-            ('99', 'Other');
+            ('99', 'Other')$q1$, lookup_schema);
 
         -- 2017 Crash Report Manual, p. 55. 
-        insert into nj_2017_lookup.type_of_most_severe_injury (code, description) values
+        execute format($q1$ insert into %I.type_of_most_severe_injury (code, description) values
             ('00', 'Unknown'),
             ('01', 'Amputation'),
             ('02', 'Concussion'),
@@ -704,10 +705,10 @@ begin
             ('06', 'Burn'),
             ('07', 'Fracture/Dislocation'),
             ('08', 'Complaint of Pain'),
-            ('99', 'Other');
+            ('99', 'Other')$q1$, lookup_schema);
 
         -- NJTR-1 overlay.
-        insert into nj_2017_lookup.veh_color (code, description) values
+        execute format($q1$ insert into %I.veh_color (code, description) values
             ('BG', 'Beige'),
             ('BK', 'Black'),
             ('BL', 'Blue'),
@@ -726,10 +727,10 @@ begin
             ('TN', 'Tan'), 
             ('TQ', 'Turquoise'),
             ('WT', 'White'),
-            ('YL', 'Yellow');
+            ('YL', 'Yellow')$q1$, lookup_schema);
 
         -- 2017 Crash Report Manual, p. 95.
-        insert into nj_2017_lookup.veh_impact_area (code, description) values
+        execute format($q1$ insert into %I.veh_impact_area (code, description) values
             ('00', 'Unknown'),
             ('01', '1 o''clock'),
             ('02', '2 o''clock'),
@@ -747,10 +748,10 @@ begin
             ('14', 'Undercarriage'),
             ('15', 'Overturned'),
             ('17', 'None Visible'),
-            ('99', 'Other');
+            ('99', 'Other')$q1$, lookup_schema);
 
         -- 2017 Crash Report Manual, pp 71-3.
-        insert into nj_2017_lookup.veh_type (code, description) values
+        execute format($q1$ insert into %I.veh_type (code, description) values
             ('00', 'Unknown'),
             -- Passenger Vehicles (01-19)
             ('01', 'Car/Station Wagon/Minivan'),
@@ -786,25 +787,25 @@ begin
             -- Other Non Pass (40)
             ('40', 'Equipment/Machinery'),
             --
-            ('99', 'Other');
+            ('99', 'Other')$q1$, lookup_schema);
 
         -- 2017 Crash Report Manual, p. 74.
-        insert into nj_2017_lookup.veh_use (code, description) values
+        execute format($q1$ insert into %I.veh_use (code, description) values
             ('00', 'Unknown'),
             ('01', 'Personal'),
             ('02', 'Business/Commerce'),
             ('03', 'Government'),
             ('04', 'Responding to Emergency'),
             ('05', 'Machinery in Use'),
-            ('99', 'Other');
+            ('99', 'Other')$q1$, lookup_schema);
 
         -- NJ Crash Report Manual, pp 46-7.
-        insert into nj_2017_lookup.veh_weight_rating (code, description) values
+        execute format($q1$ insert into %I.veh_weight_rating (code, description) values
             ('1', '<= 10,000 lbs'),
             ('2', '10,0001 to 26,000 lbs'),
-            ('3', '>= 26,001 lbs');
+            ('3', '>= 26,001 lbs')$q1$, lookup_schema);
         
-        -- insert into nj_2017_lookup. (code, description) values
+        -- execute format($q1$ insert into %I. (code, description) values
         --     ('00', 'Unknown'),
         --     ('01', ''),
         --     ('02', ''),
@@ -826,7 +827,7 @@ begin
         --     ('18', ''),
         --     ('19', ''),
         --     ('20', ''),
-        --     ('99', 'Other');
+        --     ('99', 'Other')$q1$, lookup_schema);
         -- 
     exception
         when duplicate_column then
