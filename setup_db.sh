@@ -71,7 +71,7 @@ while getopts ":urpnd" opt; do
       ;;
     p)
       pa=true
-      # check that start/end year env vars are set
+      # Check that start/end year env vars are set.
       if ! test -v pa_start_year; then
         echo "Please include a value for 'pa_start_year' in the .env file."
         exit 1
@@ -80,16 +80,26 @@ while getopts ":urpnd" opt; do
         echo "Please include a value for 'pa_end_year' in the .env file."
         exit 1
       fi
+      # Check if start year too early.
+      if test $((pa_start_year)) -lt 2005; then
+        echo "${pa_start_year} is out of the bounds of the data. The earliest year available for PA is 2005."
+        exit 1
+      fi
       ;;
     n)
       nj=true
-      # check that start/end year env vars are set
+      # Check that start/end year env vars are set.
       if ! test -v nj_start_year; then
         echo "Please include a value for 'nj_start_year' in the .env file."
         exit 1
       fi
       if ! test -v nj_end_year; then
         echo "Please include a value for 'nj_end_year' in the .env file."
+        exit 1
+      fi
+      # Check if start year too early.
+      if test $((nj_start_year)) -lt 2006; then
+        echo "${nj_start_year} is out of the bounds of the data. The earliest year available for NJ is 2006."
         exit 1
       fi
       ;;
