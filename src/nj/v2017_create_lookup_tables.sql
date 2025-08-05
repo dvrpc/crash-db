@@ -709,6 +709,7 @@ begin
 
         -- NJTR-1 overlay.
         execute format($q1$ insert into %I.veh_color (code, description) values
+            ('00', 'Unknown'),
             ('BG', 'Beige'),
             ('BK', 'Black'),
             ('BL', 'Blue'),

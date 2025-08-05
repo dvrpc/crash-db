@@ -114,6 +114,7 @@ Lookup tables:
 
 #### Data issues
 
+  - The zip file for Burlington 2009 Drivers is empty, and so that year's data cannot be imported.
   - Backslashes found in various files. These break Postgres's COPY. They are escaped (with another backslash) via src/utils/nj_pre_process_files.sh. 
   - Literal carriage returns (break to next line) were found in various files. These break the line specification. They are replaced with a space via src/utils/nj_pre_process_files.sh.
   - Line feeds (new line, \n) found in the middle of some lines in various files (and sometimes several of them - seems to be in addresses). These break the line specification. They are replaced with a space via src/utils/nj_pre_process_files.sh.

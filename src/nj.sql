@@ -23,7 +23,6 @@ declare
     years int[] := ARRAY(SELECT * FROM generate_series(start_year, end_year));
     year int;
 begin
-    raise info 'In NJ script';
     foreach year in array years loop
         raise info 'NJ %', year;
 
