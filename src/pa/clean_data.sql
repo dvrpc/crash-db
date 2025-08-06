@@ -71,7 +71,7 @@ begin
     execute format($q$update temp_crash_%s set police_agcy = null where police_agcy in ('00000', '02336', '15601', '30601', '46601', '51601', '68000', '68K00', '68S01', '68S02', '68Z99')$q$, year);
     execute format($q$update temp_person_%s set airbag_pads = null where airbag_pads in ('10', '10.0', '12', '12.0')$q$, year);
     execute format($q$update temp_person_%s set airbag1 = null where airbag1 = 'M'$q$, year);
-    execute format($q$update temp_person_%s set dvr_lic_state = null where dvr_lic_state in ('GU', 'NT', 'QR', 'PQ')$q$, year);
+    execute format($q$update temp_person_%s set dvr_lic_state = null where dvr_lic_state in ('GU', 'NT', 'QR', 'PQ', 'XN', '99')$q$, year);
     execute format($q$update temp_person_%s set extric_ind = null where extric_ind = '9'$q$, year);
     execute format($q$update temp_person_%s set restraint_helmet = null where restraint_helmet in ('13', '13.0', '14', '14.0')$q$, year);
     execute format($q$update temp_person_%s set seat_position = null where seat_position in ('16', '17', '18', '19', '20')$q$, year);
