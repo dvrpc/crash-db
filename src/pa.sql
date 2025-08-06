@@ -102,7 +102,16 @@ begin
         raise info 'PA %', year;
 
         raise info 'Create schema';
-        execute format($q$create schema if not exists pa_%s$q$, year);
+
+        -- Drop any existing schema for the year.
+        begin
+            execute format($q$drop schema pa_%s cascade$q$, year);
+        exception
+            when others then
+                null;
+        end;
+
+        execute format($q$create schema pa_%s$q$, year);
 
         raise info 'Create and populate data tables';
         call pa_create_data_tables(year::text);
