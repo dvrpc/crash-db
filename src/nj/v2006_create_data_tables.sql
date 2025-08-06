@@ -24,10 +24,10 @@ begin
         pedestrians_killed integer,
         pedestrians_injured integer,
         -- TODO: Ask about this.
-        -- 2022 contains P,F,I; property damage, fatal, injury?
+        -- contains P,F,I; property damage, fatal, injury?
         severity text,
         -- TODO: Ask about this.
-        -- 2022 contains B,R,I
+        -- contains B,R,I
         intersection text,
         alcohol_involved boolean,
         hazmat_involved boolean,
@@ -62,7 +62,6 @@ begin
         posted_speed_cross_street integer,
         latitude text,
         longitude text,
-        -- cell_phone_in_use text references %2$s.cell_phone_in_use (code),
         cell_phone_in_use boolean,
         other_property_damage text,
         report_badge_num text
@@ -101,8 +100,7 @@ begin
         sex text,
         location_of_most_severe_injury text references %2$s.location_of_most_severe_injury (code),
         type_of_most_severe_injury text references %2$s.type_of_most_severe_injury (code),
-        -- refused_med_attn text references %2$s.refused_med_attn (code),
-        refused_med_attn text,
+        refused_med_attn text references %2$s.refused_med_attn (code),
         safety_equipment_available text references %2$s.safety_equipment (code),
         safety_equipment_used text references %2$s.safety_equipment (code),
         airbag_deployment text references %2$s.airbag_deployment (code),
@@ -180,8 +178,7 @@ begin
         oversized_overweight_permit text references %2$s.oversized_overweight_permit (code),
         hazmat_status text references %2$s.hazmat_status (code),
         hazmat_placard text,
-        -- usdot_other boolean,
-        usdot_other text,
+        usdot_other text references %2$s.usdot_other (code),
         usdot_other_num text,
         carrier_name text,
         hit_run_driver boolean

@@ -24,10 +24,10 @@ begin
         pedestrians_killed integer,
         pedestrians_injured integer,
         -- TODO: Ask about this.
-        -- 2022 contains P,F,I; property damage, fatal, injury?
+        -- contains P,F,I; property damage, fatal, injury?
         severity text,
         -- TODO: Ask about this.
-        -- 2022 contains B,R,I
+        -- contains B,R,I
         intersection text,
         alcohol_involved boolean,
         hazmat_involved boolean,
@@ -201,7 +201,7 @@ begin
         hazmat_placard text,
         usdot_num text,
         mc_mx_num text,
-        usdot_other boolean,
+        usdot_other text references %2$s.usdot_other (code),
         usdot_other_num text,
         carrier_name text,
         hit_run_driver boolean

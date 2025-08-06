@@ -5,7 +5,7 @@ $body$
 declare
     lookup_schema text = 'nj_2017_lookup';
     table_name text;
-    table_names text[] := '{airbag_deployment, alcohol_test_given, alcohol_test_type, cargo_body_type, contrib_circ, crash_type, driven_left_towed, ejection, environmental_condition, extent_of_damage, hazmat_status, light_condition, location_of_most_severe_injury, ncic, oversized_overweight_permit, physical_condition, physical_status, position_in_veh, police_dept, pre_crash_action, refused_med_attn, removed_by, road_divided_by, road_grade, road_horizontal_alignment, road_surface_condition, road_surface_type, road_system, route_suffix, safety_equipment, sequence_of_events, special_function_vehicles, unit_of_measure, temp_traffic_control_zone, traffic_controls, type_of_most_severe_injury, veh_color, veh_impact_area, veh_type, veh_use, veh_weight_rating}';
+    table_names text[] := '{airbag_deployment, alcohol_test_given, alcohol_test_type, cargo_body_type, contrib_circ, crash_type, driven_left_towed, ejection, environmental_condition, extent_of_damage, hazmat_status, light_condition, location_of_most_severe_injury, ncic, oversized_overweight_permit, physical_condition, physical_status, position_in_veh, police_dept, pre_crash_action, refused_med_attn, removed_by, road_divided_by, road_grade, road_horizontal_alignment, road_surface_condition, road_surface_type, road_system, route_suffix, safety_equipment, sequence_of_events, special_function_vehicles, unit_of_measure, temp_traffic_control_zone, traffic_controls, type_of_most_severe_injury, usdot_other, veh_color, veh_impact_area, veh_type, veh_use, veh_weight_rating}';
 begin
 
     raise info 'Creating and populating % tables', lookup_schema;
@@ -61,7 +61,7 @@ begin
         -- 2017 Crash Report Manual, pp 80-4.
         execute format($q1$ insert into %I.contrib_circ (code, description) values
             ('00', 'Unknown'),
-            -- Driver/Pedalcycleist Actions (01-29)
+            -- Driver/Pedalcyclist Actions (01-29)
             ('01', 'Unsafe Speed'),
             ('02', 'Driver Inattention'),
             ('03', 'Failed to Obey Traffic Signal'),
@@ -189,7 +189,6 @@ begin
             ('04', 'Disabling'),
             ('99', 'Other')$q1$, lookup_schema);
 
-        -- TODO: confirm
         -- Assumed from NJTR-1 form, box 49.
         execute format($q1$ insert into %I.hazmat_status (code, description) values
             ('N', 'None'),
@@ -663,8 +662,7 @@ begin
             ('FE', 'Feet'),
             ('MI', 'Miles'),
             ('AT', 'At Intersection With')$q1$, lookup_schema);
-
-        
+      
         -- 2017 Crash Report Manual, p. 61.
         execute format($q1$ insert into %I.temp_traffic_control_zone (code, description) values
             ('00', 'Unknown'),
@@ -706,6 +704,10 @@ begin
             ('07', 'Fracture/Dislocation'),
             ('08', 'Complaint of Pain'),
             ('99', 'Other')$q1$, lookup_schema);
+
+        execute format($q1$ insert into %I.usdot_other (code, description) values
+            ('U', 'USDOT'),
+            ('O', 'Other')$q1$, lookup_schema);           
 
         -- NJTR-1 overlay.
         execute format($q1$ insert into %I.veh_color (code, description) values

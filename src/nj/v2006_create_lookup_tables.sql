@@ -5,7 +5,7 @@ $body$
 declare
     lookup_schema text = 'nj_2006_lookup';
     table_name text;
-    table_names text[] := '{airbag_deployment, alcohol_test_given, alcohol_test_type, cargo_body_type, cell_phone_in_use, contrib_circ, crash_type, driven_left_towed, ejection, environmental_condition, hazmat_status, light_condition, location_of_most_severe_injury, ncic, oversized_overweight_permit, physical_condition, physical_status, position_in_veh, police_dept, pre_crash_action, refused_med_attn, removed_by, road_divided_by, road_character, road_surface_condition, road_surface_type, road_system, route_suffix, safety_equipment, sequence_of_events, special_function_vehicles, unit_of_measure, temp_traffic_control_zone, traffic_controls, type_of_most_severe_injury, veh_color, veh_impact_area, veh_type, veh_use, veh_weight_rating}';
+    table_names text[] := '{airbag_deployment, alcohol_test_given, alcohol_test_type, cargo_body_type, contrib_circ, crash_type, driven_left_towed, ejection, environmental_condition, hazmat_status, light_condition, location_of_most_severe_injury, ncic, oversized_overweight_permit, physical_condition, physical_status, position_in_veh, police_dept, pre_crash_action, refused_med_attn, removed_by, road_divided_by, road_character, road_surface_condition, road_surface_type, road_system, route_suffix, safety_equipment, sequence_of_events, special_function_vehicles, unit_of_measure, temp_traffic_control_zone, traffic_controls, type_of_most_severe_injury, usdot_other, veh_color, veh_impact_area, veh_type, veh_use, veh_weight_rating}';
 begin
 
     raise info 'Creating and populating % tables', lookup_schema;
@@ -67,14 +67,6 @@ begin
             ('11', 'Pole (trailer)'),
             ('12', 'Intermodal Chassis'),
             ('13', 'No Cargo Body'),
-            ('99', 'Other')$q1$, lookup_schema);
-
-        -- TODO: determine if I'm interpreting this correctly - or are they using a boolean in the data?
-        -- NJTR-1 boxes 122 & 123; FFM2006, p. 48.
-        execute format($q1$insert into %I.cell_phone_in_use (code, description) values
-            ('00', 'Unknown'),
-            ('01', 'Handheld'),
-            ('02', 'Hands Free'),
             ('99', 'Other')$q1$, lookup_schema);
 
         -- NJTR-1 boxes 118 & 119; FFM2006, p. 47.
@@ -679,6 +671,10 @@ begin
             ('08', 'Complaint of Pain'),
             ('99', 'Other')$q1$, lookup_schema);
 
+        execute format($q1$ insert into %I.usdot_other (code, description) values
+            ('U', 'USDOT'),
+            ('O', 'Other')$q1$, lookup_schema);
+           
         -- NJTR-1
         execute format($q1$ insert into %I.veh_color (code, description) values
             ('00', 'Unknown'),
