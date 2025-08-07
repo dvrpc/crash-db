@@ -15,21 +15,22 @@ begin
 
     -- Populate lookup tables.
     begin
-        -- Added by DVRPC.
+        -- Added by DVRPC from values in table. (Did not have separate listing at end
+        -- of data dictionary files.)
         insert into pa_lookup.special_sizing (code, description) values 
-            ('00', 'No special sizing'),
-            ('01', 'over height'),
-            ('02', 'over length'),
-            ('03', 'over weight'),
-            ('04', 'over width');
-        -- Added by DVRPC.
+            ('00', 'No Special Sizing'),
+            ('01', 'Over Height'),
+            ('02', 'Over Length'),
+            ('03', 'Over Weight'),
+            ('04', 'Over Width');
+        -- Added by DVRPC from values in table. (Did not have separate listing at end
+        -- of data dictionary files.)
         insert into pa_lookup.transported_by (code, description) values
             ('00', 'Not Transported'),
             ('01', 'EMS Air'),
             ('02', 'EMS Ground'),
             ('98', 'Other'),
             ('99', 'Unknown');
-
     
         insert into pa_lookup.access_ctrl (code, description) values 
             ('1', 'Limited Access'),
