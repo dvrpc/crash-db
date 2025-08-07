@@ -155,7 +155,13 @@ begin
                     from information_schema.key_column_usage
                     where constraint_name = cons_name and constraint_schema = 'pa_' || year
             loop
-                execute format($q$update temp_%I_%s set %I = lpad(%I, 2, '0')$q$, tbl_name2, year, col_name2, col_name2);
+                -- there's one special case we want to skip: "airbag" has numbers that need
+                -- zero padded, but a 'M' value that should not be zeropadded.
+                if tbl_name2 = 'person' and col_name2 in ('airbag1', 'airbag2', 'airbag3', 'airbag4') then
+                    execute format($q$update temp_%I_%s set %I = lpad(%I, 2, '0') WHERE %I != 'M'$q$, tbl_name2, year, col_name2, col_name2, col_name2);
+                else
+                    execute format($q$update temp_%I_%s set %I = lpad(%I, 2, '0')$q$, tbl_name2, year, col_name2, col_name2);
+                end if;
             end loop;
         end loop;
     end loop;
