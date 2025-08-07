@@ -23,6 +23,7 @@ begin
             ('02', 'Over Length'),
             ('03', 'Over Weight'),
             ('04', 'Over Width');
+
         -- Added by DVRPC from values in table. (Did not have separate listing at end
         -- of data dictionary files.)
         insert into pa_lookup.transported_by (code, description) values
@@ -36,6 +37,7 @@ begin
             ('1', 'Limited Access'),
             ('2', 'Partial Access'),
             ('3', 'No Access Control');
+
         insert into pa_lookup.airbag (code, description) values
             ('00', 'Not Deployed'),
             ('01', 'Curtain'),
@@ -44,6 +46,7 @@ begin
             ('04', 'Other'),
             ('97', 'Not Applicable'),
             ('M', 'Multiple (unspecified)');
+
         insert into pa_lookup.airbag_pads (code, description) values
             ('00', 'None used or not applicable'),
             ('05', 'Motorcycle eye protection'),
@@ -53,6 +56,7 @@ begin
             ('13', 'Air bag removed (prior to crash)'),
             ('19', 'Unknown if air bag deployed'),
             ('99', 'Unknown');
+
         insert into pa_lookup.avoid_man_cd (code, description) values
             ('0', 'No avoidance maneuver'),
             ('1', 'Braking - skid marks evident'),
@@ -584,7 +588,7 @@ begin
             ('26', 'Other Row – Right Side'),
             ('27', 'Unknown Row – Left Side'),
             ('28', 'Unknown Row – Middle Position'),
-            ('29', 'Unknown Row – Left Side'),
+            ('29', 'Unknown Row – Right Side'), -- Was "left", DVRPC corrected to "right"
             ('98', 'Other'),
             ('99', 'Unknown');
     
@@ -780,7 +784,7 @@ begin
             ('08', 'Left of trafficway'),
             ('09', 'Right of trafficway'),
             ('10', 'HOV lane'),
-            ('11', 'Shoulder rig'),
+            ('11', 'Shoulder right'), -- was "rig", DVRPC corrected to "right"
             ('12', 'Shoulder left'),
             ('13', 'One lane road'),
             ('14', 'Acceleration/Deceleration Lane'),
@@ -958,8 +962,10 @@ begin
             ('TWW', 'Wide Wheel Wagon'),
             ('TXT', 'Travelall'),
             ('TYY', 'Cutaway');
-    
-        insert into pa_lookup.weather1 (code, description) values
+
+        -- NOTE: Data dictionary lists weather1 and weather2, but as they are the
+        -- same DVRPC eliminated duplicate and renamed to "weather"
+        insert into pa_lookup.weather (code, description) values
             ('01', 'Blowing Sand, Soil, Dirt'),
             ('02', 'Blowing Snow'),
             ('03', 'Clear'),
@@ -972,21 +978,7 @@ begin
             ('10', 'Snow'),
             ('98', 'Other'),
             ('99', 'Unknown');
-    
-        insert into pa_lookup.weather2 (code, description) values
-            ('01', 'Blowing Sand, Soil, Dirt'),
-            ('02', 'Blowing Snow'),
-            ('03', 'Clear'),
-            ('04', 'Cloudy'),
-            ('05', 'Fog, Smog, Smoke'),
-            ('06', 'Freezing Rain or Freezing Drizzle'),
-            ('07', 'Rain'),
-            ('08', 'Severe Crosswinds'),
-            ('09', 'Sleet or Hail'),
-            ('10', 'Snow'),
-            ('98', 'Other'),
-            ('99', 'Unknown');
-    
+      
         insert into pa_lookup.work_zone_loc (code, description) values
             ('1', 'Before the 1st work zone warning sign'),
             ('2', 'Advance warning area'),

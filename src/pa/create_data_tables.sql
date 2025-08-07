@@ -106,8 +106,8 @@ begin
         urban_rural text, -- code to classify crash as urban or rural (1=rural, 2=urbanized, 3=urban) 
         van_count integer, -- total amount of vans involved 
         vehicle_count integer, -- total number of all motor vehicles involved in the crash 
-        weather1 text references pa_lookup.weather1 (code), -- code for the first weather condition at time of crash (see column code)
-        weather2 text references pa_lookup.weather2 (code), -- code for the second weather condition at time of crash (see column code) 
+        weather1 text references pa_lookup.weather (code), -- code for the first weather condition at time of crash (see column code)
+        weather2 text references pa_lookup.weather (code), -- code for the second weather condition at time of crash (see column code) 
         workers_pres boolean, -- were construction personnel present?
         work_zone_ind boolean, -- did the crash occur in a work zone
         work_zone_loc text references pa_lookup.work_zone_loc (code), -- the work zone location code (see column code)
