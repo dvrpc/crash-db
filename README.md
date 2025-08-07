@@ -67,15 +67,13 @@ For NJ, one shell script (src/utils/nj_download_data.sh) downloads the compresse
 
 ### PennDOT
 
-Crash data:
-  - [2024 Crash Database Primer](https://gis.penndot.gov/gishub/crashZip/OPEN%20DATA%20PORTAL%20Database%20Primer%2010-16.pdf)
-  - [2024 data dictionary](https://gis.penndot.pa.gov/gishub/crashZip/Crash_Data_Dictionary_2025.pdf)
-  - [2024 data download](https://experience.arcgis.com/experience/51809b06e7b140208a4ed6fbad964990)
+  - 2024 Crash Database Primer: <https://gis.penndot.gov/gishub/crashZip/OPEN%20DATA%20PORTAL%20Database%20Primer%2010-16.pdf>
+  - 2024 data dictionary: <https://gis.penndot.pa.gov/gishub/crashZip/Crash_Data_Dictionary_2025.pdf>
+  - 2024 data download: <https://experience.arcgis.com/experience/51809b06e7b140208a4ed6fbad964990>
 
 #### 2024-version data issues and questions
 
-There are a number of discrepancies between the data dictionary and the CSVs. Those related to
-field order or missing fields are noted in src/pa/create_data_tables.sql, in a comment above each table. Those about values can be found in src/pa/alter_temp_domains.sql (which identifies the data issues) and src/pa/clean_data.sql (which cleans it). Further questions are below.
+There are a number of discrepancies between the data dictionary and the CSVs. Those related to field order or missing fields are noted in src/pa/create_data_tables.sql, in a comment above each table. Those about values can be found in src/pa/alter_temp_domains.sql (which identifies the data issues) and src/pa/clean_data.sql (which cleans it). Further questions are below.
 
 Lookup tables:
   - Some fields have values that aren't in their corresponding lookup tables; where obvious, unambiguous values could be added they were, others were were changed to null. See clean_data.sql and lookup_tables.sql.
@@ -95,22 +93,11 @@ Misc:
 
 ### NJDOT
 
-Main site: <https://dot.nj.gov/transportation/refdata/accident/>
-Data: <https://dot.nj.gov/transportation/refdata/accident/rawdata01-current.shtm>
-Data dictionaries: <https://dot.nj.gov/transportation/refdata/accident/masterfile.shtm>
-Crash report manual found at <https://dot.nj.gov/transportation/refdata/accident/publications.shtm>.
-
-Lookup tables:
-  <https://dot.nj.gov/transportation/refdata/accident/codes.shtm>
-  <https://dot.nj.gov/transportation/refdata/accident/crash_detail_summary.shtm>
-  <https://dot.nj.gov/transportation/refdata/accident/forms.shtm>
-
-  2017:
-    <https://dot.nj.gov/transportation/refdata/accident/pdf/NJTR-1_Overlays.pdf>
-  2006-2016:
-    <https://dot.nj.gov/transportation/refdata/accident/pdf/NJTR-1.pdf>
-  2001-2005:
-    <https://dot.nj.gov/transportation/refdata/accident/pdf/NJTR-1_2001.pdf>
+  - Main site: <https://dot.nj.gov/transportation/refdata/accident/>
+  - Data: <https://dot.nj.gov/transportation/refdata/accident/rawdata01-current.shtm>
+  - Data dictionaries: <https://dot.nj.gov/transportation/refdata/accident/masterfile.shtm>
+  - Manuals: <https://dot.nj.gov/transportation/refdata/accident/publications.shtm>.
+  - NJTR-1 Forms: <https://dot.nj.gov/transportation/refdata/accident/forms.shtm>
 
 #### Data issues
 
