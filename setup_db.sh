@@ -31,6 +31,9 @@ if ! test -v db; then
   db="crash"
 fi
 
+# Create database, ignoring error if it already exists.
+psql -p "${port}" -c "create database ${db}" &>/dev/null
+
 # Create pgtap extension (for testing).
 psql -p "${port}" -c "create extension if not exists pgtap"
 
