@@ -1,5 +1,19 @@
 # Crash Database
 
+<!--toc:start-->
+  - [Introduction](#introduction)
+  - [Utility Scripts](#utility-scripts)
+  - [TODO:](#todo)
+  - [Data](#data)
+    - [Obtaining and Pre-processing](#obtaining-and-pre-processing)
+    - [PennDOT](#penndot)
+      - [2024-version data issues and questions](#2024-version-data-issues-and-questions)
+    - [NJDOT](#njdot)
+      - [Data issues](#data-issues)
+<!--toc:end-->
+
+## Introduction
+
 The database is constructed via a number of shell and sql scripts. The main entry point is setup_db.sh. If it is not already executable, make it so with `chmod 755 setup_db.sh` and then invoke with `./setup_db.sh -u` to show usage details.
 
 The script assumes that data files (.csv and .txt) are in a location relative to the project directory: data/nj/ for NJ files and data/pa/ for PA files. These are then copied to appropriate folders (configurable via environment variables if necessary) to ease access by Postgres's <a href="https://www.postgresql.org/docs/17/sql-copy.html">COPY</a>.
