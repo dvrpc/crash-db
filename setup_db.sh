@@ -31,6 +31,9 @@ if ! test -v db; then
   db="crash"
 fi
 
+# Create pgtap extension (for testing).
+psql -p "${port}" -c "create extension if not exists pgtap"
+
 # Use user_data_dir from .env or a default value.
 if ! test -v user_data_dir; then
   user_data_dir="/tmp/crash-data"
