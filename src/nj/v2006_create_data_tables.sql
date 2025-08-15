@@ -64,7 +64,8 @@ begin
         longitude text,
         cell_phone_in_use boolean,
         other_property_damage text,
-        report_badge_num text
+        report_badge_num text,
+        constraint pk_crash primary key (year, ncic_code, dept_case_num)
     )$a$, data_schema, lookup_schema);
 
     execute format($b$ create unlogged table if not exists %1$s.driver (
@@ -84,7 +85,8 @@ begin
         charge text,
         summons text,
         multi_charge boolean,
-        driver_physical_status text references %2$s.physical_status (code)
+        driver_physical_status text references %2$s.physical_status (code),
+        constraint pk_driver primary key (year, ncic_code, dept_case_num, veh_num)
     )$b$, data_schema, lookup_schema);
 
     execute format($c$ create unlogged table if not exists %1$s.occupant (
@@ -108,7 +110,8 @@ begin
         -- <http://www.nj.gov/transportation/refdata/accident/policeres.shtm, which eventually>
         -- leads to
         -- <http://www.nj.gov/health/ems/documents/special_services/hospital_infomation.pdf>.
-        hospital_code text
+        hospital_code text,
+        constraint pk_occupant primary key (year, ncic_code, dept_case_num, veh_num, occupant_num)
     )$c$, data_schema, lookup_schema);
 
     execute format($d$create unlogged table if not exists %1$s.pedestrian (
@@ -142,7 +145,8 @@ begin
         hospital_code text,
         physical_status text references %2$s.physical_status (code),
         is_bicycle boolean,
-        is_other boolean
+        is_other boolean,
+        constraint pk_pedestrian primary key (year, ncic_code, dept_case_num, pedestrian_num)        
     )$d$, data_schema, lookup_schema);
 
     execute format($e$create unlogged table if not exists %1$s.vehicle (
@@ -181,7 +185,8 @@ begin
         usdot_other text references %2$s.usdot_other (code),
         usdot_other_num text,
         carrier_name text,
-        hit_run_driver boolean
+        hit_run_driver boolean,
+        constraint pk_vehicle primary key (year, ncic_code, dept_case_num, veh_num)
     )$e$, data_schema, lookup_schema);
 
 end;
