@@ -37,6 +37,9 @@ psql -p "${port}" -c "create database ${db}" &>/dev/null
 # Create pgtap extension (for testing).
 psql -p "${port}" -c "create extension if not exists pgtap"
 
+# Create pgtap extension (for testing).
+psql -p "${port}" -c "create extension if not exists postgis"
+
 # Use user_data_dir from .env or a default value.
 if [[ -z "${user_data_dir}" ]]; then
   user_data_dir="/tmp/crash-data"
@@ -229,6 +232,14 @@ if [[ $nj = true ]]; then
   fi
 
   psql -qb -p "${port}" -d "${db}" -v user_data_dir="${user_data_dir}" -v postgres_data_dir="${postgres_data_dir}" -v nj_start_year="${nj_start_year}" -v nj_end_year="${nj_end_year}" -f src/init_vars.sql -f src/nj/init_vars.sql -f src/nj.sql
+  
+  # nj geometry
+  if psql -p "${port}" -d "${db}" -tAc "SELECT EXISTS(SELECT 1 FROM information_schema.tables WHERE table_schema='public' AND table_name='nj_roads');" | grep -q 't'; then
+    echo "Generating geometry columns for NJ crash tables..."
+    psql -qb -p "${port}" -d "${db}" -c "SET session.nj_start_year = '${nj_start_year}'; SET session.nj_end_year = '${nj_end_year}';" -f src/nj_generate_geometry.sql
+  else
+    echo "Warning: NJ road network not found. Run with --roads to import road data first, then re-run with --nj to generate geometry columns."
+  fi
 fi
 
 if [[ $roads = true ]]; then
