@@ -168,11 +168,20 @@ if test ${download_pa} = true ; then
   cd src/utils && ./pa_download_data.sh && cd ../..
 fi
 
+# Copy data files in data/ to location accessible by server, for easier use in COPY, which
+# requires absolute paths/certain permissions.
+mkdir -p "${user_data_dir}/pa"
+mkdir -p "${user_data_dir}/nj"
+mkdir -p "${user_data_dir}/nj/roads"
+cp -r data/pa/*.csv "${user_data_dir}/pa" 2>/dev/null || true
+cp -r data/nj/*.txt "${user_data_dir}/nj/" 2>/dev/null || true
+cp -r data/nj/roads/* "${user_data_dir}/nj/roads/" 2>/dev/null || true
+
 if test ${download_nj} = true ; then
   echo "Downloading NJ crash data..."
   cd src/utils && ./nj_download_data.sh && cd ../..
   echo "Pre-processing NJ data files..."
-  cd src/utils && ./nj_pre_process_files.sh && cd ../..
+  cd src/utils && user_data_dir="${user_data_dir}" ./nj_pre_process_files.sh && cd ../..
 fi
 
 if test ${download_roads} = true ; then
@@ -185,15 +194,6 @@ if test ${pa} = false && test ${nj} = false && test ${roads} = false ; then
   echo "Download complete."
   exit
 fi
-
-# Copy data files in data/ to location accessible by server, for easier use in COPY, which
-# requires absolute paths/certain permissions.
-mkdir -p "${user_data_dir}/pa"
-mkdir -p "${user_data_dir}/nj"
-mkdir -p "${user_data_dir}/nj/roads"
-cp -r data/pa/*.csv "${user_data_dir}/pa" 2>/dev/null || true
-cp -r data/nj/*.txt "${user_data_dir}/nj/" 2>/dev/null || true
-cp -r data/nj/roads/* "${user_data_dir}/nj/roads/" 2>/dev/null || true
 
 ## Create custom domains.
 psql -q -p "${port}" -d "${db}" < src/domains.sql
