@@ -1,11 +1,17 @@
 #! /usr/bin/env bash
 
+# Load environment variables from .env file
+if [ -f "../../.env" ]; then
+  export $(grep -v '^#' ../../.env | xargs)
+fi
+
 usage="
 Download NJ data by year (starting from 2001).
 
 Usage:
-$(basename $0) start_year [end_year]
+$(basename $0) [start_year] [end_year]
 
+If no arguments provided, uses nj_start_year and nj_end_year from .env file.
 Use 'start_year' without an 'end_year' to download data for a single year.
 "
 # Parse and handle command line options.
@@ -29,17 +35,20 @@ tables=("Accidents" "Drivers" "Occupants" "Pedestrians" "Vehicles")
 base_url="https://dot.nj.gov/transportation/refdata/accident"
 
 if [ -z $1 ]; then
-  1>&2 echo "Start year not provided. Quitting."
-  echo "${usage}"
-  exit 1
-fi
-
-first_year=$1
-
-if [ -z $2 ]; then
-  last_year=$1
+  if [ -z "$nj_start_year" ]; then
+    1>&2 echo "Start year not provided and nj_start_year not set in .env. Quitting."
+    echo "${usage}"
+    exit 1
+  fi
+  first_year=$nj_start_year
+  last_year=${nj_end_year:-$nj_start_year}
 else
-  last_year=$2
+  first_year=$1
+  if [ -z $2 ]; then
+    last_year=$1
+  else
+    last_year=$2
+  fi
 fi
 
 if (( first_year < 2001 || last_year < 2001 )); then
@@ -48,12 +57,15 @@ if (( first_year < 2001 || last_year < 2001 )); then
   exit;
 fi
 
+# Create data directory if it doesn't exist
+mkdir -p ../../data/nj
+
 for year in $(seq ${first_year} ${last_year}); do
   for county in ${nj_counties[@]}; do
     for table in ${tables[@]}; do
       curl "${base_url}/${year}/${county}${year}${table}.zip" \
         -H 'User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36' \
-         -o "data/nj/${county}${year}${table}.zip"
+         -o "../../data/nj/${county}${year}${table}.zip"
     done
   done
 done

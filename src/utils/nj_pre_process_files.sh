@@ -19,19 +19,19 @@ if [[ "${1}" = '-u' || "${1}" = 'u' ]]; then
 fi
 
 # Unzip all the downloaded files, overwriting any existing .txt files.
-unzip -o data/nj/\*.zip -d data/nj/
+unzip -o ../../data/nj/\*.zip -d ../../data/nj/
 
 # Convert encoding from win1252/cp1252 to UTF8 and write to new file.
 # (Postgres's `COPY`, even using the `encoding 'WIN1252'` option, was not able to decipher the
 # encoding from the original files correctly and would add odd symbols, replacing one character
 # with multiple characters, and thus break the specification that NJ uses.)
-for file in $(ls data/nj/*.txt); do
+for file in $(ls ../../data/nj/*.txt); do
   # iconv doesn't do in-place conversion, so first output to a new file name and then replace it
-  iconv -f WINDOWS-1252 -t UTF-8 -o "${file}.new" "${file}" && mv -f "${file}.new" "${file}"
+  iconv -f WINDOWS-1252 -t UTF-8 "${file}" > "${file}.new" && mv -f "${file}.new" "${file}"
 done
 
 # Convert from dos to unix formatting (CRLF -> LF).
-for file in $(ls data/nj/*.txt); do
+for file in $(ls ../../data/nj/*.txt); do
   dos2unix "${file}"
 done
 
@@ -39,7 +39,7 @@ done
 # Escape or replace characters that cause issues with either Postgres's COPY or that break NJ's
 # specification.
 echo 'Escape/replace problematic characters.'
-for file in $(ls data/nj/*.txt); do
+for file in $(ls ../../data/nj/*.txt); do
   # With the file format the NJ provides (fields determined by start/end byte, not a CSV), it must
   # be treated as the TXT format to be used with Postgres's COPY. Almost everything can be handled
   # in Postgres after that (adding quotes around space-separated fields, for example), except for an
@@ -81,7 +81,7 @@ done
 #  - `:1 and b1`: first set a label, and then at the end go to it to test the line again (this
 #     addresses the case when there are multiple incorrect line breaks within the same line)
 echo 'Remove extra/misplaced new lines'
-for file in $(ls data/nj/*.txt); do
+for file in $(ls ../../data/nj/*.txt); do
   # The characters per line vary by both file and year, so need to check filename.
 	case "${file}" in 
 	  *2017* | *2018* | *2019* | *2020* | *2021* | *2022*)

@@ -1,19 +1,19 @@
-#! /usr/bin/env bash
+#!/usr/bin/env bash
 
 # Describe how to use this script.
 usage="
 Usage:
-$(basename $0) -p -n [ -r ] | -u
+$(basename $0) --pa --nj --roads [ --reset ] | --usage
 
--p: Import PA data.
--n: Import NJ data.
--r: Reset database (drop and recreate all objects), by state.
--d: Dump existing database to file.
--u: Show usage (this message) and exit. Other options will be ignored.
-
-e.g.
-./setup_db.sh -p to import PA data
-./setup_db.sh -nr to reset and import NJ data
+--pa: Import PA data.
+--nj: Import NJ data.
+--roads: Import NJ road network data.
+--reset: Reset database (drop and recreate all objects), by state.
+--dump: Dump existing database to file.
+--download-pa: Download PA crash data using pa_start_year and pa_end_year from .env
+--download-nj: Download and pre-process NJ crash data using nj_start_year and nj_end_year from .env
+--download-roads: Download NJ road network shapefile
+--usage: Show usage (this message) and exit. Other options will be ignored.
 
 "
 
@@ -27,7 +27,7 @@ if [[ -z "${port}" ]]; then
 fi
 
 # Use db (name) from .env or a default value.
-if ! test -v db; then
+if [[ -z "${db}" ]]; then
   db="crash"
 fi
 
@@ -38,12 +38,12 @@ psql -p "${port}" -c "create database ${db}" &>/dev/null
 psql -p "${port}" -c "create extension if not exists pgtap"
 
 # Use user_data_dir from .env or a default value.
-if ! test -v user_data_dir; then
+if [[ -z "${user_data_dir}" ]]; then
   user_data_dir="/tmp/crash-data"
 fi
 
 # Use postgres_data_dir from .env or a default value.
-if ! test -v postgres_data_dir; then
+if [[ -z "${postgres_data_dir}" ]]; then
   postgres_data_dir="/var/lib/postgresql"
 fi
 
@@ -54,35 +54,33 @@ if [[ ${#} < 1 ]]; then
   exit 1
 fi
 
-# Exit if an argument provided, rather than option.
-if [[ "${1}" != -* ]]; then
-  echo "This program does not take any arguments, only options. Quitting."
-  echo "${usage}" 
-  exit 1
-fi
-
 pa=false
 nj=false
+roads=false
 reset=false
+download_pa=false
+download_nj=false
+download_roads=false
 
 # Parse and handle command line options.
-while getopts ":urpnd" opt; do
-  case $opt in
-    u)
+while [[ $# -gt 0 ]]; do
+  case $1 in
+    --usage)
       echo "${usage}"
       exit
       ;;
-    r)
+    --reset)
       reset=true
+      shift
       ;;
-    p)
+    --pa)
       pa=true
       # Check that start/end year env vars are set.
-      if ! test -v pa_start_year; then
+      if [[ -z "${pa_start_year}" ]]; then
         echo "Please include a value for 'pa_start_year' in the .env file."
         exit 1
       fi
-      if ! test -v pa_end_year; then
+      if [[ -z "${pa_end_year}" ]]; then
         echo "Please include a value for 'pa_end_year' in the .env file."
         exit 1
       fi
@@ -91,15 +89,16 @@ while getopts ":urpnd" opt; do
         echo "${pa_start_year} is out of the bounds of the data. The earliest year available for PA is 2005."
         exit 1
       fi
+      shift
       ;;
-    n)
+    --nj)
       nj=true
       # Check that start/end year env vars are set.
-      if ! test -v nj_start_year; then
+      if [[ -z "${nj_start_year}" ]]; then
         echo "Please include a value for 'nj_start_year' in the .env file."
         exit 1
       fi
-      if ! test -v nj_end_year; then
+      if [[ -z "${nj_end_year}" ]]; then
         echo "Please include a value for 'nj_end_year' in the .env file."
         exit 1
       fi
@@ -108,23 +107,82 @@ while getopts ":urpnd" opt; do
         echo "${nj_start_year} is out of the bounds of the data. The earliest year available for NJ is 2006."
         exit 1
       fi
+      shift
       ;;
-    d)
+    --dump)
       pg_dump -O -p "${port}" "${db}" > "data/crash_$(date +%F_%I-%M).dump"
       exit 0
       ;;
-    \?)
-      echo "Invalid option -${OPTARG}. Quitting."
+    --download-pa)
+      download_pa=true
+      # Check that start/end year env vars are set.
+      if [[ -z "${pa_start_year}" ]]; then
+        echo "Please include a value for 'pa_start_year' in the .env file."
+        exit 1
+      fi
+      if [[ -z "${pa_end_year}" ]]; then
+        echo "Please include a value for 'pa_end_year' in the .env file."
+        exit 1
+      fi
+      shift
+      ;;
+    --download-nj)
+      download_nj=true
+      # Check that start/end year env vars are set.
+      if [[ -z "${nj_start_year}" ]]; then
+        echo "Please include a value for 'nj_start_year' in the .env file."
+        exit 1
+      fi
+      if [[ -z "${nj_end_year}" ]]; then
+        echo "Please include a value for 'nj_end_year' in the .env file."
+        exit 1
+      fi
+      shift
+      ;;
+    --roads)
+      roads=true
+      shift
+      ;;
+    --download-roads)
+      download_roads=true
+      shift
+      ;;
+    *)
+      echo "Invalid option $1. Quitting."
       echo "${usage}"
       exit 1
       ;;    
   esac
 done
 
-# The rest of the script deals only with importing data and so one of the state options is required.
-if test ${pa} = false && test ${nj} = false ; then
-  echo "You must choose at least one state. Quitting."
+# Check if at least one action was specified
+if test ${pa} = false && test ${nj} = false && test ${roads} = false && test ${download_pa} = false && test ${download_nj} = false && test ${download_roads} = false ; then
+  echo "You must choose at least one action. Quitting."
   echo "${usage}"
+  exit
+fi
+
+# Handle download actions first
+if test ${download_pa} = true ; then
+  echo "Downloading PA crash data..."
+  cd src/utils && ./pa_download_data.sh && cd ../..
+fi
+
+if test ${download_nj} = true ; then
+  echo "Downloading NJ crash data..."
+  cd src/utils && ./nj_download_data.sh && cd ../..
+  echo "Pre-processing NJ data files..."
+  cd src/utils && ./nj_pre_process_files.sh && cd ../..
+fi
+
+if test ${download_roads} = true ; then
+  echo "Downloading NJ road network..."
+  cd src/utils && ./nj_download_roads.sh && cd ../..
+fi
+
+# If only downloading, exit here
+if test ${pa} = false && test ${nj} = false && test ${roads} = false ; then
+  echo "Download complete."
   exit
 fi
 
@@ -132,8 +190,10 @@ fi
 # requires absolute paths/certain permissions.
 mkdir -p "${user_data_dir}/pa"
 mkdir -p "${user_data_dir}/nj"
-cp -r data/pa/*.csv "${user_data_dir}/pa"
-cp -r data/nj/*.txt "${user_data_dir}/nj/"
+mkdir -p "${user_data_dir}/nj/roads"
+cp -r data/pa/*.csv "${user_data_dir}/pa" 2>/dev/null || true
+cp -r data/nj/*.txt "${user_data_dir}/nj/" 2>/dev/null || true
+cp -r data/nj/roads/* "${user_data_dir}/nj/roads/" 2>/dev/null || true
 
 ## Create custom domains.
 psql -q -p "${port}" -d "${db}" < src/domains.sql
@@ -169,4 +229,20 @@ if [[ $nj = true ]]; then
   fi
 
   psql -qb -p "${port}" -d "${db}" -v user_data_dir="${user_data_dir}" -v postgres_data_dir="${postgres_data_dir}" -v nj_start_year="${nj_start_year}" -v nj_end_year="${nj_end_year}" -f src/init_vars.sql -f src/nj/init_vars.sql -f src/nj.sql
+fi
+
+if [[ $roads = true ]]; then
+  if [[ $reset = true ]]; then
+    read -p "Are you sure want to reset the NJ roads table? (Press y to reset it, any other key to abort.) " -n 1 -r
+    echo
+      if [[ $REPLY =~ ^[Yy]$ ]]; then
+        psql -qb -p "${port}" -d "${db}" -c "DROP TABLE IF EXISTS nj_roads;"
+      else
+        echo 'Aborting.'
+        exit
+      fi
+  fi
+
+  # Use the roads download script with --import flag
+  cd src/utils && ./nj_download_roads.sh --import && cd ../..
 fi  
