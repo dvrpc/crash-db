@@ -35,10 +35,10 @@ fi
 psql -p "${port}" -c "create database ${db}" &>/dev/null
 
 # Create pgtap extension (for testing).
-psql -p "${port}" -c "create extension if not exists pgtap"
+psql -p "${port}" -d "${db}" -c "create extension if not exists pgtap"
 
-# Create pgtap extension (for testing).
-psql -p "${port}" -c "create extension if not exists postgis"
+# Create postgis extension.
+psql -p "${port}" -d "${db}" -c "create extension if not exists postgis"
 
 # Use user_data_dir from .env or a default value.
 if [[ -z "${user_data_dir}" ]]; then
@@ -216,6 +216,10 @@ if [[ $pa = true ]]; then
 
 
   psql -qb -p "${port}" -d "${db}" -v user_data_dir="${user_data_dir}" -v postgres_data_dir="${postgres_data_dir}" -v pa_start_year="${pa_start_year}" -v pa_end_year="${pa_end_year}" -f src/init_vars.sql -f src/pa/init_vars.sql -f src/pa.sql
+  
+  # pa geometry
+  echo "Generating geometry columns for PA crash tables..."
+  psql -qb -p "${port}" -d "${db}" -c "SET myvars.pa_start_year = '${pa_start_year}'; SET myvars.pa_end_year = '${pa_end_year}';" -f src/pa_generate_geometry.sql
 fi
 
 if [[ $nj = true ]]; then
@@ -254,6 +258,24 @@ if [[ $roads = true ]]; then
       fi
   fi
 
-  # Use the roads download script with --import flag
-  cd src/utils && ./nj_download_roads.sh --import && cd ../..
+  # check if nj roads table exists and handle accordingly
+  table_exists=$(psql -p "${port}" -d "${db}" -tAc "SELECT EXISTS (SELECT FROM information_schema.tables WHERE table_name='nj_roads');")
+  
+  if [ "$table_exists" = "t" ]; then
+    echo "Table nj_roads already exists. Use --roads --reset to recreate it."
+  else
+    # import roads using shp2pgsql
+    echo "Importing road network into database..."
+    echo "Running shp2pgsql import (this may take a few minutes)..."
+    shp2pgsql -I -s 3424 -W UTF-8 "${user_data_dir}/nj/roads/NJ_Roads_shp/NJ_Roads.shp" nj_roads | psql -q -p "${port}" -d "${db}"
+    
+    if [ $? -eq 0 ]; then      
+      # stats
+      echo "Import complete. Road network statistics:"
+      psql -p "${port}" -d "${db}" -c "SELECT COUNT(*) as total_roads, ST_GeometryType(geom) as geometry_type FROM nj_roads GROUP BY ST_GeometryType(geom);"
+    else
+      echo "Import failed. Check database connection and permissions."
+      exit 1
+    fi
+  fi
 fi  
