@@ -2,10 +2,15 @@
 
 <!--toc:start-->
   - [Introduction](#introduction)
-  - [Utility Scripts](#utility-scripts)
-  - [TODO:](#todo)
+  - [Installation Requirements](#installation-requirements)
+    - [System Dependencies](#system-dependencies)
+    - [User Permissions](#user-permissions)
+  - [Setup Process](#setup-process)
+    - [Phase 1: Download Data](#phase-1-download-data)
+    - [Phase 2: Import and Process Data](#phase-2-import-and-process-data)
+    - [Additional Options](#additional-options)
+    - [Important Considerations](#important-considerations)
   - [Data](#data)
-    - [Obtaining and Pre-processing](#obtaining-and-pre-processing)
     - [PennDOT](#penndot)
       - [2024-version data issues and questions](#2024-version-data-issues-and-questions)
     - [NJDOT](#njdot)
@@ -14,13 +19,28 @@
 
 ## Introduction
 
-The database is constructed via a number of shell and sql scripts. The main entry point is setup_db.sh. If it is not already executable, make it so with `chmod 755 setup_db.sh` and then invoke with `./setup_db.sh -u` to show usage details.
+This project creates a comprehensive PostgreSQL database for vehicle crash data from Pennsylvania (PennDOT) and New Jersey (NJDOT). The tool handles downloading, preprocessing, importing, data validation and cleaning, and spatially enabling the crash data.
 
-The script assumes that data files (.csv and .txt) are in a location relative to the project directory: data/nj/ for NJ files and data/pa/ for PA files. These are then copied to appropriate folders (configurable via environment variables if necessary) to ease access by Postgres's <a href="https://www.postgresql.org/docs/17/sql-copy.html">COPY</a>.
+The database is constructed via shell and SQL scripts, with the main entry point being `setup_db.sh`. 
 
-The Postgres user running this script must have been granted two roles: `pg_read_server_files` and `pg_write_server_files`. As a superuser, run `grant pg_read_server_files, pg_write_server_files to <user>`.
+## Installation Requirements
 
-Several environment variables are required, others are optional. Create a .env file in the project directory to set them:
+Before running the setup scripts, ensure you have the following installed:
+
+### System Dependencies
+- **PostgreSQL**: Database server with appropriate permissions
+- **postgis**: Spatial data functions for PostgreSQL
+- **shp2pgsql**: Command-line tool for importing shapefiles (part of PostGIS)
+
+### User Permissions
+The PostgreSQL user running this script must have been granted two roles:
+```sql
+GRANT pg_read_server_files, pg_write_server_files TO <user>;
+```
+
+### Environment Configuration
+
+Create a `.env` file in the project directory with the following variables:
 
 ```sh
 # NOTE: REQUIRED
@@ -47,37 +67,55 @@ user_data_dir="/tmp/somewhere"
 postgres_data_dir="/var/lib/postgresql/data" 
 ```
 
-## Utility Scripts
+## Setup Process
 
-Utility scripts that can be run independently are in src/utils. Make them executable and run with the `-u` option to see usage.
+The typical workflow involves two phases: downloading data and importing it into the database.
 
-## TODO:
+### Phase 1: Download Data
+First, download the required data files:
 
-For either the pa or the dvrpc schema, add in "shape" for better geometry field, using this or something close to it (from Sean Lawrence):
+```bash
+# Download PA crash data (uses pa_start_year and pa_end_year from .env)
+./setup_db.sh --download-pa
 
-```sql
-select 
-  latitude, 
-  longitude,
-  ST_SetSRID(ST_Point((
-        CAST(SUBSTRING(longitude FROM 1 FOR POSITION(' ' IN longitude) - 1) AS NUMERIC) + 
-        CAST(SUBSTRING(longitude FROM POSITION(' ' IN longitude) + 1 FOR POSITION(':' IN longitude) - POSITION(' ' IN longitude) - 1) AS NUMERIC) / 60 + 
-        CAST(SUBSTRING(longitude FROM POSITION(':' IN longitude) + 1) AS NUMERIC) / 3600) * -1,
-        (CAST(SUBSTRING(latitude FROM 1 FOR POSITION(' ' IN latitude) - 1) AS NUMERIC) + 
-        CAST(SUBSTRING(latitude FROM POSITION(' ' IN latitude) + 1 FOR POSITION(':' IN latitude) - POSITION(' ' IN latitude) - 1) AS NUMERIC) / 60 + 
-        CAST(SUBSTRING(latitude FROM POSITION(':' IN latitude) + 1) AS NUMERIC) / 3600)
-    ),4326) as shape
-from 
-  crash -- will need schema specified
+# Download NJ crash data (uses nj_start_year and nj_end_year from .env)  
+./setup_db.sh --download-nj
+
+# Download NJ road network shapefile
+./setup_db.sh --download-roads
+
+# Or download everything at once:
+./setup_db.sh --download-pa --download-nj --download-roads
 ```
 
+### Phase 2: Import and Process Data
+After downloading, import the data into the database:
+
+```bash
+# Import NJ road network (required for NJ crash geometry generation)
+./setup_db.sh --roads
+
+# Import crash data for both states
+./setup_db.sh --nj --pa
+
+# Or do everything in one command:
+./setup_db.sh --roads --nj --pa
+```
+
+### Additional Options
+- `--reset`: Reset database (drop and recreate all objects) by state
+- `--dump`: Export existing database to a timestamped dump file
+- `--usage`: Show detailed usage information
+
+**Note**: NJ crash data requires the road network to be imported first for geometry generation. If you run `--nj` without `--roads`, a warning will be displayed.
+
+### Important Considerations
+- **Data Years**: Ensure the year ranges in your `.env` file are within the available data bounds:
+  - PA: 2005 and later
+  - NJ: 2006 and later
+- **Spatial Data**: NJ crash data requires the road network to generate geometries on import
+
 ## Data
-
-### Obtaining and Pre-processing
-
-As there are only a handful of files for PA, these can be downloaded manually and placed in data/pa/. No pre-processing prior to sql scripts called by Postgres is done on these files.
-
-For NJ, one shell script (src/utils/nj_download_data.sh) downloads the compressed (.zip) files (to data/nj/) and another (src/utils/nj_pre_process_files.sh) extracts and pre-processes them so they can be properly imported into Postgres (see comments in that latter script for additional details).
 
 ### PennDOT
 
