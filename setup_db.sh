@@ -165,6 +165,13 @@ if test ${pa} = false && test ${nj} = false && test ${roads} = false && test ${d
   exit
 fi
 
+# Create directories for data processing if needed
+if test ${download_pa} = true || test ${download_nj} = true || test ${download_roads} = true ; then
+  mkdir -p "${user_data_dir}/pa"
+  mkdir -p "${user_data_dir}/nj"
+  mkdir -p "${user_data_dir}/nj/roads"
+fi
+
 # Handle download actions first
 if test ${download_pa} = true ; then
   echo "Downloading PA crash data..."

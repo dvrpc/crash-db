@@ -2,7 +2,9 @@
 
 # Load environment variables from .env file
 if [ -f "../../.env" ]; then
-  export $(grep -v '^#' ../../.env | xargs)
+  set -a
+  source ../../.env
+  set +a
 fi
 
 usage="
@@ -54,12 +56,26 @@ if (( first_year < 2005 || last_year < 2005 )); then
   exit 1
 fi
 
-# Create data directory if it doesn't exist
+# Create data directories if they don't exist
 mkdir -p ../../data/pa
+
+# Use user_data_dir from .env or default value
+if [ -z "${user_data_dir}" ]; then
+  user_data_dir="/tmp/crash-data"
+fi
+mkdir -p "${user_data_dir}/pa"
 
 for year in $(seq ${first_year} ${last_year}); do
   echo "Downloading District-06 data for ${year}..."
   curl "${base_url}/D06_${year}.zip" \
     -H 'User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36' \
     -o "../../data/pa/D06_${year}.zip"
+  
+  # Extract the ZIP file to the processing directory
+  if [ -f "../../data/pa/D06_${year}.zip" ]; then
+    echo "Extracting D06_${year}.zip to ${user_data_dir}/pa..."
+    unzip -o "../../data/pa/D06_${year}.zip" -d "${user_data_dir}/pa"
+  else
+    echo "Warning: Failed to download D06_${year}.zip"
+  fi
 done
