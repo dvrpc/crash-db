@@ -226,7 +226,7 @@ if [[ $pa = true ]]; then
   
   # pa geometry
   echo "Generating geometry columns for PA crash tables..."
-  psql -qb -p "${port}" -d "${db}" -c "SET myvars.pa_start_year = '${pa_start_year}'; SET myvars.pa_end_year = '${pa_end_year}';" -f src/pa_generate_geometry.sql
+  psql -qb -p "${port}" -d "${db}" -c "SET myvars.pa_start_year = '${pa_start_year}'; SET myvars.pa_end_year = '${pa_end_year}';" -f src/pa/generate_geometry.sql
 fi
 
 if [[ $nj = true ]]; then
@@ -247,7 +247,7 @@ if [[ $nj = true ]]; then
   # nj geometry
   if psql -p "${port}" -d "${db}" -tAc "SELECT EXISTS(SELECT 1 FROM information_schema.tables WHERE table_schema='public' AND table_name='nj_roads');" | grep -q 't'; then
     echo "Generating geometry columns for NJ crash tables..."
-    psql -qb -p "${port}" -d "${db}" -c "SET session.nj_start_year = '${nj_start_year}'; SET session.nj_end_year = '${nj_end_year}';" -f src/nj_generate_geometry.sql
+    psql -qb -p "${port}" -d "${db}" -c "SET session.nj_start_year = '${nj_start_year}'; SET session.nj_end_year = '${nj_end_year}';" -f src/nj/generate_geometry.sql
   else
     echo "Warning: NJ road network not found. Run with --roads to import road data first, then re-run with --nj to generate geometry columns."
   fi
