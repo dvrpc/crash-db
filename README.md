@@ -28,7 +28,7 @@ The database is constructed via shell and SQL scripts, with the main entry point
 Before running the setup scripts, ensure you have the following installed:
 
 ### System Dependencies
-- **PostgreSQL**: Database server with appropriate permissions
+- **PostgreSQL** 17+: Database server with appropriate permissions
 - **postgis**: Spatial data functions for PostgreSQL
 - **unzip**: Some Linux installs might need this
 - **shp2pgsql**: Command-line tool for importing shapefiles (part of PostGIS)
