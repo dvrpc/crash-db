@@ -226,8 +226,8 @@ if test ${nj} = true; then
     fi
 
     # Check that they are valid years.
-    if (( nj_start_year < 2001 || nj_end_year < 2001 )); then
-      echo "Invalid NJ year. Data only available from 2004 onwards. Quitting."
+    if (( nj_start_year < 2006 || nj_end_year < 2006 )); then
+      echo "Invalid NJ year. Data only available from 2006 onwards. Quitting."
       echo "${usage}"
       exit 1;
     fi
