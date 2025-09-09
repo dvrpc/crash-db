@@ -34,8 +34,6 @@ fi
 # Create database, ignoring error if it already exists.
 psql -p "${port}" -c "create database ${db}" &>/dev/null
 
-# Create pgtap extension (for testing).
-psql -p "${port}" -d "${db}" -c "create extension if not exists pgtap"
 # If postgis extension doesn't exist on db, inform user and exit.
 postgis_check=$(psql -p "${port}" -d "${db}" -t -c "select count(extname) from pg_extension where extname='postgis'")
 

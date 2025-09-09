@@ -32,7 +32,6 @@ Before running the setup scripts, ensure you have the following installed:
 - **postgis**: Spatial data functions for PostgreSQL
 - **unzip**: Some Linux installs might need this
 - **shp2pgsql**: Command-line tool for importing shapefiles (part of PostGIS)
-- **pgtap**: For testing purposes (not required)
 
 ### User Permissions
 The PostgreSQL user running this script must have been granted two roles:
