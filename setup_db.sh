@@ -264,14 +264,6 @@ if test ${pa} = false && test ${nj} = false && test ${roads} = false && test ${p
   exit
 fi
 
-# Copy data files in data/ to location accessible by server, for easier use in COPY, which
-# requires absolute paths/certain permissions.
-mkdir -p "${user_data_dir}/pa"
-mkdir -p "${user_data_dir}/nj"
-mkdir -p "${user_data_dir}/nj/roads"
-cp -r data/pa/*.csv "${user_data_dir}/pa" 2>/dev/null || true
-cp -r data/nj/*.txt "${user_data_dir}/nj/" 2>/dev/null || true
-cp -r data/nj/roads/* "${user_data_dir}/nj/roads/" 2>/dev/null || true
 if test ${process_nj} = true; then
   ./src/utils/nj_pre_process_files.sh
 fi
@@ -280,6 +272,11 @@ fi
 psql -q -p "${port}" -d "${db}" < src/domains.sql
 
 if [[ $pa = true ]]; then
+  # Copy data files in data/ to location accessible by server, for easier use in COPY, which
+  # requires absolute paths/certain permissions.
+  mkdir -p "${user_data_dir}/pa"
+  cp -r data/pa/*.csv "${user_data_dir}/pa" 2>/dev/null || true
+
   if [[ $reset = true ]]; then
     read -p "Are you sure want to reset the PA database? (Press y to reset it, any other key to abort.) " -n 1 -r
     echo
@@ -301,6 +298,11 @@ if [[ $pa = true ]]; then
 fi
 
 if [[ $nj = true ]]; then
+  # Copy data files in data/ to location accessible by server, for easier use in COPY, which
+  # requires absolute paths/certain permissions.
+  mkdir -p "${user_data_dir}/nj"
+  cp -r data/nj/*.txt "${user_data_dir}/nj/" 2>/dev/null || true
+
   if [[ $reset = true ]]; then
     read -p "Are you sure want to reset the NJ database? (Press y to reset it, any other key to abort.) " -n 1 -r
     echo
