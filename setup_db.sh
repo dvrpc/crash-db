@@ -15,16 +15,15 @@ $(basename $0) --pa --nj --roads [ --reset ] | --usage
 --process-nj: Pre-process NJ crash data without downloading first.
 --download-roads: Download NJ road network shapefile
 --usage: Show usage (this message) and exit. Other options will be ignored.
-
 "
 
 # Bring in environment variables.
 . .env
 
-# `port` is a required env var; exit it not set.
+# `port` is a required env var; exit if not set.
 if [[ -z "${port}" ]]; then
   echo "Expected environment variable 'port' not found or doesn't have a value; please set it in a .env file." >&2
-  exit
+  exit 1
 fi
 
 # Use db (name) from .env or a default value.
