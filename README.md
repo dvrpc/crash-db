@@ -70,48 +70,44 @@ postgres_data_dir="/var/lib/postgresql/data"
 
 ## Setup Process
 
-The typical workflow involves two phases: downloading data and importing it into the database.
+The setup process can be done in one step or split into separate download and import steps.
 
-### Phase 1: Download Data 
-First, download the required data files:
-
-```bash
-# Download PA crash data (uses pa_start_year and pa_end_year from .env)
-./setup_db.sh --download-pa
-
-# Download NJ crash data (uses nj_start_year and nj_end_year from .env)
-# (note this does some pre-processing of the files so they can be handled by Postgres) 
-./setup_db.sh --download-nj
-
-# Download NJ road network shapefile
-./setup_db.sh --download-roads
-
-# Or download everything at once:
-./setup_db.sh --download-pa --download-nj --download-roads
-```
-
-### Phase 2: Import and Process Data
-After downloading, import the data into the database:
+### Quick Start (Recommended)
+For most users, a simple one-command setup:
 
 ```bash
-# Import NJ road network (required for NJ crash geometry generation)
-./setup_db.sh --roads
-
-# Import crash data for both states
-./setup_db.sh --nj --pa
+# Download data and import with full geometry support (recommended)
+./setup_db.sh --download pa nj --import pa nj
 ```
 
-### Additional Options
-- `--reset`: Reset database (drop and recreate all objects) by state
-- `--process-nj`: Pre-process NJ data without first downloading it (when already downloaded)
+### Other Options
+
+#### Download/Import Data Separately
+If you prefer to download first, then import, or by individual state:
+
+```bash
+# Phase 1: Download data
+./setup_db.sh --download pa
+
+# Phase 2: Import data  
+./setup_db.sh --import pa
+```
+
+#### Skip Geometry Generation
+```bash
+# Import data without geometry columns
+./setup_db.sh --import pa --no-geometry
+```
+
+#### Additional Flags
+- `--reset [nj] [pa]`: Reset database (drop and recreate all objects) by state
+- `--process-nj`: Pre-process NJ data without downloading first  
 - `--dump`: Export existing database to a timestamped dump file
 - `--usage`: Show detailed usage information
 
-### Important Considerations
-- **Data Years**: Ensure the year ranges in your `.env` file are within the available data bounds:
-  - PA: 2005 and later
-  - NJ: 2006 and later
-- **Spatial Data**: NJ crash data requires the road network to be imported first for geometry generation. If you run `--nj` without `--roads`, a warning will be displayed. 
+### Important Notes
+- **Geometry enabled by default**: The `--import pa` and `--import nj` options automatically generate geometry columns
+- **Data Years**: Ensure year ranges in `.env` are within available bounds (PA: 2005+, NJ: 2006+)
 
 ## Data
 

@@ -3,18 +3,24 @@
 # Describe how to use this script.
 usage="
 Usage:
-$(basename $0) --pa --nj --roads [ --reset ] | --usage
+$(basename $0) [--download|--import|--reset] [pa] [nj] [--no-geometry] [--process-nj] | --usage
 
---pa: Import PA data.
---nj: Import NJ data.
---roads: Import NJ road network data.
---reset: Reset database (drop and recreate all objects), by state.
---dump: Dump existing database to file.
---download-pa: Download PA crash data using pa_start_year and pa_end_year from .env
---download-nj: Download and pre-process NJ crash data using nj_start_year and nj_end_year from .env
+--download [pa] [nj]: Download specified state crash data.
+--import [pa] [nj]: Import specified state data and generate geometry columns.
+--reset [pa] [nj]: Reset database (drop and recreate all objects) for specified states.
+--no-geometry: Skip geometry column generation and road network import.
 --process-nj: Pre-process NJ crash data without downloading first.
---download-roads: Download NJ road network shapefile
+--dump: Dump existing database to file.
 --usage: Show usage (this message) and exit. Other options will be ignored.
+
+Examples:
+  $(basename $0) --import pa nj               # Import both PA and NJ data
+  $(basename $0) --reset pa                   # Reset only PA database
+  $(basename $0) --download nj                # Download only NJ data
+  $(basename $0) --reset pa --no-geometry     # Reset only PA database, with no geometry
+
+Note: Geometry generation is enabled by default. For NJ data, this automatically
+downloads and imports the road network if not already present.
 "
 
 # Bring in environment variables.
@@ -62,12 +68,12 @@ fi
 
 pa=false
 nj=false
-roads=false
 reset=false
-download_pa=false
-download_nj=false
-download_roads=false
 process_nj=false
+geometry=true
+import_mode=false
+download_mode=false
+reset_mode=false
 
 # Parse and handle command line options.
 while [[ $# -gt 0 ]]; do
@@ -76,37 +82,74 @@ while [[ $# -gt 0 ]]; do
       echo "${usage}"
       exit
       ;;
+    --import)
+      import_mode=true
+      shift
+      # Parse state arguments
+      while [[ $# -gt 0 ]] && [[ $1 != --* ]]; do
+        case $1 in
+          pa)
+            pa=true
+            ;;
+          nj)
+            nj=true
+            ;;
+          *)
+            echo "Invalid state '$1' for --import. Valid states: pa, nj"
+            exit 1
+            ;;
+        esac
+        shift
+      done
+      ;;
+    --download)
+      download_mode=true
+      shift
+      # Parse state arguments
+      while [[ $# -gt 0 ]] && [[ $1 != --* ]]; do
+        case $1 in
+          pa)
+            pa=true
+            ;;
+          nj)
+            nj=true
+            ;;
+          *)
+            echo "Invalid state '$1' for --download. Valid states: pa, nj"
+            exit 1
+            ;;
+        esac
+        shift
+      done
+      ;;
     --reset)
+      reset_mode=true
       reset=true
       shift
+      # Parse state arguments
+      while [[ $# -gt 0 ]] && [[ $1 != --* ]]; do
+        case $1 in
+          pa)
+            pa=true
+            ;;
+          nj)
+            nj=true
+            ;;
+          *)
+            echo "Invalid state '$1' for --reset. Valid states: pa, nj"
+            exit 1
+            ;;
+        esac
+        shift
+      done
       ;;
-    --pa)
-      pa=true
-      shift
-      ;;
-    --nj)
-      nj=true
+    --no-geometry)
+      geometry=false
       shift
       ;;
     --dump)
       pg_dump -O -p "${port}" "${db}" > "data/crash_$(date +%F_%I-%M).dump"
       exit 0
-      ;;
-    --download-pa)
-      download_pa=true
-      shift
-      ;;
-    --download-nj)
-      download_nj=true
-      shift
-      ;;
-    --roads)
-      roads=true
-      shift
-      ;;
-    --download-roads)
-      download_roads=true
-      shift
       ;;
     --process-nj)
       process_nj=true
@@ -121,14 +164,33 @@ while [[ $# -gt 0 ]]; do
 done
 
 # Check if at least one action was specified
-if test ${pa} = false && test ${nj} = false && test ${roads} = false && test ${download_pa} = false && test ${download_nj} = false && test ${download_roads} = false && test ${process_nj} = false ; then
+if test ${import_mode} = false && test ${download_mode} = false && test ${reset_mode} = false && test ${process_nj} = false ; then
   echo "You must choose at least one action. Quitting."
   echo "${usage}"
   exit
 fi
 
+# For import, download, and reset mode, pick at least one state
+if test ${import_mode} = true && test ${pa} = false && test ${nj} = false ; then
+  echo "You must specify at least one state for --import (pa, nj). Quitting."
+  echo "${usage}"
+  exit
+fi
+
+if test ${download_mode} = true && test ${pa} = false && test ${nj} = false ; then
+  echo "You must specify at least one state for --download (pa, nj). Quitting."
+  echo "${usage}"
+  exit
+fi
+
+if test ${reset_mode} = true && test ${pa} = false && test ${nj} = false ; then
+  echo "You must specify at least one state for --reset (pa, nj). Quitting."
+  echo "${usage}"
+  exit
+fi
+
 # Check that required year env vars (by state) are set.
-if test ${pa} = true || test ${download_pa} = true; then
+if test ${pa} = true; then
     # Check that start/end year env vars are set.
     if [[ -z "${pa_start_year}" ]]; then
       echo "Please include a value for 'pa_start_year' in the .env file."
@@ -147,7 +209,7 @@ if test ${pa} = true || test ${download_pa} = true; then
     fi
 fi
 
-if test ${nj} = true || test ${download_nj} = true; then
+if test ${nj} = true; then
     # Check that start/end year env vars are set.
     if [[ -z "${nj_start_year}" ]]; then
       echo "Please include a value for 'nj_start_year' in the .env file."
@@ -167,7 +229,7 @@ if test ${nj} = true || test ${download_nj} = true; then
 fi
 
 # Handle download actions first
-if test ${download_pa} = true ; then
+if test ${pa} = true && test ${download_mode} = true; then
   echo "Downloading PA crash data..."
   base_url="https://gis.penndot.pa.gov/gishub/crashZip/District/District-06"
 
@@ -189,7 +251,7 @@ if test ${download_pa} = true ; then
   done
 fi
 
-if test ${download_nj} = true ; then
+if test ${nj} = true && test ${download_mode} = true; then
   echo "Downloading NJ crash data..."
 
   nj_counties=("Burlington" "Camden" "Mercer" "Gloucester")
@@ -215,54 +277,8 @@ if test ${download_nj} = true ; then
   ./src/utils/nj_pre_process_files.sh
 fi
 
-if test ${download_roads} = true ; then
-
-  mkdir -p data/nj/roads
-
-  echo "Downloading NJDOT road network shapefile..."
-
-  # Download the shapefile
-  curl "https://www.nj.gov/transportation/refdata/gis/zip/NJ_Roads_shp.zip" \
-    -H 'User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36' \
-    -o "data/nj/roads/NJ_Roads_shp.zip" \
-    -w '%{filename_effective} downloaded \n' \
-    --progress-bar
-
-  # Check if download was successful
-  if [ $? -eq 0 ]; then
-    echo "Download successful. Extracting..."
-    unzip -o data/nj/roads/NJ_Roads_shp.zip
-    echo "NJDOT road network shapefile ready."
-  else
-    echo "Download failed. Please check your connection and try again."
-    exit 1
-  fi
-
-  echo "Importing road network into database..."
-
-  # Check if table exists and handle accordingly
-  table_exists=$(psql -p "${port}" -d "${db}" -tAc "SELECT EXISTS (SELECT FROM information_schema.tables WHERE table_name='nj_roads');")
-
-  if [ "$table_exists" = "t" ]; then
-    echo "Table nj_roads already exists. Use --roads --reset to recreate it."
-  else
-    # Import using shp2pgsql
-    echo "Running shp2pgsql import (this may take a few minutes)..."
-    shp2pgsql -I -s 3424 -W UTF-8 "data/nj/roads/NJ_Roads_shp/NJ_Roads.shp" nj_roads | psql -q -p "${port}" -d "${db}"
-  
-    if [ $? -eq 0 ]; then      
-      # Show statistics
-      echo "Import complete. Road network statistics:"
-      psql -p "${port}" -d "${db}" -c "SELECT COUNT(*) as total_roads, ST_GeometryType(geom) as geometry_type FROM nj_roads GROUP BY ST_GeometryType(geom);"
-    else
-      echo "Import failed. Check database connection and permissions."
-      exit 1
-    fi
-  fi 
-fi
-
 # If only downloading, exit here.
-if test ${pa} = false && test ${nj} = false && test ${roads} = false && test ${process_nj} = false ; then
+if test ${pa} = false && test ${nj} = false && test ${process_nj} = false ; then
   exit
 fi
 
@@ -292,9 +308,11 @@ if [[ $pa = true ]]; then
 
   psql -qb -p "${port}" -d "${db}" -v user_data_dir="${user_data_dir}" -v postgres_data_dir="${postgres_data_dir}" -v pa_start_year="${pa_start_year}" -v pa_end_year="${pa_end_year}" -f src/init_vars.sql -f src/pa/init_vars.sql -f src/pa.sql
   
-  # pa geometry
-  echo "Generating geometry columns for PA crash tables..."
-  psql -qb -p "${port}" -d "${db}" -c "SET myvars.pa_start_year = '${pa_start_year}'; SET myvars.pa_end_year = '${pa_end_year}';" -f src/pa/generate_geometry.sql
+  # pa geometry (if not disabled)
+  if [[ $geometry = true ]]; then
+    echo "Generating geometry columns for PA crash tables..."
+    psql -qb -p "${port}" -d "${db}" -c "SET myvars.pa_start_year = '${pa_start_year}'; SET myvars.pa_end_year = '${pa_end_year}';" -f src/pa/generate_geometry.sql
+  fi
 fi
 
 if [[ $nj = true ]]; then
@@ -316,44 +334,44 @@ if [[ $nj = true ]]; then
 
   psql -qb -p "${port}" -d "${db}" -v user_data_dir="${user_data_dir}" -v postgres_data_dir="${postgres_data_dir}" -v nj_start_year="${nj_start_year}" -v nj_end_year="${nj_end_year}" -f src/init_vars.sql -f src/nj/init_vars.sql -f src/nj.sql
   
-  # nj geometry
-  if psql -p "${port}" -d "${db}" -tAc "SELECT EXISTS(SELECT 1 FROM information_schema.tables WHERE table_schema='public' AND table_name='nj_roads');" | grep -q 't'; then
+  # nj geometry (if not disabled)
+  if [[ $geometry = true ]]; then
+    # Check if NJ roads table exists, download and import if needed
+    if ! psql -p "${port}" -d "${db}" -tAc "SELECT EXISTS(SELECT 1 FROM information_schema.tables WHERE table_schema='public' AND table_name='nj_roads');" | grep -q 't'; then
+      echo "NJ road network not found. Downloading and importing roads for geometry generation..."
+      
+      # Create roads dir
+      mkdir -p data/nj/roads
+      
+      # Download the shapefile if not there
+      if [ ! -f "data/nj/roads/NJ_Roads_shp.zip" ]; then
+        echo "Downloading NJDOT road network shapefile..."
+        curl "https://www.nj.gov/transportation/refdata/gis/zip/NJ_Roads_shp.zip" \
+          -H 'User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36' \
+          -o "data/nj/roads/NJ_Roads_shp.zip" \
+          -w '%{filename_effective} downloaded \n' \
+          --progress-bar
+      fi
+      
+      # Extract
+      if [ ! -d "data/nj/roads/NJ_Roads_shp" ]; then
+        echo "Extracting NJ roads shapefile..."
+        unzip -o data/nj/roads/NJ_Roads_shp.zip -d data/nj/roads
+      fi
+      
+      # Import roads
+      echo "Importing road network into database (this may take a few minutes)..."
+      shp2pgsql -I -s 3424 -W UTF-8 "data/nj/roads/NJ_Roads_shp/NJ_Roads.shp" nj_roads | psql -q -p "${port}" -d "${db}"
+      
+      if [ $? -eq 0 ]; then
+        echo "Road network import complete."
+      else
+        echo "Road network import failed. Skipping geometry generation."
+        exit 1
+      fi
+    fi
+    
     echo "Generating geometry columns for NJ crash tables..."
     psql -qb -p "${port}" -d "${db}" -c "SET session.nj_start_year = '${nj_start_year}'; SET session.nj_end_year = '${nj_end_year}';" -f src/nj/generate_geometry.sql
-  else
-    echo "Warning: NJ road network not found. Run with --roads to import road data first, then re-run with --nj to generate geometry columns."
   fi
 fi
-
-if [[ $roads = true ]]; then
-  if [[ $reset = true ]]; then
-    read -p "Are you sure want to reset the NJ roads table? (Press y to reset it, any other key to abort.) " -n 1 -r
-    echo
-      if [[ $REPLY =~ ^[Yy]$ ]]; then
-        psql -qb -p "${port}" -d "${db}" -c "DROP TABLE IF EXISTS nj_roads;"
-      else
-        echo 'Aborting.'
-        exit
-      fi
-  fi
-
-  # check if nj roads table exists and handle accordingly
-  table_exists=$(psql -p "${port}" -d "${db}" -tAc "SELECT EXISTS (SELECT FROM information_schema.tables WHERE table_name='nj_roads');")
-  
-  if [ "$table_exists" = "t" ]; then
-    echo "Table nj_roads already exists. Use --roads --reset to recreate it."
-  else
-    # import roads using shp2pgsql
-    echo "Importing road network into database. (This may take a few minutes)..."
-    shp2pgsql -I -s 3424 -W UTF-8 "data/nj/roads/NJ_Roads_shp/NJ_Roads.shp" nj_roads | psql -q -p "${port}" -d "${db}"
-    
-    if [ $? -eq 0 ]; then      
-      # stats
-      echo "Import complete. Road network statistics:"
-      psql -p "${port}" -d "${db}" -c "SELECT COUNT(*) as total_roads, ST_GeometryType(geom) as geometry_type FROM nj_roads GROUP BY ST_GeometryType(geom);"
-    else
-      echo "Import failed. Check database connection and permissions."
-      exit 1
-    fi
-  fi
-fi  
