@@ -219,7 +219,7 @@ if test ${download_nj} = true ; then
   done
 
   echo "Pre-processing NJ data files..."
-  cd src/utils && ./nj_pre_process_files.sh && cd ../..
+  ./src/utils/nj_pre_process_files.sh
 fi
 
 if test ${download_roads} = true ; then
