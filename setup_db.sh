@@ -12,6 +12,7 @@ $(basename $0) --pa --nj --roads [ --reset ] | --usage
 --dump: Dump existing database to file.
 --download-pa: Download PA crash data using pa_start_year and pa_end_year from .env
 --download-nj: Download and pre-process NJ crash data using nj_start_year and nj_end_year from .env
+--process-nj: Pre-process NJ crash data without downloading first.
 --download-roads: Download NJ road network shapefile
 --usage: Show usage (this message) and exit. Other options will be ignored.
 
@@ -64,6 +65,7 @@ reset=false
 download_pa=false
 download_nj=false
 download_roads=false
+process_nj=false
 
 # Parse and handle command line options.
 while [[ $# -gt 0 ]]; do
@@ -150,6 +152,10 @@ while [[ $# -gt 0 ]]; do
       download_roads=true
       shift
       ;;
+    --process-nj)
+      process_nj=true
+      shift
+      ;;
     *)
       echo "Invalid option $1. Quitting."
       echo "${usage}"
@@ -159,7 +165,7 @@ while [[ $# -gt 0 ]]; do
 done
 
 # Check if at least one action was specified
-if test ${pa} = false && test ${nj} = false && test ${roads} = false && test ${download_pa} = false && test ${download_nj} = false && test ${download_roads} = false ; then
+if test ${pa} = false && test ${nj} = false && test ${roads} = false && test ${download_pa} = false && test ${download_nj} = false && test ${download_roads} = false && test ${process_nj} = false ; then
   echo "You must choose at least one action. Quitting."
   echo "${usage}"
   exit
@@ -221,9 +227,8 @@ if test ${download_roads} = true ; then
   cd src/utils && ./nj_download_roads.sh && cd ../..
 fi
 
-# If only downloading, exit here
-if test ${pa} = false && test ${nj} = false && test ${roads} = false ; then
-  echo "Download complete."
+# If only downloading, exit here.
+if test ${pa} = false && test ${nj} = false && test ${roads} = false && test ${process_nj} = false ; then
   exit
 fi
 
@@ -235,6 +240,9 @@ mkdir -p "${user_data_dir}/nj/roads"
 cp -r data/pa/*.csv "${user_data_dir}/pa" 2>/dev/null || true
 cp -r data/nj/*.txt "${user_data_dir}/nj/" 2>/dev/null || true
 cp -r data/nj/roads/* "${user_data_dir}/nj/roads/" 2>/dev/null || true
+if test ${process_nj} = true; then
+  ./src/utils/nj_pre_process_files.sh
+fi
 
 ## Create custom domains.
 psql -q -p "${port}" -d "${db}" < src/domains.sql

@@ -73,14 +73,15 @@ postgres_data_dir="/var/lib/postgresql/data"
 
 The typical workflow involves two phases: downloading data and importing it into the database.
 
-### Phase 1: Download Data
+### Phase 1: Download Data 
 First, download the required data files:
 
 ```bash
 # Download PA crash data (uses pa_start_year and pa_end_year from .env)
 ./setup_db.sh --download-pa
 
-# Download NJ crash data (uses nj_start_year and nj_end_year from .env)  
+# Download NJ crash data (uses nj_start_year and nj_end_year from .env)
+# (note this does some pre-processing of the files so they can be handled by Postgres) 
 ./setup_db.sh --download-nj
 
 # Download NJ road network shapefile
@@ -103,6 +104,7 @@ After downloading, import the data into the database:
 
 ### Additional Options
 - `--reset`: Reset database (drop and recreate all objects) by state
+- `--process-nj`: Pre-process NJ data without first downloading it (when already downloaded)
 - `--dump`: Export existing database to a timestamped dump file
 - `--usage`: Show detailed usage information
 
