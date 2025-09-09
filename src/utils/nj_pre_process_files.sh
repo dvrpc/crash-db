@@ -95,13 +95,6 @@ done
 #  - 2019 Camden Drivers table, line 14349
 #  - 2019 Mercer Drivers table, line 7177
 # 
-# What the sed command does is:
-#  - `/.\351\}/!`: match lines that don't (`!`) have 351 characters (or whatever they should have)
-#  - `{ ... }'` these mark the beginning and end of a list of commands 
-#  - `N;`: read the next line into the pattern space
-#  - `s/\n/ /;`: replaces the new line/line feed/"\n" character with a space
-#  - `:1 and b1`: first set a label, and then at the end go to it to test the line again (this
-#     addresses the case when there are multiple incorrect line breaks within the same line)
 echo 'Remove extra/misplaced new lines'
 for file in $(ls data/nj/*.txt); do
   # The characters per line vary by both file and year, so need to check filename.
