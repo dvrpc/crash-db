@@ -165,22 +165,53 @@ if test ${pa} = false && test ${nj} = false && test ${roads} = false && test ${d
   exit
 fi
 
-# Create directories for data processing if needed
-if test ${download_pa} = true || test ${download_nj} = true || test ${download_roads} = true ; then
-  mkdir -p "${user_data_dir}/pa"
-  mkdir -p "${user_data_dir}/nj"
-  mkdir -p "${user_data_dir}/nj/roads"
 fi
 
 # Handle download actions first
 if test ${download_pa} = true ; then
   echo "Downloading PA crash data..."
-  cd src/utils && ./pa_download_data.sh && cd ../..
+  base_url="https://gis.penndot.pa.gov/gishub/crashZip/District/District-06"
+
+  mkdir -p data/pa
+
+  for year in $(seq ${pa_start_year} ${pa_end_year}); do
+    curl "${base_url}/D06_${year}.zip" \
+      -H 'User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36' \
+      -o "data/pa/D06_${year}.zip" \
+      -w '%{filename_effective} downloaded\n' \
+      --progress-bar
+  
+    # Extract the ZIP file to the processing directory
+    if [ -f "data/pa/D06_${year}.zip" ]; then
+      unzip -o "data/pa/D06_${year}.zip" -d "data/pa"
+    else
+      echo "Warning: Failed to download D06_${year}.zip"
+    fi
+  done
 fi
 
 if test ${download_nj} = true ; then
   echo "Downloading NJ crash data..."
-  cd src/utils && ./nj_download_data.sh && cd ../..
+
+  nj_counties=("Burlington" "Camden" "Mercer" "Gloucester")
+  tables=("Accidents" "Drivers" "Occupants" "Pedestrians" "Vehicles")
+
+  base_url="https://dot.nj.gov/transportation/refdata/accident"
+
+  mkdir -p data/nj
+
+  for year in $(seq ${nj_start_year} ${nj_end_year}); do
+    for county in ${nj_counties[@]}; do
+      for table in ${tables[@]}; do
+        curl "${base_url}/${year}/${county}${year}${table}.zip" \
+          -H 'User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36' \
+           -o "data/nj/${county}${year}${table}.zip" \
+           -w '%{filename_effective} downloaded \n' \
+           --progress-bar
+      done
+    done
+  done
+
   echo "Pre-processing NJ data files..."
   cd src/utils && ./nj_pre_process_files.sh && cd ../..
 fi
