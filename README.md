@@ -107,13 +107,11 @@ After downloading, import the data into the database:
 - `--dump`: Export existing database to a timestamped dump file
 - `--usage`: Show detailed usage information
 
-**Note**: NJ crash data requires the road network to be imported first for geometry generation. If you run `--nj` without `--roads`, a warning will be displayed.
-
 ### Important Considerations
 - **Data Years**: Ensure the year ranges in your `.env` file are within the available data bounds:
   - PA: 2005 and later
   - NJ: 2006 and later
-- **Spatial Data**: NJ crash data requires the road network to generate geometries on import
+- **Spatial Data**: NJ crash data requires the road network to be imported first for geometry generation. If you run `--nj` without `--roads`, a warning will be displayed. 
 
 ## Data
 
