@@ -80,38 +80,10 @@ while [[ $# -gt 0 ]]; do
       ;;
     --pa)
       pa=true
-      # Check that start/end year env vars are set.
-      if [[ -z "${pa_start_year}" ]]; then
-        echo "Please include a value for 'pa_start_year' in the .env file."
-        exit 1
-      fi
-      if [[ -z "${pa_end_year}" ]]; then
-        echo "Please include a value for 'pa_end_year' in the .env file."
-        exit 1
-      fi
-      # Check if start year too early.
-      if test $((pa_start_year)) -lt 2005; then
-        echo "${pa_start_year} is out of the bounds of the data. The earliest year available for PA is 2005."
-        exit 1
-      fi
       shift
       ;;
     --nj)
       nj=true
-      # Check that start/end year env vars are set.
-      if [[ -z "${nj_start_year}" ]]; then
-        echo "Please include a value for 'nj_start_year' in the .env file."
-        exit 1
-      fi
-      if [[ -z "${nj_end_year}" ]]; then
-        echo "Please include a value for 'nj_end_year' in the .env file."
-        exit 1
-      fi
-      # Check if start year too early.
-      if test $((nj_start_year)) -lt 2006; then
-        echo "${nj_start_year} is out of the bounds of the data. The earliest year available for NJ is 2006."
-        exit 1
-      fi
       shift
       ;;
     --dump)
@@ -120,28 +92,10 @@ while [[ $# -gt 0 ]]; do
       ;;
     --download-pa)
       download_pa=true
-      # Check that start/end year env vars are set.
-      if [[ -z "${pa_start_year}" ]]; then
-        echo "Please include a value for 'pa_start_year' in the .env file."
-        exit 1
-      fi
-      if [[ -z "${pa_end_year}" ]]; then
-        echo "Please include a value for 'pa_end_year' in the .env file."
-        exit 1
-      fi
       shift
       ;;
     --download-nj)
       download_nj=true
-      # Check that start/end year env vars are set.
-      if [[ -z "${nj_start_year}" ]]; then
-        echo "Please include a value for 'nj_start_year' in the .env file."
-        exit 1
-      fi
-      if [[ -z "${nj_end_year}" ]]; then
-        echo "Please include a value for 'nj_end_year' in the .env file."
-        exit 1
-      fi
       shift
       ;;
     --roads)
@@ -171,6 +125,43 @@ if test ${pa} = false && test ${nj} = false && test ${roads} = false && test ${d
   exit
 fi
 
+# Check that required year env vars (by state) are set.
+if test ${pa} = true || test ${download_pa} = true; then
+    # Check that start/end year env vars are set.
+    if [[ -z "${pa_start_year}" ]]; then
+      echo "Please include a value for 'pa_start_year' in the .env file."
+      exit 1
+    fi
+    if [[ -z "${pa_end_year}" ]]; then
+      echo "Please include a value for 'pa_end_year' in the .env file."
+      exit 1
+    fi
+
+    # Check that they are valid years.
+    if (( pa_start_year < 2005 || pa_end_year < 2005 )); then
+      echo "Invalid PA year. Data only available from 2005 onwards. Quitting."
+      echo "${usage}"
+      exit 1
+    fi
+fi
+
+if test ${nj} = true || test ${download_nj} = true; then
+    # Check that start/end year env vars are set.
+    if [[ -z "${nj_start_year}" ]]; then
+      echo "Please include a value for 'nj_start_year' in the .env file."
+      exit 1
+    fi
+    if [[ -z "${nj_end_year}" ]]; then
+      echo "Please include a value for 'nj_end_year' in the .env file."
+      exit 1
+    fi
+
+    # Check that they are valid years.
+    if (( nj_start_year < 2001 || nj_end_year < 2001 )); then
+      echo "Invalid NJ year. Data only available from 2004 onwards. Quitting."
+      echo "${usage}"
+      exit 1;
+    fi
 fi
 
 # Handle download actions first
