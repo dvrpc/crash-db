@@ -272,9 +272,8 @@ if [[ $roads = true ]]; then
     echo "Table nj_roads already exists. Use --roads --reset to recreate it."
   else
     # import roads using shp2pgsql
-    echo "Importing road network into database..."
-    echo "Running shp2pgsql import (this may take a few minutes)..."
-    shp2pgsql -I -s 3424 -W UTF-8 "${user_data_dir}/nj/roads/NJ_Roads_shp/NJ_Roads.shp" nj_roads | psql -q -p "${port}" -d "${db}"
+    echo "Importing road network into database. (This may take a few minutes)..."
+    shp2pgsql -I -s 3424 -W UTF-8 "data/nj/roads/NJ_Roads_shp/NJ_Roads.shp" nj_roads | psql -q -p "${port}" -d "${db}"
     
     if [ $? -eq 0 ]; then      
       # stats

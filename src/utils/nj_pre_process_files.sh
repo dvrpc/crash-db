@@ -18,13 +18,12 @@ if [[ "${1}" = '-u' || "${1}" = 'u' ]]; then
   exit 0
 fi
 
-# Function to fix newlines using a more portable approach
-fix_newlines_portable() {
+# Function to remove misplaced newlines.
+remove_newlines() {
     local expected_length="$1"
     local file="$2"
     local temp_file="${file}.tmp"
     
-    # awk instead of sed for more reliable cross-platform behavior
     awk -v len="$expected_length" '
     {
         # If line is shorter than expected, keep reading and joining lines
@@ -35,27 +34,20 @@ fix_newlines_portable() {
     }' "$file" > "$temp_file" && mv "$temp_file" "$file"
 }
 
-# Set data directory (use environment variable or default)
-if [[ -z "${user_data_dir}" ]]; then
-  data_dir="/tmp/crash-data"
-else
-  data_dir="${user_data_dir}"
-fi
-
 # Unzip all the downloaded files, overwriting any existing .txt files.
-unzip -o ../../data/nj/\*.zip -d "${data_dir}/nj/"
+unzip -o data/nj/\*.zip -d data/nj/
 
 # Convert encoding from win1252/cp1252 to UTF8 and write to new file.
 # (Postgres's `COPY`, even using the `encoding 'WIN1252'` option, was not able to decipher the
 # encoding from the original files correctly and would add odd symbols, replacing one character
 # with multiple characters, and thus break the specification that NJ uses.)
-for file in $(ls "${data_dir}/nj/"*.txt); do
+for file in $(ls data/nj/*.txt); do
   # iconv doesn't do in-place conversion, so first output to a new file name and then replace it
   iconv -f WINDOWS-1252 -t UTF-8 "${file}" > "${file}.new" && mv -f "${file}.new" "${file}"
 done
 
 # Convert from dos to unix formatting (CRLF -> LF).
-for file in $(ls "${data_dir}/nj/"*.txt); do
+for file in $(ls data/nj/*.txt); do
   # Try GNU sed first, fallback to BSD
   if ! sed -i 's/\r$//' "${file}" 2>/dev/null; then
     sed -i '' 's/\r$//' "${file}"
@@ -65,7 +57,7 @@ done
 # Escape or replace characters that cause issues with either Postgres's COPY or that break NJ's
 # specification.
 echo 'Escape/replace problematic characters.'
-for file in $(ls "${data_dir}/nj/"*.txt); do
+for file in $(ls data/nj/*.txt); do
   # With the file format the NJ provides (fields determined by start/end byte, not a CSV), it must
   # be treated as the TXT format to be used with Postgres's COPY. Almost everything can be handled
   # in Postgres after that (adding quotes around space-separated fields, for example), except for an
@@ -111,44 +103,44 @@ done
 #  - `:1 and b1`: first set a label, and then at the end go to it to test the line again (this
 #     addresses the case when there are multiple incorrect line breaks within the same line)
 echo 'Remove extra/misplaced new lines'
-for file in $(ls "${data_dir}/nj/"*.txt); do
+for file in $(ls data/nj/*.txt); do
   # The characters per line vary by both file and year, so need to check filename.
 	case "${file}" in 
 	  *2017* | *2018* | *2019* | *2020* | *2021* | *2022*)
 	  	case "${file}" in
 	  		*Accidents*)
-	  		  fix_newlines_portable 469 "${file}"
+	  		  remove_newlines 469 "${file}"
 			    ;;
 	  		*Drivers*)
-	  		  fix_newlines_portable 350 "${file}"
+	  		  remove_newlines 350 "${file}"
 		    	;;
 	  		*Occupants*)
-	  		  fix_newlines_portable 75 "${file}"
+	  		  remove_newlines 75 "${file}"
 		    	;;
 	  		*Pedestrians*)
-	  		  fix_newlines_portable 390 "${file}"
+	  		  remove_newlines 390 "${file}"
 		    	;;
 	  		*Vehicles*)
-	  		  fix_newlines_portable 272 "${file}"
+	  		  remove_newlines 272 "${file}"
 		    	;;
 		  esac
 			;;
 	  *2006* | *2007* | *2008* | *2009* | *2010* | *2011* | *2012* | *2013* | *2014* | *2015* | *2016*)
 	  	case "${file}" in
 	  		*Accidents*)
-	  		  fix_newlines_portable 458 "${file}"
+	  		  remove_newlines 458 "${file}"
 			    ;;
 	  		*Drivers*)
-	  		  fix_newlines_portable 161 "${file}"
+	  		  remove_newlines 161 "${file}"
 		    	;;
 	  		*Occupants*)
-	  		  fix_newlines_portable 74 "${file}"
+	  		  remove_newlines 74 "${file}"
 		    	;;
 	  		*Pedestrians*)
-	  		  fix_newlines_portable 200 "${file}"
+	  		  remove_newlines 200 "${file}"
 		    	;;
 	  		*Vehicles*)
-	  		  fix_newlines_portable 240 "${file}"
+	  		  remove_newlines 240 "${file}"
 		    	;;
 		  esac
 			;;
