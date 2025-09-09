@@ -284,11 +284,9 @@ if [[ $pa = true ]]; then
         psql -p "${port}" -c "SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE datname='${db}';"
         psql -qb -p "${port}" -d "${db}" -f src/pa/drop.sql
       else
-        echo 'Aborting.'
-        exit
+        echo 'Aborted PA reset; continuing with import.'
       fi
   fi
-
 
   psql -qb -p "${port}" -d "${db}" -v user_data_dir="${user_data_dir}" -v postgres_data_dir="${postgres_data_dir}" -v pa_start_year="${pa_start_year}" -v pa_end_year="${pa_end_year}" -f src/init_vars.sql -f src/pa/init_vars.sql -f src/pa.sql
   
@@ -310,8 +308,7 @@ if [[ $nj = true ]]; then
         psql -qb -p "${port}" -c "SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE datname='${db}';"
         psql -qb -p "${port}" -d "${db}" -f src/nj/drop.sql
       else
-        echo 'Aborting.'
-        exit
+        echo 'Aborted NJ reset; continuing with import.'
       fi
   fi
 
