@@ -37,9 +37,14 @@ psql -p "${port}" -c "create database ${db}" &>/dev/null
 
 # Create pgtap extension (for testing).
 psql -p "${port}" -d "${db}" -c "create extension if not exists pgtap"
+# If postgis extension doesn't exist on db, inform user and exit.
+postgis_check=$(psql -p "${port}" -d "${db}" -t -c "select count(extname) from pg_extension where extname='postgis'")
 
-# Create postgis extension.
-psql -p "${port}" -d "${db}" -c "create extension if not exists postgis"
+if [ ${postgis_check} = 0 ]; then
+  echo "The postgis extension is not installed. Please install it (as a superuser) before continuing.";
+  echo "${usage}"
+  exit 1;
+fi
 
 # Use user_data_dir from .env or a default value.
 if [[ -z "${user_data_dir}" ]]; then
