@@ -214,8 +214,49 @@ if test ${download_nj} = true ; then
 fi
 
 if test ${download_roads} = true ; then
-  echo "Downloading NJ road network..."
-  cd src/utils && ./nj_download_roads.sh && cd ../..
+
+  mkdir -p data/nj/roads
+
+  echo "Downloading NJDOT road network shapefile..."
+
+  # Download the shapefile
+  curl "https://www.nj.gov/transportation/refdata/gis/zip/NJ_Roads_shp.zip" \
+    -H 'User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36' \
+    -o "data/nj/roads/NJ_Roads_shp.zip" \
+    -w '%{filename_effective} downloaded \n' \
+    --progress-bar
+
+  # Check if download was successful
+  if [ $? -eq 0 ]; then
+    echo "Download successful. Extracting..."
+    unzip -o data/nj/roads/NJ_Roads_shp.zip
+    echo "NJDOT road network shapefile ready."
+  else
+    echo "Download failed. Please check your connection and try again."
+    exit 1
+  fi
+
+  echo "Importing road network into database..."
+
+  # Check if table exists and handle accordingly
+  table_exists=$(psql -p "${port}" -d "${db}" -tAc "SELECT EXISTS (SELECT FROM information_schema.tables WHERE table_name='nj_roads');")
+
+  if [ "$table_exists" = "t" ]; then
+    echo "Table nj_roads already exists. Use --roads --reset to recreate it."
+  else
+    # Import using shp2pgsql
+    echo "Running shp2pgsql import (this may take a few minutes)..."
+    shp2pgsql -I -s 3424 -W UTF-8 "data/nj/roads/NJ_Roads_shp/NJ_Roads.shp" nj_roads | psql -q -p "${port}" -d "${db}"
+  
+    if [ $? -eq 0 ]; then      
+      # Show statistics
+      echo "Import complete. Road network statistics:"
+      psql -p "${port}" -d "${db}" -c "SELECT COUNT(*) as total_roads, ST_GeometryType(geom) as geometry_type FROM nj_roads GROUP BY ST_GeometryType(geom);"
+    else
+      echo "Import failed. Check database connection and permissions."
+      exit 1
+    fi
+  fi 
 fi
 
 # If only downloading, exit here.
