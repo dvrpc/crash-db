@@ -40,13 +40,18 @@ fi
 # Create database, ignoring error if it already exists.
 psql -p "${port}" -c "create database ${db}" &>/dev/null
 
-# If postgis extension doesn't exist on db, inform user and exit.
+# If postgis extension doesn't exist on db, inform and exit.
 postgis_check=$(psql -p "${port}" -d "${db}" -t -c "select count(extname) from pg_extension where extname='postgis'")
 
 if [ ${postgis_check} = 0 ]; then
-  echo "The postgis extension is not installed. Please install it (as a superuser) before continuing.";
-  echo "${usage}"
-  exit 1;
+  echo "PostGIS extension not found. Attempting to create it..."
+  if psql -p "${port}" -d "${db}" -c "CREATE EXTENSION postgis;" >/dev/null 2>&1; then
+    echo "PostGIS extension created successfully."
+  else
+    echo "Failed to create PostGIS extension. Please install PostGIS and/or run as a superuser."
+    echo "${usage}"
+    exit 1
+  fi
 fi
 
 # Use user_data_dir from .env or a default value.
