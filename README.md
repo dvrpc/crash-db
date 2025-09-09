@@ -52,7 +52,7 @@ port=5437
 # use the same year for start and end to process a single year's data
 pa_start_year=2024  # earliest year that data is available for is 2005
 pa_end_year=2024
-nj_start_year=2022  # earliest year that data is available for is 2001
+nj_start_year=2022  # earliest year that data is available for is 2006
 nj_end_year=2022
 
 # NOTE: ALL OTHERS OPTIONAL
