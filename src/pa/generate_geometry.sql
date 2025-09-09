@@ -47,8 +47,8 @@ DECLARE
     result_text text;
 BEGIN
     -- variables set by setup_db.sh
-    start_year := coalesce(current_setting('myvars.pa_start_year', true)::integer, 2022);
-    end_year := coalesce(current_setting('myvars.pa_end_year', true)::integer, 2022);
+    start_year := current_setting('myvars.pa_start_year', true)::integer;
+    end_year := current_setting('myvars.pa_end_year', true)::integer;
     
     RAISE NOTICE 'Generating geometry for PA crash data from % to %', start_year, end_year;
     
