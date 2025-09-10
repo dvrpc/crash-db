@@ -31,6 +31,11 @@ begin
     execute format($q$update temp_vehicle_%s set dir_of_travel = 'W' where dir_of_travel = '04'$q$, year);
     
     /* Year-specific. */
+    if year = '2023' then
+        -- safety_equipment lookup: 10 and 11 are now reserved
+        -- execute format($q$update temp_occupant_%s set safety_equipment_used = null where safety_equipment_used in ('10', '11')$q$, year);
+        -- execute format($q$update temp_occupant_%s set safety_equipment_used = null where safety_equipment_available in ('10', '11')$q$, year);
+        -- execute format($q$update temp_pedestrian_%s set safety_equipment_used = null where safety_equipment_used in ('10', '11')$q$, year);
     if year = '2022' then
         execute format($q$update temp_occupant_%s set airbag_deployment = null where airbag_deployment in ('05', '06')$q$, year);
     elseif year = '2017' then
@@ -48,9 +53,11 @@ begin
         -- safety_equipment lookup: 07 is reserved
         execute format($q$update temp_occupant_%s set safety_equipment_used = null where safety_equipment_used = '07'$q$, year);
         execute format($q$update temp_occupant_%s set safety_equipment_available = null where safety_equipment_available = '07'$q$, year);
+
         -- pre_crash_action lookup: 42 is reserved
         execute format($q$update temp_vehicle_%s set pre_crash_action = null where pre_crash_action = '42'$q$, year);
         execute format($q$update temp_pedestrian_%s set pre_crash_action = null where pre_crash_action = '42'$q$, year);
+
         -- veh_type lookup: 09 is reserved
         execute format($q$update temp_vehicle_%s set veh_type = null where veh_type = '09'$q$, year);
     end if;

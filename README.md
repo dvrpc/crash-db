@@ -115,6 +115,8 @@ After downloading, import the data into the database:
 
 ## Data
 
+NOTE: Where lookup tables contain reserved codes/values, they are included in the sql scripts that create them but commented out, and thus not included in the database. If those codes/values are subsequently used in the data tables, they are changed to NULL values.
+
 ### PennDOT
 
   - 2024 Crash Database Primer: <https://gis.penndot.gov/gishub/crashZip/OPEN%20DATA%20PORTAL%20Database%20Primer%2010-16.pdf>
