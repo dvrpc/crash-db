@@ -155,6 +155,9 @@ Misc:
 
   - The data for one crash in the 2016 data lacked a value for the "department case number" field, and as that's part of the primary key, the records for it weren't inserted into the various tables.
   - The zip file for Burlington 2009 Drivers is empty, and so that year's data cannot be imported.
+  - Two zip files contain extra files in addition to the one they should contain. (Note, however, that the extra files match the ones in their corresponding zip files so they are ok.)
+    - Gloucester2014Occupants.zip
+    - Camden2019Occupants.zip
   - Backslashes found in various files. These break Postgres's COPY. They are escaped (with another backslash) via src/utils/nj_pre_process_files.sh. 
   - Literal carriage returns (break to next line) were found in various files. These break the line specification. They are replaced with a space via src/utils/nj_pre_process_files.sh.
   - Line feeds (new line, \n) found in the middle of some lines in various files (and sometimes several of them - seems to be in addresses). These break the line specification. They are replaced with a space via src/utils/nj_pre_process_files.sh.
