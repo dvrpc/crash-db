@@ -180,7 +180,7 @@ begin
                 raise info '%', quote_nullable(line);
                 null;
         end;
-    elseif year_int >= 2017 and year_int <= 2022 then 
+    elseif year_int >= 2017 and year_int <= 2023 then 
         if db_table = 'crash' then
             execute format($q2$insert into temp_%1$s_%2$s values (
                 nullif(trim(substring(%3$s from 1 for 4)), ''),    -- year
@@ -238,7 +238,7 @@ begin
             )$q2$, db_table, year, quote_nullable(line));
         elseif db_table = 'driver' then
             -- 2021 and 2022 not to spec, use null for DOB
-            if year in ('2021', '2022') then
+            if year in ('2021', '2022', '2023') then
                 execute format($q2$insert into temp_%1$s_%2$s values (
                     nullif(trim(substring(%3$s from 1 for 4)), ''),    -- year
                     nullif(trim(substring(%3$s from 5 for 4)), ''),    -- ncic (county & muni) code
@@ -315,7 +315,7 @@ begin
             )$q2$, db_table, year, quote_nullable(line));
         elseif db_table = 'pedestrian' then
             -- 2021 and 2022 not to spec, use null for DOB
-            if year in ('2021', '2022') then
+            if year in ('2021', '2022', '2023') then
                 execute format($q2$insert into temp_%1$s_%2$s values (
                     nullif(trim(substring(%3$s from 1 for 4)), ''),    -- year
                     nullif(trim(substring(%3$s from 5 for 4)), ''),    -- ncic (county & muni) code

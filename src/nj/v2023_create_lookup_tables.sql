@@ -1,9 +1,14 @@
-create or replace procedure nj_v2017_create_and_populate_lookup_tables()
+-- NOTE: each lookup table includes the reference above it in a comment.
+-- Typically, these are carried over from the previous schema and so references
+-- the previous Crash Report Manual or NJTR-1 form. However, if there has been a change
+-- the reference has been updated to reflect the source.
+
+create or replace procedure nj_v2023_create_and_populate_lookup_tables()
 language plpgsql
 as
 $body$
 declare
-    lookup_schema text = 'nj_2017_lookup';
+    lookup_schema text = 'nj_2023_lookup';
     table_name text;
     table_names text[] := '{airbag_deployment, alcohol_test_given, alcohol_test_type, cargo_body_type, contrib_circ, crash_type, driven_left_towed, ejection, environmental_condition, extent_of_damage, hazmat_status, light_condition, location_of_most_severe_injury, ncic, oversized_overweight_permit, physical_condition, physical_status, position_in_veh, police_dept, pre_crash_action, refused_med_attn, removed_by, road_divided_by, road_grade, road_horizontal_alignment, road_surface_condition, road_surface_type, road_system, route_suffix, safety_equipment, sequence_of_events, special_function_vehicles, unit_of_measure, temp_traffic_control_zone, traffic_controls, type_of_most_severe_injury, usdot_other, veh_color, veh_impact_area, veh_type, veh_use, veh_weight_rating}';
 begin
@@ -16,13 +21,15 @@ begin
 
     -- Populate lookup tables.
     begin
-        -- 2017 Crash Report Manual, p. 58.
+        -- 2023 Crash Report Manual, p. 60.
         execute format($q1$insert into %I.airbag_deployment (code, description) values
             ('00', 'Unknown'),
             ('01', 'Front'),
             ('02', 'Side'),
             ('03', 'Other (Knee, Airbelt, etc)'),
             ('04', 'Combination'),
+            ('05', 'Not Available'),
+            ('06', 'Not Deployed'),
             ('99', 'Other')$q1$, lookup_schema);
 
         -- 2017 NJTR-1 form has boxes for each of these options;
@@ -531,7 +538,7 @@ begin
             ('W', 'Western Alignment (NJTPK, Route 9 & Route 173)'),
             ('99', 'Other')$q1$, lookup_schema);
 
-        -- 2017 Crash Report Manual, p. 57.
+        -- 2023 Crash Report Manual, p. 59.
         execute format($q1$ insert into %I.safety_equipment (code, description) values
             ('00', 'Unknown'),
             ('01', 'None'),
@@ -543,8 +550,8 @@ begin
             ('07', 'Child Restraint - Booster'),
             ('08', 'Helmet'),
             ('09', 'Unapproved Helmet'),
-            ('10', 'Airbag'),
-            ('11', 'Airbag & Seatbelts'),
+            -- ('10', 'Reserved'),
+            -- ('11', 'Reserved'),
             ('12', 'Safety Vest (Ped only)'),
             ('99', 'Other')$q1$, lookup_schema);
 
@@ -617,7 +624,7 @@ begin
             ('05', 'No Apparent Injury'),
             ('99', 'Other')$q1$, lookup_schema);
 
-        -- 2017 Crash Report Manual, p. 85.
+        -- 2023 Crash Report Manual, p. 89.
         -- Box 120/121 on form.
         execute format($q1$ insert into %I.physical_status (code, description) values
             ('00', 'Unknown'),
@@ -630,9 +637,10 @@ begin
             ('07', 'Illness'),
             ('08', 'Fatigue'),
             ('09', 'Fell Asleep'),
+            ('10', 'Cannabinoid Use'),
             ('99', 'Other')$q1$, lookup_schema);
 
-        -- 2017 Crash Report Manual, p. 75.
+        -- 2023 Crash Report Manual, p. 78.
         execute format($q1$ insert into %I.special_function_vehicles (code, description) values
             ('00', 'Unknown'),
             ('01', 'Work Equipment'),
@@ -655,6 +663,7 @@ begin
             ('18', 'Farm Vehicle'),
             ('19', 'Construction/Off Road Equip'),
             ('20', 'Rental Truck (Over 10,000 lbs)'),
+            ('21', 'Electronic Ride Share'),
             ('99', 'Other')$q1$, lookup_schema);
 
         -- Assumed from NJTR-1 form, box 15.
@@ -753,7 +762,7 @@ begin
             ('17', 'None Visible'),
             ('99', 'Other')$q1$, lookup_schema);
 
-        -- 2017 Crash Report Manual, pp 71-3.
+        -- 2023 Crash Report Manual, pp 74-75.
         execute format($q1$ insert into %I.veh_type (code, description) values
             ('00', 'Unknown'),
             -- Passenger Vehicles (01-19)
@@ -767,12 +776,13 @@ begin
             ('08', 'Motorcycle'),
             -- ('09', '(reserved)'),
             ('10', 'Any previous w/Trailer'),
-            ('11', 'Moped'),
+            ('11', 'Motorized Bicycle (Moped)'),
             ('12', 'Streetcar/Trolley'),
             ('13', 'Pedalcycle'),
             ('14', 'Golf Cart'),
             ('15', 'Low Speed Vehicle'),
             ('16', 'Snowmobile'),
+            ('17', 'Personal Conveyance'),
             ('19', 'Other Pass Vehicle'),
             -- Trucks (20-29)
             ('20', 'Single Unit (2 axle)'),

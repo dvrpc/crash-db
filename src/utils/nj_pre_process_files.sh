@@ -98,7 +98,27 @@ done
 echo 'Remove extra/misplaced new lines'
 for file in $(ls data/nj/*.txt); do
   # The characters per line vary by both file and year, so need to check filename.
-	case "${file}" in 
+	case "${file}" in
+		*2023*)
+	  	case "${file}" in
+	  		*Accidents*)
+	  		  remove_newlines 469 "${file}"
+			    ;;
+	  		*Drivers*)
+	  		  remove_newlines 340 "${file}"  # There are no longer 10 empty spaces at end of file.
+		    	;;
+	  		*Occupants*)
+	  		  remove_newlines 75 "${file}"
+		    	;;
+	  		*Pedestrians*)
+	  		  remove_newlines 380 "${file}"  # There are no longer 10 empty spaces at end of file.
+		    	;;
+	  		*Vehicles*)
+	  		  remove_newlines 272 "${file}"  # NOTE: likely wrong; file/spec do not match
+		    	;;
+		  esac
+			;;
+		
 	  *2017* | *2018* | *2019* | *2020* | *2021* | *2022*)
 	  	case "${file}" in
 	  		*Accidents*)

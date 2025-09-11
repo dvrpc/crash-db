@@ -111,6 +111,8 @@ If you prefer to download first, then import, or by individual state:
 
 ## Data
 
+NOTE: Where lookup tables contain reserved codes/values, they are included in the sql scripts that create them but commented out, and thus not included in the database. If those codes/values are subsequently used in the data tables, they are changed to NULL values.
+
 ### PennDOT
 
   - 2024 Crash Database Primer: <https://gis.penndot.gov/gishub/crashZip/OPEN%20DATA%20PORTAL%20Database%20Primer%2010-16.pdf>
@@ -149,9 +151,12 @@ Misc:
 
   - The data for one crash in the 2016 data lacked a value for the "department case number" field, and as that's part of the primary key, the records for it weren't inserted into the various tables.
   - The zip file for Burlington 2009 Drivers is empty, and so that year's data cannot be imported.
+  - Two zip files contain extra files in addition to the one they should contain. (Note, however, that the extra files match the ones in their corresponding zip files so they are ok.)
+    - Gloucester2014Occupants.zip
+    - Camden2019Occupants.zip
   - Backslashes found in various files. These break Postgres's COPY. They are escaped (with another backslash) via src/utils/nj_pre_process_files.sh. 
   - Literal carriage returns (break to next line) were found in various files. These break the line specification. They are replaced with a space via src/utils/nj_pre_process_files.sh.
   - Line feeds (new line, \n) found in the middle of some lines in various files (and sometimes several of them - seems to be in addresses). These break the line specification. They are replaced with a space via src/utils/nj_pre_process_files.sh.
   - police_station field in crash table seems to often just be the same as dept_case_number, other times it's text
-  - In 2021 and 2022, in the Drivers and Pedestrians tables, DOB is an empty field with a length of zero, while the specification indicates it should have a length of ten. This makes all of the subsequent from/to/length values incorrect in the corresponding table layout pdf. These fields were removed from our version of the table for these years. All prior years (2001-2020) do have a length of 10 for this field. Is there a problem with the 2021 and 2022 tables? Has the specification changed started in 2021? Will this field be included going forward?
+  - For 2021-2023, in the Drivers and Pedestrians tables, DOB is an empty field with a length of 0, while the specification states it should have a length of 10. In the latest (2023) version of the table layout, it’s now noted that “Effective in 2021 data no longer displayed, field retained” however the columns in the table have not been updated and so are incorrect starting from this field.
   - See src/nj/create_data_tables.sql for questions about fields that appear to be lookup tables but whose values cannot be located and src/nj/lookup_tables.sql for questions about exact order/values in tables. Each is highlighted by a preceding "TODO" item in a comment.
