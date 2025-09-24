@@ -30,6 +30,7 @@ insert into pa_lookup_table_names (name, zero_padded) values
     ('intersect_type', true),
     ('impact_point', true),
     ('lane_closure_direction', false),
+    ('lane_closed', false),
     ('location_type', false),
     ('max_severity_level', false),
     ('non_motorist_crossing_tcd', true),
@@ -121,7 +122,7 @@ begin
         execute format($q$alter table pa_%s.commveh add primary key (crn, unit_num)$q$, year);
         execute format($q$alter table pa_%s.cycle add primary key (crn, unit_num)$q$, year);
         execute format($q$alter table pa_%s.flag add primary key(crn)$q$, year);
-        -- execute format($q$alter table pa_%s.person add primary key (crn, unit_num)$q$, year);
+        execute format($q$alter table pa_%s.person add primary key (crn, unit_num, person_num)$q$, year);
         execute format($q$alter table pa_%s.trailveh add primary key(crn, unit_num, trl_seq_num)$q$, year);
         execute format($q$alter table pa_%s.vehicle add primary key (crn, unit_num)$q$, year);
 

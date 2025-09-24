@@ -88,7 +88,6 @@ begin
     /* Year-specific. */
     -- If anything here occurs in more than one year, move above to apply to all years.
     if year = '2007' or year = '2006' or year = '2005' then
-        execute format($q$update temp_crash_%s set lane_closed = null where lane_closed = '2'$q$, year);
         execute format($q$update temp_person_%s set dvr_ped_condition = null where dvr_ped_condition = '8.0'$q$, year);
     end if;
     

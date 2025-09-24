@@ -407,7 +407,13 @@ begin
             ('14', 'Undercarriage'),
             ('15', 'Towed Unit'),
             ('99', 'Unknown');
-    
+
+        insert into pa_lookup.lane_closed (code, description) values
+            ('0', 'Not applicable'),
+            ('1', 'Partially closed'),
+            ('2', 'Fully closed'),
+            ('9', 'Unknown');
+
         insert into pa_lookup.lane_closure_direction (code, description) values
             ('1', 'North'),
             ('2', 'South'),
@@ -698,8 +704,7 @@ begin
     
         insert into pa_lookup.urban_rural (code, description) values
             ('1', 'Rural'),
-            ('2', 'Urbanized'),
-            ('3', 'Urban');
+            ('2', 'Urban');
     
         insert into pa_lookup.veh_color_cd (code, description) values
             ('01', 'Blue'),

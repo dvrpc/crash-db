@@ -60,7 +60,7 @@ begin
         injury_count integer, -- total count of all injuries sustained
         intersection_related boolean, -- was this midblock crash related to a nearby intersection?
         intersect_type text references pa_lookup.intersect_type (code), -- code that defines the intersection type (see column code) 
-        lane_closed boolean, -- was there a lane closure?
+        lane_closed text references pa_lookup.lane_closed (code), -- was there a lane closure?
         latitude text, -- gps latitude determined by penndot (dd mm:ss.ddd)
         ln_close_dir text references pa_lookup.lane_closure_direction (code), -- direction of traffic in closed lane (s) (see column code) 
         location_type text references pa_lookup.location_type (code), -- code that defines the crash location (see column code) 
