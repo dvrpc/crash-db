@@ -129,15 +129,9 @@ Lookup tables:
   - hazmat_rel_1 - hazmat_rel_4 in the commveh table: in the data dictionary, it lists "1=Y, 0=N" as the possible values, but then there is also a lookup table for it that contains "1 – No Release, 2 – Release occurred, 9 – Unknown". The latter is what is actually in the CSV files. This was converted to a boolean field.
   - Some of the values between the pdf and the spreadsheet differ. This seems to be either in spelling, e.g. using "Twp" (pdf) or "Township" (spreadsheet), or zero-padding.
 
-Primary keys:
-  - "person" table: is crn/unit_num supposed to be primary key? Duplicate when attempted.
-  - "trailveh" table: data dictionary says "The CRN, UNIT_NUM and define the unit that corresponds to the vehicle record". Assume "trl_seq_num" is the missing field here?
-
 Misc:
-  - The crash table's "urban_rural" field lists (in comments only, not as separate lookup table) possible values 1=rural, 2=urbanized, 3=urban, but only values across all years are 1 and 2. So should it be 1=rural, 2=urban? What is "urbanized"?
   - The commveh table's "axle_cnt" doesn't have a lookup table, but seems to use 99 for unknown. Converted to null. But what about others that are very high? What's the highest number of axles a vehicle and trailers could have?
-  - The crash table's "lane_closed" field contains no data for years 2008-2024. I have not checked other fields but probably worthwhile to do so. I only happened across this by chance as the previous version of the data had bad values for this field (supposed to by Y/N but contained 0,1,2,9,U).
-  - In 2005-2007, lane_closed (boolean) contained '2'. Converted to null.
+  - The crash table's "lane_closed" field contains no data for years 2008-2024. I have not checked other fields but probably worthwhile to do so. 
 
 ### NJDOT
 
