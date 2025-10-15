@@ -5,8 +5,10 @@ $body$
 declare
     col_name text;
     dat_type text;
-    db_tables text[] := '{crash, commveh, cycle, flag, person, roadway, trailveh, vehicle}';
+    db_tables text[] := '{crash, commveh, cycle, flags, person, roadway, trailveh, vehicle}';
     db_table text;
+    counties text[] := '{Bucks, Chester, Delaware, Montgomery, Philadelphia}';
+    county text;
     user_data_dir text = current_setting('myvars.user_data_dir');
     postgres_data_dir text = current_setting('myvars.postgres_data_dir');
     
@@ -41,7 +43,9 @@ begin
 
     raise info '.Copy data into temporary tables';
     foreach db_table in array db_tables loop
-        execute format($q$copy temp_%I_%s from '%s/pa/%s_D06_%s.csv' with (format csv, header, force_null *)$q$, db_table, year, user_data_dir, upper(db_table), year);
+        foreach county in array counties loop
+            execute format($q$copy temp_%I_%s from '%s/pa/%s_%s_%s.csv' with (format csv, header, force_null *)$q$, db_table, year, user_data_dir, upper(db_table), upper(county), year);
+        end loop;
     end loop;
 
     -- Run analyze on temporary tables, which should improve performance on queries on them.

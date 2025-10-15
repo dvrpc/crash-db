@@ -36,7 +36,7 @@ begin
         -- execute format($q$update temp_occupant_%s set safety_equipment_used = null where safety_equipment_used in ('10', '11')$q$, year);
         -- execute format($q$update temp_occupant_%s set safety_equipment_used = null where safety_equipment_available in ('10', '11')$q$, year);
         -- execute format($q$update temp_pedestrian_%s set safety_equipment_used = null where safety_equipment_used in ('10', '11')$q$, year);
-    if year = '2022' then
+    elseif year = '2022' then
         execute format($q$update temp_occupant_%s set airbag_deployment = null where airbag_deployment in ('05', '06')$q$, year);
     elseif year = '2017' then
         execute format($q$update temp_vehicle_%s set veh_color = 'WT' where veh_color = 'WHI'$q$, year);

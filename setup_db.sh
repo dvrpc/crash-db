@@ -38,9 +38,12 @@ psql -p "${port}" -c "create database ${db}" &>/dev/null
 postgis_check=$(psql -p "${port}" -d "${db}" -t -c "select count(extname) from pg_extension where extname='postgis'")
 
 if [ ${postgis_check} = 0 ]; then
-  echo "The postgis extension is not installed. Please install it (as a superuser) before continuing.";
-  echo "${usage}"
-  exit 1;
+  # Try to add it.
+  if ! psql -p 5437 -d crash -c "Create extension postgis"; then
+    echo "The postgis extension is not installed. Please install it (as a superuser) before continuing.";
+    echo "${usage}"
+    exit 1;
+  fi
 fi
 
 # Use user_data_dir from .env or a default value.
@@ -169,23 +172,26 @@ fi
 # Handle download actions first
 if test ${download_pa} = true ; then
   echo "Downloading PA crash data..."
-  base_url="https://gis.penndot.pa.gov/gishub/crashZip/District/District-06"
+  base_url="https://gis.penndot.pa.gov/gishub/crashZip/County"
+  counties=("Bucks Chester Delaware Montgomery Philadelphia")
 
   mkdir -p data/pa
 
   for year in $(seq ${pa_start_year} ${pa_end_year}); do
-    curl "${base_url}/D06_${year}.zip" \
-      -H 'User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36' \
-      -o "data/pa/D06_${year}.zip" \
-      -w '%{filename_effective} downloaded\n' \
-      --progress-bar
-  
-    # Extract the ZIP file to the processing directory
-    if [ -f "data/pa/D06_${year}.zip" ]; then
-      unzip -o "data/pa/D06_${year}.zip" -d "data/pa"
-    else
-      echo "Warning: Failed to download D06_${year}.zip"
-    fi
+    for county in ${counties[@]}; do
+      curl "${base_url}/${county}/${county}_${year}.zip" \
+        -H 'User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36' \
+        -o "data/pa/${county}_${year}.zip" \
+        -w '%{filename_effective} downloaded\n' \
+        --progress-bar
+
+      # Extract the ZIP file to the processing directory
+      if [ -f "data/pa/${county}_${year}.zip" ]; then
+        unzip -o "data/pa/${county}_${year}.zip" -d "data/pa"
+      else
+        echo "Warning: Failed to download ${county}/${county}_${year}.zip"
+      fi
+    done
   done
 fi
 

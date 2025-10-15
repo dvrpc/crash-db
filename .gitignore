@@ -2,4 +2,5 @@
 *.csv
 *.pdf
 /data
+/NJ_Roads_shp
 .env
