@@ -49,6 +49,11 @@ begin
         execute format($q$update temp_vehicle_%s set veh_color = null where veh_color in ('?', '0', '0?', '00', '01', '02', '1', '28', '3G', '6', '96', 'A/E', 'ALB', 'ALE', 'ASH', 'AUB', 'B', 'B?', 'BB', 'BC', 'BD', 'BE', 'BEN', 'BER', 'BH', 'BL.', 'BL?', 'BLG', 'BNT', 'BOL', 'BON', 'BQ', 'BRG', 'BRU', 'BU', 'BUS', 'BW', 'BY', 'CA', 'CAL', 'CAR', 'CAS', 'CH', 'CHE', 'CHM', 'CHO', 'CHP', 'CHR', 'CK', 'CN', 'COA', 'CP', 'CRA', 'CUT', 'CY', 'DAR', 'DGR', 'DK?', 'DL', 'DRK', 'ELA', 'ELE', 'EME', 'EMR', 'FAW', 'FL', 'GB', 'GDB', 'GEE', 'GR', 'GR.', 'GW', 'ION', 'IRI', 'JAR', 'LK', 'LT.', 'MA', 'MAG', 'MAL', 'MAP', 'MCH', 'MD', 'MET', 'MGN', 'MIS', 'MND', 'MO', 'MON', 'MUR', 'OLI', 'OLV', 'OPA', 'OYS', 'PAT', 'PAU', 'PAW', 'PEA', 'PIA', 'PLA', 'PLT', 'PRW', 'PSG', 'PTR', 'PW', 'PWR', 'QUE', 'R', 'RAL', 'RAS', 'ROS', 'RS', 'RST', 'RSW', 'RUM', 'RUS', 'RWB', 'SAT', 'SC', 'SD', 'SDF', 'SDN', 'SEA', 'SEN', 'SGE', 'SHA', 'SIE', 'SK', 'SLA', 'SMO', 'SN', 'SSY', 'STE', 'STL', 'STO', 'SUN', 'SVR', 'SWT', 'TBZ', 'TD', 'TEL', 'TER', 'TG', 'THU', 'TI', 'TIL', 'TOA', 'TOP', 'TOU', 'TP', 'TUN', 'TW', 'W?', 'WC', 'WD', 'WN', 'WY')$q$, year);
     end if;
 
+    if 2017 <= year::int AND year::int <= 2023 then
+        -- 09 is reserved is veh_type
+        execute format($q$update temp_vehicle_%s set veh_type = null where veh_type = '09'$q$, year);    
+    end if;
+
     if 2006 <= year::int AND year::int <= 2016 then
         -- safety_equipment lookup: 07 is reserved
         execute format($q$update temp_occupant_%s set safety_equipment_used = null where safety_equipment_used = '07'$q$, year);
