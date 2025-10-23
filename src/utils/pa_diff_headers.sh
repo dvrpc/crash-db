@@ -15,7 +15,7 @@ if [[ "${1}" = '-u' || "${1}" = 'u' ]]; then
   exit 0
 fi
 
-tables=('CRASH' 'COMMVEH' 'CYCLE' 'FLAG' 'PERSON' 'ROADWAY' 'TRAILVEH' 'VEHICLE')
+tables=('CRASH' 'COMMVEH' 'CYCLE' 'FLAGS' 'PERSON' 'ROADWAY' 'TRAILVEH' 'VEHICLE')
 
 
 # Exit if we don't have requirement number of arguments.
