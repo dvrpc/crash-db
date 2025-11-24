@@ -37,9 +37,11 @@ psql -p "${port}" -c "create database ${db}" &>/dev/null
 # If postgis extension doesn't exist on db, inform user and exit.
 postgis_check=$(psql -p "${port}" -d "${db}" -t -c "select count(extname) from pg_extension where extname='postgis'")
 
+
+
 if [ ${postgis_check} = 0 ]; then
   # Try to add it.
-  if ! psql -p "${port}" -d crash -c "Create extension postgis"; then
+  if ! psql -p "${port}" -d "${db}" -c "Create extension postgis"; then
     echo "The postgis extension is not installed. Please install it (as a superuser) before continuing.";
     echo "${usage}"
     exit 1;
