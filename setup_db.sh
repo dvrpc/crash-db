@@ -39,7 +39,7 @@ postgis_check=$(psql -p "${port}" -d "${db}" -t -c "select count(extname) from p
 
 if [ ${postgis_check} = 0 ]; then
   # Try to add it.
-  if ! psql -p 5437 -d crash -c "Create extension postgis"; then
+  if ! psql -p "${port}" -d crash -c "Create extension postgis"; then
     echo "The postgis extension is not installed. Please install it (as a superuser) before continuing.";
     echo "${usage}"
     exit 1;
