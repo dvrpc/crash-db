@@ -239,7 +239,7 @@ if test ${download_roads} = true ; then
   # Check if download was successful
   if [ $? -eq 0 ]; then
     echo "Download successful. Extracting..."
-    unzip -o data/nj/roads/NJ_Roads_shp.zip
+    unzip -o data/nj/roads/NJ_Roads_shp.zip -d data/nj/roads
     echo "NJDOT road network shapefile ready."
   else
     echo "Download failed. Please check your connection and try again."
