@@ -2,7 +2,7 @@
 
 usage="
 This script pre-processes NJ data files in order to make them importable by Postgres. Specifically:
-  - unzips all .zip files in the data/nj directory
+  - unzips all .zip files in the NJ data directory
   - converts encoding of the resulting .txt files from win1252/cp1252 to utf8
   - converts formatting from dos to unix
   - escapes backslashes characters
@@ -10,7 +10,10 @@ This script pre-processes NJ data files in order to make them importable by Post
   - removes misplaced line feeds (\n) in middle of lines, even if there is more than one
 
 Usage:
-$(basename $0)
+$(basename $0) [data_directory]
+
+Arguments:
+  data_directory  Path to NJ data directory (default: data/nj)
 "
 
 if [[ "${1}" = '-u' || "${1}" = 'u' ]]; then
@@ -18,12 +21,16 @@ if [[ "${1}" = '-u' || "${1}" = 'u' ]]; then
   exit 0
 fi
 
+# Get data directory from parameter or use default
+NJ_DATA_DIR="${1:-data/nj}"
+
 # Function to remove misplaced newlines.
 remove_newlines() {
     local expected_length="$1"
     local file="$2"
-    local temp_file="${file}.tmp"
-    
+    # Use temp file in /tmp (VM local storage) to avoid multipass mount issues
+    local temp_file=$(mktemp /tmp/nj_preprocess.XXXXXX)
+
     awk -v len="$expected_length" '
     {
         # If line is shorter than expected, keep reading and joining lines
@@ -35,29 +42,27 @@ remove_newlines() {
 }
 
 # Unzip all the downloaded files, overwriting any existing .txt files.
-unzip -o data/nj/\*.zip -d data/nj/
+unzip -o "${NJ_DATA_DIR}"/\*.zip -d "${NJ_DATA_DIR}/"
 
 # Convert encoding from win1252/cp1252 to UTF8 and write to new file.
 # (Postgres's `COPY`, even using the `encoding 'WIN1252'` option, was not able to decipher the
 # encoding from the original files correctly and would add odd symbols, replacing one character
 # with multiple characters, and thus break the specification that NJ uses.)
-for file in $(ls data/nj/*.txt); do
+for file in $(ls "${NJ_DATA_DIR}"/*.txt); do
   # iconv doesn't do in-place conversion, so first output to a new file name and then replace it
   iconv -f WINDOWS-1252 -t UTF-8 "${file}" > "${file}.new" && mv -f "${file}.new" "${file}"
 done
 
 # Convert from dos to unix formatting (CRLF -> LF).
-for file in $(ls data/nj/*.txt); do
-  # Try GNU sed first, fallback to BSD
-  if ! sed -i 's/\r$//' "${file}" 2>/dev/null; then
-    sed -i '' 's/\r$//' "${file}"
-  fi
+for file in $(ls "${NJ_DATA_DIR}"/*.txt); do
+  tmpfile=$(mktemp /tmp/nj_preprocess.XXXXXX)
+  sed 's/\r$//' "${file}" > "${tmpfile}" && mv "${tmpfile}" "${file}"
 done
 
 # Escape or replace characters that cause issues with either Postgres's COPY or that break NJ's
 # specification.
 echo 'Escape/replace problematic characters.'
-for file in $(ls data/nj/*.txt); do
+for file in $(ls "${NJ_DATA_DIR}"/*.txt); do
   # With the file format the NJ provides (fields determined by start/end byte, not a CSV), it must
   # be treated as the TXT format to be used with Postgres's COPY. Almost everything can be handled
   # in Postgres after that (adding quotes around space-separated fields, for example), except for an
@@ -72,19 +77,17 @@ for file in $(ls data/nj/*.txt); do
   # If a backslash is included in a file and not escaped, it appears to be excluded altogether. This
   # is a problem because the line then becomes one character shorter, thus distorting where
   # fields are supposed to be.
-  if ! sed -i 's;\\;\\\\;g' "${file}" 2>/dev/null; then
-    sed -i '' 's;\\;\\\\;g' "${file}"
-  fi
+  tmpfile=$(mktemp /tmp/nj_preprocess.XXXXXX)
+  sed 's;\\;\\\\;g' "${file}" > "${tmpfile}" && mv "${tmpfile}" "${file}"
 
   # Replace any stray carriage returns with a space, as otherwise they add a break mid-line,
   # breaking spec.
-  if ! sed -i 's;\r; ;g' "${file}" 2>/dev/null; then
-    sed -i '' 's;\r; ;g' "${file}"
-  fi
+  tmpfile=$(mktemp /tmp/nj_preprocess.XXXXXX)
+  sed 's;\r; ;g' "${file}" > "${tmpfile}" && mv "${tmpfile}" "${file}"
 done
 
 # Remove new lines that have been mistakenly entered into the middle of the line.
-# 
+#
 # Here are the locations of some that had been previously found and manually removed prior to using
 # the sed command below to clean them automatically, if for some reason we need this information in
 # the future:
@@ -94,9 +97,9 @@ done
 #  - 2019 Camden Accidents table, line 6165
 #  - 2019 Camden Drivers table, line 14349
 #  - 2019 Mercer Drivers table, line 7177
-# 
+#
 echo 'Remove extra/misplaced new lines'
-for file in $(ls data/nj/*.txt); do
+for file in $(ls "${NJ_DATA_DIR}"/*.txt); do
   # The characters per line vary by both file and year, so need to check filename.
 	case "${file}" in
 		*2023*)

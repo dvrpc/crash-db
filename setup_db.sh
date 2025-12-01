@@ -280,9 +280,6 @@ if test ${nj} = true && test ${download_mode} = true; then
       done
     done
   done
-
-  echo "Pre-processing NJ data files..."
-  ./src/utils/nj_pre_process_files.sh
 fi
 
 # If only downloading, exit here.
@@ -291,7 +288,13 @@ if test ${pa} = false && test ${nj} = false && test ${process_nj} = false ; then
 fi
 
 if test ${process_nj} = true; then
-  ./src/utils/nj_pre_process_files.sh
+  # Use user_data_dir if set, otherwise use data/nj
+  nj_data_dir="${user_data_dir:-/tmp/crash-data}/nj"
+  mkdir -p "${nj_data_dir}"
+  cp -r data/nj/*.txt "${nj_data_dir}/" 2>/dev/null || true
+  ./src/utils/nj_pre_process_files.sh "${nj_data_dir}"
+  # Copy processed files back to data/nj
+  cp -r "${nj_data_dir}"/*.txt data/nj/ 2>/dev/null || true
 fi
 
 ## Create custom domains.
@@ -302,6 +305,11 @@ if [[ $pa = true ]]; then
   # requires absolute paths/certain permissions.
   mkdir -p "${user_data_dir}/pa"
   cp -r data/pa/*.csv "${user_data_dir}/pa" 2>/dev/null || true
+
+  # Make files readable by postgres user
+  chmod a+x "${user_data_dir}"
+  chmod -R a+r "${user_data_dir}/pa"
+  chmod a+x "${user_data_dir}/pa"
 
   if [[ $reset = true ]]; then
     read -p "Are you sure want to reset the PA database? (Press y to reset it, any other key to abort.) " -n 1 -r
@@ -324,10 +332,19 @@ if [[ $pa = true ]]; then
 fi
 
 if [[ $nj = true ]]; then
-  # Copy data files in data/ to location accessible by server, for easier use in COPY, which
-  # requires absolute paths/certain permissions.
+  # Copy zip files to VM local storage for preprocessing, for easier use in COPY, which
+  # requires absolute paths/certain permissions. Preprocessing will unzip and process them.
   mkdir -p "${user_data_dir}/nj"
-  cp -r data/nj/*.txt "${user_data_dir}/nj/" 2>/dev/null || true
+  cp -r data/nj/*.zip "${user_data_dir}/nj/" 2>/dev/null || true
+
+  # Pre-process NJ data files on VM local storage (not mounted filesystem)
+  echo "Pre-processing NJ data files..."
+  ./src/utils/nj_pre_process_files.sh "${user_data_dir}/nj"
+
+  # Make files readable by postgres user
+  chmod a+x "${user_data_dir}"
+  chmod -R a+r "${user_data_dir}/nj"
+  chmod a+x "${user_data_dir}/nj"
 
   if [[ $reset = true ]]; then
     read -p "Are you sure want to reset the NJ database? (Press y to reset it, any other key to abort.) " -n 1 -r

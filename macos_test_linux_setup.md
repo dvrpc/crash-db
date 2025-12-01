@@ -1,6 +1,6 @@
 # macOS -> Linux VM testing
 
-This guide helps macOS users run the crash database setup tool in an Ubuntu VM using Multipass.
+This guide helps macOS users run the crash database setup tool in an Ubuntu VM using Multipass.  The setup script does run natively in macOS so this isn't necessary really.
 
 ## Prerequisites
 
@@ -10,6 +10,10 @@ This guide helps macOS users run the crash database setup tool in an Ubuntu VM u
    ```
 
 2. Ensure you have the crash-db repository cloned locally
+
+3. `.env` variables set (see [readme.md](README.md))
+
+    **NOTE**: macOS PostgreSQL installations vary.  Postgres.app data directory is usually something like this `/Users/your_login/Library/Application Support/Postgres/var-17`
 
 ## Setup Steps
 
@@ -31,15 +35,16 @@ multipass exec crash-db -- bash -c "
   sudo apt-get update
 "
 
-# Install PostgreSQL 17 and PostGIS
-multipass exec crash-db -- bash -c "sudo apt-get install -y postgresql-17 postgresql-17-postgis-3 unzip"
+# Install PostgreSQL 17, PostGIS extension, and PostGIS command-line tools
+multipass exec crash-db -- bash -c "sudo apt-get install -y postgresql-17 postgresql-17-postgis-3 postgis unzip"
 
-# Create database user and initial database
+# Create database user and initial database with PostGIS
 multipass exec crash-db -- bash -c "
   cd /home/ubuntu/crash-db && \
-  sudo -u postgres createuser -s ubuntu && \
+  sudo -u postgres psql -c \"CREATE USER ubuntu WITH SUPERUSER\" 2>/dev/null || true && \
   DB_NAME=\$(grep '^db=' .env | cut -d'\"' -f2) && \
-  psql -d postgres -c \"create database \${DB_NAME}\"
+  sudo -u postgres psql -c \"CREATE DATABASE \${DB_NAME}\" 2>/dev/null || echo \"Database \${DB_NAME} may already exist\" && \
+  sudo -u postgres psql -d \${DB_NAME} -c \"CREATE EXTENSION IF NOT EXISTS postgis\"
 "
 ```
 

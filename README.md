@@ -59,8 +59,9 @@ nj_end_year=2022
 # If you want something other than default of "crash":
 db="crash2"
 
-# If you want something other than default of /tmp/crash-data:
-# NOTE: the system user you run the script/create the db as needs to read/write from this directory.
+# Directory for data processing and import (default: /tmp/crash-data)
+# Downloaded data files are copied here for preprocessing (NJ only) and importing into PostgreSQL.
+# The postgres user needs read access to this directory and its contents.
 user_data_dir="/tmp/somewhere"
 
 # If you want something other than default of /var/lib/postgresql:
@@ -71,6 +72,17 @@ postgres_data_dir="/var/lib/postgresql/data"
 ## Setup Process
 
 The setup process can be done in one step or split into separate download and import steps.
+
+### Data Flow
+
+The script manages data in two locations:
+
+1. **Download location**: `data/pa/` or `data/nj/` in the repository
+
+2. **Processing/Import location**: `user_data_dir` (default: `/tmp/crash-data`)
+   - Files are copied here from download location
+   - NJ files are preprocessed here (encoding conversion, backslash escaping, etc.)
+   - PostgreSQL imports data from here
 
 ### Quick Start (Recommended)
 For most users, a simple one-command setup:
