@@ -82,13 +82,39 @@ counties = [
 for table in tables:
     for year in years:
         for county in counties:
-            df = table[0].loc[
-                (table[0]["CRASH_YEAR"] == year) & (table[0]["COUNTY"] == county[0])
-            ]
-            df.to_csv(
-                "G:/My Drive/penndot_2019_2023/output/{}_{}_{}.csv".format(
-                    table[1], county[1], year
-                ),
-                index=False,
-            )
+            if table[1] == "CRASH":
+                df = table[0].loc[
+                    (table[0]["CRASH_YEAR"] == year) & (table[0]["COUNTY"] == county[0])
+                ]
+                df.to_csv(
+                    "C:/Users/bcarney/Documents/pa_crash_data/{}_{}_{}.csv".format(
+                        table[1], county[1], year
+                    ),
+                    index=False,
+                )
+            else:
+                if table[1] == "ROADWAY":
+                    df = table[0].loc[
+                        (table[0]["CRASH_YEAR"] == year)
+                        & (table[0]["COUNTY"] == county[0])
+                    ]
+                    df.drop(columns=["CRASH_YEAR"])
+                    df.to_csv(
+                        "C:/Users/bcarney/Documents/pa_crash_data/{}_{}_{}.csv".format(
+                            table[1], county[1], year
+                        ),
+                        index=False,
+                    )
+                else:
+                    df = table[0].loc[
+                        (table[0]["CRASH_YEAR"] == year)
+                        & (table[0]["COUNTY"] == county[0])
+                    ]
+                    df.drop(columns=["CRASH_YEAR", "COUNTY"])
+                    df.to_csv(
+                        "C:/Users/bcarney/Documents/pa_crash_data/{}_{}_{}.csv".format(
+                            table[1], county[1], year
+                        ),
+                        index=False,
+                    )
     print(f"{table[1]} success")
