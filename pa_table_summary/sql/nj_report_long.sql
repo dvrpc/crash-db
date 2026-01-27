@@ -190,15 +190,15 @@ from nj.all_crash c where c.light_condition = '99'
    MONTH / DAY / HOUR
    ========================================================= */
 union all
-select c.casenumber, 'month', c.crash_month, 1
-from nj.all_crash c
+select c.casenumber, 'month', extract(month from c."date"), 1
+from nj.all_crash c 
 
 union all
 select c.casenumber, 'day_of_week', c.day_of_week, 1
 from nj.all_crash c
 
 union all
-select c.casenumber, 'hour', c.hour_of_day, 1
+select c.casenumber, 'hour', left(c.time_of_day, 2), 1
 from nj.all_crash c
 
 
@@ -206,43 +206,83 @@ from nj.all_crash c
    VEHICLE TYPE
    ========================================================= */
 union all
-select v.casenumber, 'vehicle', 'automobile', count(*)
+select v.casenumber, 'vehicle', 'unknown', count(*)
+from nj.all_vehicle v where v.veh_type = '00'
+group by v.casenumber
+
+union all
+select v.casenumber, 'vehicle', 'car_stationwagon_minivan', count(*)
 from nj.all_vehicle v where v.veh_type = '01'
 group by v.casenumber
 
 union all
 select v.casenumber, 'vehicle', 'motorcycle', count(*)
-from nj.all_vehicle v where v.veh_type = '02'
+from nj.all_vehicle v where v.veh_type = '08'
+group by v.casenumber
+
+union all
+select v.casenumber, 'vehicle', 'small_truck', count(*)
+from nj.all_vehicle v where v.veh_type = '05'
+group by v.casenumber
+
+union all
+select v.casenumber, 'vehicle', 'large_truck', count(*)
+from nj.all_vehicle v where v.veh_type in ('20', '21', '22', '23', '24', '25', '26', '27', '29')
 group by v.casenumber
 
 union all
 select v.casenumber, 'vehicle', 'other_motor', count(*)
 from nj.all_vehicle v
-where v.veh_type in ('03','04','05','06','07','08','09','10','11','12','13','14','15','16','17','18','19')
+where v.veh_type in ('02', '03', '04', '06', '07', '10', '15', '16', '19', '30', '31', '40', '99')
 group by v.casenumber
 
+union all
+select v.casenumber, 'vehicle', 'other_nonmotor', count(*)
+from nj.all_vehicle v
+where v.veh_type in ('12', '14')
+group by v.casenumber
+
+union all
+select v.casenumber, 'vehicle', 'bicycle', count(*)
+from nj.all_vehicle v where v.veh_type = '13'
+group by v.casenumber
 
 /* =========================================================
    PERSON INJURY SEVERITY
    ========================================================= */
 union all
+select p.casenumber, 'person_injury', 'unknown', count(*)
+from nj.all_person p where p.physical_condition = '00'
+group by p.casenumber
+
+union all
 select p.casenumber, 'person_injury', 'fatal', count(*)
-from nj.all_person p where p.inj_severity = '1'
+from nj.all_person p where p.physical_condition = '01'
 group by p.casenumber
 
 union all
 select p.casenumber, 'person_injury', 'serious', count(*)
-from nj.all_person p where p.inj_severity = '2'
+from nj.all_person p where p.physical_condition = '02'
 group by p.casenumber
 
 union all
 select p.casenumber, 'person_injury', 'minor', count(*)
-from nj.all_person p where p.inj_severity = '3'
+from nj.all_person p where p.physical_condition = '03'
 group by p.casenumber
 
 union all
 select p.casenumber, 'person_injury', 'possible', count(*)
-from nj.all_person p where p.inj_severity = '4'
+from nj.all_person p where p.physical_condition = '04'
+group by p.casenumber
+
+union all
+select p.casenumber, 'person_injury', 'no_injury', count(*)
+from nj.all_person p where p.physical_condition = '05'
+group by p.casenumber
+
+union all
+select p.casenumber, 'person_injury', 'other', count(*)
+from nj.all_person p where p.physical_condition = '99'
 group by p.casenumber
 
 
@@ -256,5 +296,5 @@ select
     c.crash_year::text as category,
     count(*) as cnt
 from nj.all_crash c
-where c.crash_year::int between 2019 and 2023
+where c.crash_year::int between 2019 and 2022
 group by c.crash_year;
