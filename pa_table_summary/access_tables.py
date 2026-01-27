@@ -17,10 +17,11 @@ CRASH = pd.read_sql(
 
 
 # Modify Access columns to match Data Dictionary
-CRASH["INJURY_COUNT"] = (
-    CRASH["MIN_INJ_COUNT"] + CRASH["MOD_INJ_COUNT"] + CRASH["MAJ_INJ_COUNT"]
+CRASH["INJURY_COUNT"] = CRASH[["MIN_INJ_COUNT", "MOD_INJ_COUNT", "MAJ_INJ_COUNT"]].sum(
+    axis=1
 )
 
+"""
 CRASH = CRASH.replace("  ", None, regex=True)
 
 CRASH.rename(
@@ -262,8 +263,8 @@ counties = [
     ["46", "MONTGOMERY"],
     ["67", "PHILADELPHIA"],
 ]
-
-
+"""
+"""
 for table in tables:
     for year in years:
         for county in counties:
@@ -312,3 +313,4 @@ for table in tables:
                         index=False,
                     )
     print(f"{table[1]} success")
+"""
