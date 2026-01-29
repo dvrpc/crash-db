@@ -190,7 +190,7 @@ from nj.all_crash c where c.light_condition = '99'
    MONTH / DAY / HOUR
    ========================================================= */
 union all
-select c.casenumber, 'month', extract(month from c."date"), 1
+select c.casenumber, 'month', cast(extract(month from c."date") as text), 1
 from nj.all_crash c 
 
 union all
@@ -291,10 +291,10 @@ group by p.casenumber
    ========================================================= */
 union all
 select
-    null::bigint as casenumber,
+    null as casenumber,
     'year' as domain,
-    c.crash_year::text as category,
+    c."year"::text as category,
     count(*) as cnt
 from nj.all_crash c
-where c.crash_year::int between 2019 and 2022
-group by c.crash_year;
+where c."year"::int between 2017 and 2022
+group by c."year";

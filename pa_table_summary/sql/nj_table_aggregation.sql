@@ -1,3 +1,4 @@
+drop schema nj cascade;
 create schema if not exists nj;
 
 create or replace procedure nj.table_aggregation_union(
@@ -16,9 +17,9 @@ begin
         schema_name := 'nj_' || year;  -- compute schema_name for this year
 
         if sql = '' then
-            sql := format('select * from %I.%I', schema_name, db_table);
+            sql := format('select CONCAT("year", ncic_code, dept_case_num) as casenumber, * from %I.%I', schema_name, db_table);
         else
-            sql := sql || ' UNION ALL ' || format('select * from %I.%I', schema_name, db_table);
+            sql := sql || ' UNION ALL ' || format('select CONCAT("year", ncic_code, dept_case_num) as casenumber, * from %I.%I', schema_name, db_table);
         end if;
     end loop;
 
@@ -33,4 +34,4 @@ $func$;
 call nj.table_aggregation_union('crash'::text, 2017, 2022);
 call nj.table_aggregation_union('occupant'::text, 2017, 2022);
 call nj.table_aggregation_union('pedestrian'::text, 2017, 2022);
-call nj.table_aggregation_union('driver'::text, 2017, 2022);
+call nj.table_aggregation_union('vehicle'::text, 2017, 2022);
