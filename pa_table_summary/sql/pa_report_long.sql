@@ -6,7 +6,7 @@ create view pa.report_summary_long as
    COLLISION TYPE
    ========================================================= */
 select c.crn, 'collision_type' as domain, 'noncollision' as category, 1 as cnt
-from pa.all_crash c where c.collision_type = '0'
+from pa.all_crash c where c.collision_type = '0' or c.collision_type is null
 
 union all
 select c.crn, 'collision_type', 'rearend', 1
@@ -70,7 +70,7 @@ from pa.all_crash c where c.max_severity_level = '4'
 
 union all
 select c.crn, 'severity', 'injury_unknown', 1
-from pa.all_crash c where c.max_severity_level in ('8','9')
+from pa.all_crash c where c.max_severity_level in ('8','9') or c.max_severity_level is null
 
 
 /* =========================================================
@@ -103,7 +103,7 @@ where c.road_condition in ('03','04','05','06','22','98')
 
 union all
 select c.crn, 'road_condition', 'unknown', 1
-from pa.all_crash c where c.road_condition = '99'
+from pa.all_crash c where c.road_condition = '99' or c.road_condition is null
 
 
 /* =========================================================
@@ -136,7 +136,7 @@ where c.weather1 in ('01','02','06','08','09','98')
 
 union all
 select c.crn, 'weather', 'unknown', 1
-from pa.all_crash c where c.weather1 = '99'
+from pa.all_crash c where c.weather1 = '99' or c.weather1 is null
 
 
 /* =========================================================
@@ -160,7 +160,7 @@ from pa.all_crash c where c.illumination in ('4','5')
 
 union all
 select c.crn, 'illumination', 'other_unknown', 1
-from pa.all_crash c where c.illumination in ('6','8','9')
+from pa.all_crash c where c.illumination in ('6','8','9') or c.illumination is null
 
 
 /* =========================================================
@@ -231,7 +231,7 @@ group by v.crn
 
 union all
 select v.crn, 'vehicle', 'unknown', count(*)
-from pa.all_vehicle v where v.veh_type = '99'
+from pa.all_vehicle v where v.veh_type = '99' or v.veh_type is null
 group by v.crn
 
 
@@ -265,7 +265,7 @@ group by p.crn
 
 union all
 select p.crn, 'person_injury', 'injury_unknown', count(*)
-from pa.all_person p where p.inj_severity in ('8','9')
+from pa.all_person p where p.inj_severity in ('8','9') or p.inj_severity is null
 group by p.crn
 
 

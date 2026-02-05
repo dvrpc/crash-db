@@ -6,7 +6,7 @@ create view nj.report_summary_long as
    COLLISION TYPE
    ========================================================= */
 select c.casenumber, 'collision_type' as domain, 'unknown' as category, 1 as cnt
-from nj.all_crash c where c.crash_type = '00'
+from nj.all_crash c where c.crash_type = '00' or c.crash_type is null
 
 union all
 select c.casenumber, 'collision_type', 'same_direction_rearend', 1
@@ -99,7 +99,7 @@ from nj.all_crash c where c.severity = 'I'
    ========================================================= */
 union all
 select c.casenumber, 'road_condition', 'unknown', 1
-from nj.all_crash c where c.road_surface_condition = '00'
+from nj.all_crash c where c.road_surface_condition = '00' or c.road_surface_condition is null
 
 union all
 select c.casenumber, 'road_condition', 'dry', 1
@@ -127,7 +127,7 @@ from nj.all_crash c where c.road_surface_condition in ('05', '06', '07', '08', '
    ========================================================= */
 union all
 select c.casenumber, 'weather', 'unknown', 1
-from nj.all_crash c where c.environmental_condition = '00'
+from nj.all_crash c where c.environmental_condition = '00' or c.environmental_condition is null
 
 union all
 select c.casenumber, 'weather', 'clear', 1
@@ -152,7 +152,7 @@ from nj.all_crash c where c.environmental_condition in ('04', '05', '06', '07', 
    ========================================================= */
 union all
 select c.casenumber, 'illumination', 'unknown', 1
-from nj.all_crash c where c.light_condition = '00'
+from nj.all_crash c where c.light_condition = '00' or c.light_condition is null
 
 union all
 select c.casenumber, 'illumination', 'daylight', 1
@@ -207,7 +207,7 @@ from nj.all_crash c
    ========================================================= */
 union all
 select v.casenumber, 'vehicle', 'unknown', count(*)
-from nj.all_vehicle v where v.veh_type = '00'
+from nj.all_vehicle v where v.veh_type = '00' or v.veh_type is null
 group by v.casenumber
 
 union all
@@ -252,7 +252,7 @@ group by v.casenumber
    ========================================================= */
 union all
 select p.casenumber, 'person_injury', 'unknown', count(*)
-from nj.all_person p where p.physical_condition = '00'
+from nj.all_person p where p.physical_condition = '00' or p.physical_condition is null
 group by p.casenumber
 
 union all
