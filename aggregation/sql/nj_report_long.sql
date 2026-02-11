@@ -1,6 +1,6 @@
-drop view if exists nj.report_summary_long;
+drop  materialized view if exists nj.report_summary_long;
 
-create view nj.report_summary_long as
+create materialized view nj.report_summary_long as
 
 /* =========================================================
    COLLISION TYPE
@@ -142,7 +142,7 @@ select c.casenumber, "year" AS crash_year, 'weather', 'snow', 1
 from nj.all_crash c where c.environmental_condition = '03'
 
 union all
-select c.casenumber, "year" AS crash_year, 'weather', 'clear', 1
+select c.casenumber, "year" AS crash_year, 'weather', 'other', 1
 from nj.all_crash c where c.environmental_condition in ('04', '05', '06', '07', '08', '09', '10', '99')
 
 

@@ -1,6 +1,6 @@
-drop view if exists pa.report_summary_long;
+drop materialized view if exists pa.report_summary_long;
 
-create view pa.report_summary_long as
+create materialized view pa.report_summary_long as
 
 /* =========================================================
    COLLISION TYPE
