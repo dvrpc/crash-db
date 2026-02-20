@@ -45,13 +45,21 @@ where b.person_casenumber is null;
 ```  
 n = 6563  
 
-There are 6563 crash events that have no corresponding records in the Person table  
+There are 6563 crash vehicles/drivers that have no corresponding records in the Person table  
 
 ### Vehicles missing drivers  
 
 ```  
-select sum(a.vehicle_count) as total_vehicles, sum(a.driver_count) as total_drivers from
-(select casenumber, count(distinct(casenumber, veh_num)) as vehicle_count, count(distinct(casenumber, veh_num)) filter (where position_in_veh = '01') as driver_count from nj.all_person group by casenumber) as a; 
+select 
+
+    sum(a.vehicle_count) as total_vehicles,   
+    sum(a.driver_count) as total_drivers from  
+        (select 
+            casenumber,  
+            count(distinct(casenumber, veh_num)) as  vehicle_count,   
+            count(distinct(casenumber, veh_num)) filter (where position_in_veh = '01') as driver_count   
+        from nj.all_person group by casenumber) as a; 
+
 ```  
 **total_vehicles:** 439919  
 **total_drivers:** 425455  
