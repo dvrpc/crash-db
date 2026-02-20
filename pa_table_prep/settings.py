@@ -1,5 +1,6 @@
 import os
 import urllib.parse
+from sqlalchemy import create_engine
 from dotenv import find_dotenv, load_dotenv
 
 load_dotenv(find_dotenv())
