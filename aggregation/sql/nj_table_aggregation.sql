@@ -35,3 +35,4 @@ call nj.table_aggregation_union('crash'::text, 2017, 2022);
 call nj.table_aggregation_union('occupant'::text, 2017, 2022);
 call nj.table_aggregation_union('pedestrian'::text, 2017, 2022);
 call nj.table_aggregation_union('vehicle'::text, 2017, 2022);
+call nj.table_aggregation_union('driver'::text, 2017, 2022);
