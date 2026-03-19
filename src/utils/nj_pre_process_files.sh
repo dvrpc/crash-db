@@ -81,6 +81,14 @@ for file in $(ls data/nj/*.txt); do
   if ! sed -i 's;\r; ;g' "${file}" 2>/dev/null; then
     sed -i '' 's;\r; ;g' "${file}"
   fi
+
+	# Sometimes there are tabs in the columns, remove them.
+	# Example: Burlington2023Drivers.txt, lines 119 and 124, in the 13th column (summons1)
+
+  if ! sed -i 's;\t; ;g' "${file}" 2>/dev/null; then
+    sed -i '' 's;\t; ;g' "${file}"
+	fi
+
 done
 
 # Remove new lines that have been mistakenly entered into the middle of the line.
