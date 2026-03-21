@@ -20,11 +20,12 @@ begin
     -- rather than first letter of cardinal direction. Make it consistent with the others.
     -- codes are on p. 79 of 2017 Crash Report Manual and on NJTR_1 forms.
     execute format($q$update temp_pedestrian_%s set dir_of_travel = null where dir_of_travel not in ('01', '02', '03', '04')$q$, year);
-    execute format($q$update temp_vehicle_%s set dir_of_travel = null where dir_of_travel not in ('01', '02', '03', '04')$q$, year);
     execute format($q$update temp_pedestrian_%s set dir_of_travel = 'N' where dir_of_travel = '01'$q$, year);    
     execute format($q$update temp_pedestrian_%s set dir_of_travel = 'E' where dir_of_travel = '02'$q$, year);    
     execute format($q$update temp_pedestrian_%s set dir_of_travel = 'S' where dir_of_travel = '03'$q$, year);    
     execute format($q$update temp_pedestrian_%s set dir_of_travel = 'W' where dir_of_travel = '04'$q$, year);    
+    execute format($q$update temp_vehicle_%s set dir_of_travel = '03' where dir_of_travel in ('3 ', '3')$q$, year);
+    execute format($q$update temp_vehicle_%s set dir_of_travel = null where dir_of_travel not in ('01', '02', '03', '04')$q$, year);
     execute format($q$update temp_vehicle_%s set dir_of_travel = 'N' where dir_of_travel = '01'$q$, year);    
     execute format($q$update temp_vehicle_%s set dir_of_travel = 'E' where dir_of_travel = '02'$q$, year);    
     execute format($q$update temp_vehicle_%s set dir_of_travel = 'S' where dir_of_travel = '03'$q$, year);    
@@ -32,10 +33,81 @@ begin
     
     /* Year-specific. */
     if year = '2023' then
-        -- safety_equipment lookup: 10 and 11 are now reserved
-        -- execute format($q$update temp_occupant_%s set safety_equipment_used = null where safety_equipment_used in ('10', '11')$q$, year);
-        -- execute format($q$update temp_occupant_%s set safety_equipment_used = null where safety_equipment_available in ('10', '11')$q$, year);
-        -- execute format($q$update temp_pedestrian_%s set safety_equipment_used = null where safety_equipment_used in ('10', '11')$q$, year);
+        /* these are alphabetical by field name, then table */
+        -- execute format($q$update temp_<table>_%s set <field> = null where <field> = '98'$q$, year);
+        
+        execute format($q$update temp_occupant_%s set airbag_deployment = null where airbag_deployment = '98'$q$, year);
+
+        execute format($q$update temp_pedestrian_%s set contrib_circ1 = null where contrib_circ1 = '98'$q$, year);
+        execute format($q$update temp_pedestrian_%s set contrib_circ2 = null where contrib_circ2 = '98'$q$, year);
+
+        -- Some distance_to_cross_street values are floats or end with '.', trim them.
+        execute format($q$update temp_crash_%s set distance_to_cross_street = rtrim(distance_to_cross_street, '.1234567890')$q$, year);
+
+        execute format($q$update temp_crash_%s set environmental_condition = null where environmental_condition = '98'$q$, year);
+        execute format($q$update temp_crash_%s set environmental_condition = '01' where environmental_condition = '1'$q$, year);
+
+        execute format($q$update temp_occupant_%s set ejection = null where ejection in ('10', '98')$q$, year);
+
+        execute format($q$update temp_crash_%s set first_harmful_event = null where first_harmful_event = '98'$q$, year);
+
+        execute format($q$update temp_crash_%s set light_condition = null where light_condition = '98'$q$, year);
+
+        execute format($q$update temp_occupant_%s set location_of_most_severe_injury = null where location_of_most_severe_injury = '98'$q$, year);
+        execute format($q$update temp_pedestrian_%s set location_of_most_severe_injury = null where location_of_most_severe_injury = '98'$q$, year);
+
+        execute format($q$update temp_crash_%s set milepost = '25.90' where milepost = '2590.00'$q$, year);
+
+        -- These do not appear to be valid ncic codes or are out of the four-county area.
+        -- <https://dot.nj.gov/transportation/refdata/accident/pdf/CountyMunicipalCodes1-13-17.pdf>
+        -- <https://www.nj.gov/treasury/taxation/pdf/lpt/cntycode.pdf>
+        execute format($q$delete from temp_crash_%s where ncic_code in ('0800', '0826', '1216')$q$, year);
+        execute format($q$delete from temp_occupant_%s where ncic_code in ('0800', '0826', '1216')$q$, year);
+
+        -- "O" (oh) is no apparent injury, 05
+        execute format($q$update temp_occupant_%s set physical_condition = '05' where physical_condition = 'O'$q$, year);
+
+        execute format($q$update temp_occupant_%s set physical_condition = null where physical_condition in ('06', '98')$q$, year);
+
+        execute format($q$update temp_pedestrian_%s set physical_condition = null where physical_condition in ('98')$q$, year);
+
+        execute format($q$update temp_pedestrian_%s set physical_status1 = null where physical_status1 = '98'$q$, year);
+        execute format($q$update temp_pedestrian_%s set physical_status2 = null where physical_status2 = '98'$q$, year);
+
+        execute format($q$update temp_occupant_%s set position_in_veh = null where position_in_veh = '98'$q$, year);
+
+        execute format($q$update temp_occupant_%s set refused_med_attn = '01' where refused_med_attn = '1'$q$, year);
+        execute format($q$update temp_occupant_%s set refused_med_attn = '02' where refused_med_attn = '2'$q$, year);
+        execute format($q$update temp_pedestrian_%s set refused_med_attn = '01' where refused_med_attn = '1'$q$, year);
+        execute format($q$update temp_pedestrian_%s set refused_med_attn = '02' where refused_med_attn = '2'$q$, year);
+
+        execute format($q$update temp_crash_%s set road_divided_by = null where road_divided_by = '98'$q$, year);
+
+        execute format($q$update temp_crash_%s set road_grade = null where road_grade = '98'$q$, year);
+
+        execute format($q$update temp_crash_%s set road_horizontal_alignment = null where road_horizontal_alignment = '98'$q$, year);
+
+        execute format($q$update temp_crash_%s set road_surface_condition = '01' where road_surface_condition = '1'$q$, year);
+        execute format($q$update temp_crash_%s set road_surface_condition = null where road_surface_condition = '98'$q$, year);
+
+        execute format($q$update temp_crash_%s set road_surface_type = '02' where road_surface_type = '2'$q$, year);
+        execute format($q$update temp_crash_%s set road_surface_type = null where road_surface_type = '98'$q$, year);
+
+        execute format($q$update temp_crash_%s set road_system = null where road_system = '0'$q$, year);
+
+        -- safety_equipment lookup: 10 and 11 are now reserved; 98 undocumented
+        execute format($q$update temp_occupant_%s set safety_equipment_available = null where safety_equipment_available in ('10', '11', '98')$q$, year);
+        execute format($q$update temp_occupant_%s set safety_equipment_used = null where safety_equipment_used in ('10', '11', '98')$q$, year);
+        execute format($q$update temp_pedestrian_%s set safety_equipment_used = null where safety_equipment_used in ('10', '11', '98')$q$, year);
+
+        execute format($q$update temp_pedestrian_%s set traffic_controls = null where traffic_controls = '98'$q$, year);
+
+        execute format($q$update temp_crash_%s set temp_traffic_control_zone = null where temp_traffic_control_zone = '98'$q$, year);
+
+        execute format($q$update temp_occupant_%s set type_of_most_severe_injury = null where type_of_most_severe_injury = '98'$q$, year);
+        execute format($q$update temp_pedestrian_%s set type_of_most_severe_injury = null where type_of_most_severe_injury = '98'$q$, year);
+
+        execute format($q$update temp_crash_%s set unit_of_measure = 'FE' where unit_of_measure = 'FT'$q$, year);
     elseif year = '2022' then
         execute format($q$update temp_occupant_%s set airbag_deployment = null where airbag_deployment in ('05', '06')$q$, year);
     elseif year = '2017' then

@@ -163,7 +163,7 @@ begin
             ('4', 'Towed Impounded'),
             ('5', 'Towed Disabled & Impounded')$q1$, lookup_schema);
 
-        -- 2017 Crash Report Manual, p. 51.
+        -- 2023 Crash Report Manual, p. 53.
         execute format($q1$ insert into %I.ejection (code, description) values
             ('00', 'Unknown'),
             ('01', 'Not Ejected'),
@@ -238,7 +238,9 @@ begin
         two digits are the municipality. Because the municipality code starts at 01 for each county,
         they have to be used together, and so they are combined into one field in our db rather
         than two.
-        NJ available at <https://dot.nj.gov/transportation/refdata/accident/pdf/CountyMunicipalCodes1-13-17.pdf>
+        NJ available at
+            - <https://dot.nj.gov/transportation/refdata/accident/pdf/CountyMunicipalCodes1-13-17.pdf>
+            - <https://www.nj.gov/treasury/taxation/pdf/lpt/cntycode.pdf>
         */
         execute format($q1$ insert into %I.ncic (code, description) values
             -- 03 is Burlington County
@@ -613,7 +615,7 @@ begin
             ('69', 'Other Fixed Object'),
             ('99', 'Other')$q1$, lookup_schema);
 
-        -- 2017 Crash Report Manual, pp 52-3.
+        -- 2023 Crash Report Manual, pp 53-55.
         -- NJTR-1 form, Box 86
         execute format($q1$ insert into %I.physical_condition (code, description) values
             ('00', 'Unknown'),
