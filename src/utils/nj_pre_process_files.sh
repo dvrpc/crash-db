@@ -93,6 +93,20 @@ for file in $(ls "${NJ_DATA_DIR}"/*.txt); do
     sed -i '' 's;\t; ;g' "${file}"
 	fi
 
+  # Replace ï¿½ with a
+  # single space to preserve fixed-width field alignment.
+  if ! sed -i 's/ï¿½/ /g' "${file}" 2>/dev/null; then
+    sed -i '' 's/ï¿½/ /g' "${file}"
+  fi
+
+  # Strip leading zeros from veh_num field (positions 33-34) in Drivers files.
+  # Some 2023 data uses '01', '02' instead of ' 1', ' 2', causing duplicate key collisions
+  # when the integer type conversion makes them equal during COPY to the final table.
+  if [[ "${file}" == *Drivers* ]]; then
+    if ! sed -i 's/^\(.\{32\}\)0\([0-9]\)/\1 \2/' "${file}" 2>/dev/null; then
+      sed -i '' 's/^\(.\{32\}\)0\([0-9]\)/\1 \2/' "${file}"
+    fi
+  fi
 
 done
 

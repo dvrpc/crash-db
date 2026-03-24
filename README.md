@@ -6,10 +6,8 @@
     - [System Dependencies](#system-dependencies)
     - [User Permissions](#user-permissions)
   - [Setup Process](#setup-process)
-    - [Phase 1: Download Data](#phase-1-download-data)
-    - [Phase 2: Import and Process Data](#phase-2-import-and-process-data)
-    - [Additional Options](#additional-options)
-    - [Important Considerations](#important-considerations)
+    - [Quick Start](#quick-start)
+    - [Other Options](#other-options)
   - [Data](#data)
     - [PennDOT](#penndot)
       - [2024-version data issues and questions](#2024-version-data-issues-and-questions)
@@ -73,18 +71,7 @@ postgres_data_dir="/var/lib/postgresql/data"
 
 The setup process can be done in one step or split into separate download and import steps.
 
-### Data Flow
-
-The script manages data in two locations:
-
-1. **Download location**: `data/pa/` or `data/nj/` in the repository
-
-2. **Processing/Import location**: `user_data_dir` (default: `/tmp/crash-data`)
-   - Files are copied here from download location
-   - NJ files are preprocessed here (encoding conversion, backslash escaping, etc.)
-   - PostgreSQL imports data from here
-
-### Quick Start (Recommended)
+### Quick Start
 For most users, a simple one-command setup:
 
 ```bash
@@ -122,6 +109,17 @@ If you prefer to download first, then import, or by individual state:
 - **Data Years**: Ensure year ranges in `.env` are within available bounds (PA: 2005+, NJ: 2006+)
 
 ## Data
+
+### Script Data Flow
+
+The script manages data in two locations:
+
+1. **Download location**: `data/pa/` or `data/nj/` in the repository
+
+2. **Processing/Import location**: `user_data_dir` (default: `/tmp/crash-data`)
+   - Files are copied here from download location
+   - NJ files are preprocessed here (encoding conversion, backslash escaping, etc.)
+   - PostgreSQL imports data from here
 
 NOTE: Where lookup tables contain reserved codes/values, they are included in the sql scripts that create them but commented out, and thus not included in the database. If those codes/values are subsequently used in the data tables, they are changed to NULL values.
 

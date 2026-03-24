@@ -88,7 +88,9 @@ begin
         -- <https://dot.nj.gov/transportation/refdata/accident/pdf/CountyMunicipalCodes1-13-17.pdf>
         -- <https://www.nj.gov/treasury/taxation/pdf/lpt/cntycode.pdf>
         execute format($q$delete from temp_crash_%s where ncic_code in ('0800', '0826', '1216')$q$, year);
+        execute format($q$delete from temp_driver_%s where ncic_code in ('0800', '0826', '1216')$q$, year);
         execute format($q$delete from temp_occupant_%s where ncic_code in ('0800', '0826', '1216')$q$, year);
+        execute format($q$delete from temp_pedestrian_%s where ncic_code in ('0800', '0826', '1216')$q$, year);
         execute format($q$delete from temp_vehicle_%s where ncic_code in ('0800', '0826', '1216')$q$, year);
 
         -- "O" (oh) is no apparent injury, 05
@@ -119,6 +121,8 @@ begin
         execute format($q$update temp_vehicle_%s set veh_color = 'TN' where veh_color in ('Ta', 'TA')$q$, year);
         execute format($q$update temp_vehicle_%s set veh_color = 'WT' where veh_color in ('Wh', 'WH')$q$, year);
         execute format($q$update temp_vehicle_%s set veh_color = 'YL' where veh_color in ('YE', 'YW')$q$, year);
+
+        execute format($q$update temp_driver_%s set alcohol_test_type = null where alcohol_test_type = '?'$q$, year);
 
         -- drop V from v1,v2,v3
         execute format($q$update temp_driver_%s set veh_num = '1' where veh_num = 'V1'$q$, year);
