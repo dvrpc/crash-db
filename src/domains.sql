@@ -113,7 +113,7 @@ begin
             raise notice '%', SQLSTATE;
     end;
 
-    -- found '98', '0' '3 ' in 2023 data
+    -- found '98', '0' '3 ' in 2023 NJ data
     begin
         create domain text_direction1 text check(value in ('00', '01', '02', '03', '04', '0', '0 ', '98', '3 ', '3', 'N', 'E', 'S', 'W'));
     exception

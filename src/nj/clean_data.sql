@@ -3,15 +3,16 @@ language plpgsql
 as
 $body$
 declare
-    col_name text;
-    col_name2 text;
-    tbl_schema text;
+    db_tables text[] = '{crash, driver, occupant, pedestrian, vehicle}';
     tbl_name text;
     tbl_name2 text;
+    col_name text;
+    col_name2 text;
     cons_name text;
+    -- It's possible these lookup tables that contain zero-padded values could change between
+    -- each year of data, so define it within each year's section.
+    zeropadded text[]; 
 begin
-
-    raise info '..Fix miscellaneous issues';
 
     -- Cleaning that applies to all years comes first; below that is year-specific cleaning.
     /* All years. */
@@ -33,28 +34,53 @@ begin
     
     /* Year-specific. */
     if year = '2023' then
+
         /* these are alphabetical by field name, then table */
         -- execute format($q$update temp_<table>_%s set <field> = null where <field> = '98'$q$, year);
-        
-        execute format($q$update temp_occupant_%s set airbag_deployment = null where airbag_deployment = '98'$q$, year);
 
-        execute format($q$update temp_pedestrian_%s set contrib_circ1 = null where contrib_circ1 = '98'$q$, year);
-        execute format($q$update temp_pedestrian_%s set contrib_circ2 = null where contrib_circ2 = '98'$q$, year);
+        -- '98' is a value in many columns, but is undocumented. Probably used for unknown. (99 is sometimes Other.)
+        foreach tbl_name in array db_tables loop
+        	for col_name in select column_name from information_schema.columns where table_name = 'temp_' || tbl_name || '_' || year loop
+                if col_name not in ('veh_num', 'occupant_num', 'pedestrian_num') then
+                    execute format($q$update temp_%s_%s set %s = null where %s = '98'$q$, tbl_name, year, col_name, col_name);
+                end if;
+            end loop;
+        end loop;
+
+    
+        -- Add zero padding for columns using it.'
+        raise info '..Zeropad lookup values requiring it';
+        zeropadded = '{airbag_deployment, cargo_body_type, contrib_circ, crash_type, ejection, environmental_condition, extent_of_damage, light_condition, location_of_most_severe_injury, oversized_overweight_permit, position_in_veh, police_dept, pre_crash_action, refused_med_attn, road_divided_by, road_grade, road_horizontal_alignment, road_surface_condition, road_surface_type, road_system, route_suffix, safety_equipment, sequence_of_events, physical_condition, physical_status, special_function_vehicles, temp_traffic_control_zone, traffic_controls, type_of_most_severe_injury, veh_impact_area, veh_type, veh_use}';
+
+        -- Get the lookup tables that use zero padding in their values.
+        foreach tbl_name in array zeropadded loop
+            -- Use the table name to get name of the foreign key constraints referencing it.
+            -- raise info '%s', tbl_name;
+            for cons_name in
+                select constraint_name
+                from information_schema.constraint_column_usage
+                where constraint_schema = 'nj_' || year
+                    and table_schema = 'nj_' || year || '_lookup'
+                    and table_name = tbl_name
+            loop
+                -- Use the constraint name to get the table/column it is used in.
+                for tbl_name2, col_name2 in
+                    select table_name, column_name
+                        from information_schema.key_column_usage
+                        where constraint_name = cons_name and constraint_schema = 'nj_' || year
+                loop
+                    execute format($q$update temp_%I_%s set %I = lpad(%I, 2, '0')$q$, tbl_name2, year, col_name2, col_name2);
+                end loop;
+            end loop;
+        end loop;
 
         -- Some distance_to_cross_street values are floats or end with '.', trim them.
         execute format($q$update temp_crash_%s set distance_to_cross_street = rtrim(distance_to_cross_street, '.1234567890')$q$, year);
 
-        execute format($q$update temp_crash_%s set environmental_condition = null where environmental_condition = '98'$q$, year);
-        execute format($q$update temp_crash_%s set environmental_condition = '01' where environmental_condition = '1'$q$, year);
 
-        execute format($q$update temp_occupant_%s set ejection = null where ejection in ('10', '98')$q$, year);
+        execute format($q$update temp_occupant_%s set ejection = null where ejection = '10'$q$, year);
 
-        execute format($q$update temp_crash_%s set first_harmful_event = null where first_harmful_event = '98'$q$, year);
-
-        execute format($q$update temp_crash_%s set light_condition = null where light_condition = '98'$q$, year);
-
-        execute format($q$update temp_occupant_%s set location_of_most_severe_injury = null where location_of_most_severe_injury = '98'$q$, year);
-        execute format($q$update temp_pedestrian_%s set location_of_most_severe_injury = null where location_of_most_severe_injury = '98'$q$, year);
+        execute format($q$update temp_vehicle_%s set initial_impact_location = null where initial_impact_location = '16'$q$, year);
 
         execute format($q$update temp_crash_%s set milepost = '25.90' where milepost = '2590.00'$q$, year);
 
@@ -63,51 +89,48 @@ begin
         -- <https://www.nj.gov/treasury/taxation/pdf/lpt/cntycode.pdf>
         execute format($q$delete from temp_crash_%s where ncic_code in ('0800', '0826', '1216')$q$, year);
         execute format($q$delete from temp_occupant_%s where ncic_code in ('0800', '0826', '1216')$q$, year);
+        execute format($q$delete from temp_vehicle_%s where ncic_code in ('0800', '0826', '1216')$q$, year);
 
         -- "O" (oh) is no apparent injury, 05
         execute format($q$update temp_occupant_%s set physical_condition = '05' where physical_condition = 'O'$q$, year);
 
-        execute format($q$update temp_occupant_%s set physical_condition = null where physical_condition in ('06', '98')$q$, year);
+        execute format($q$update temp_occupant_%s set physical_condition = '00' where physical_condition = '0O'$q$, year);
+        execute format($q$update temp_occupant_%s set physical_condition = null where physical_condition = '06'$q$, year);
 
-        execute format($q$update temp_pedestrian_%s set physical_condition = null where physical_condition in ('98')$q$, year);
-
-        execute format($q$update temp_pedestrian_%s set physical_status1 = null where physical_status1 = '98'$q$, year);
-        execute format($q$update temp_pedestrian_%s set physical_status2 = null where physical_status2 = '98'$q$, year);
-
-        execute format($q$update temp_occupant_%s set position_in_veh = null where position_in_veh = '98'$q$, year);
-
-        execute format($q$update temp_occupant_%s set refused_med_attn = '01' where refused_med_attn = '1'$q$, year);
-        execute format($q$update temp_occupant_%s set refused_med_attn = '02' where refused_med_attn = '2'$q$, year);
-        execute format($q$update temp_pedestrian_%s set refused_med_attn = '01' where refused_med_attn = '1'$q$, year);
-        execute format($q$update temp_pedestrian_%s set refused_med_attn = '02' where refused_med_attn = '2'$q$, year);
-
-        execute format($q$update temp_crash_%s set road_divided_by = null where road_divided_by = '98'$q$, year);
-
-        execute format($q$update temp_crash_%s set road_grade = null where road_grade = '98'$q$, year);
-
-        execute format($q$update temp_crash_%s set road_horizontal_alignment = null where road_horizontal_alignment = '98'$q$, year);
-
-        execute format($q$update temp_crash_%s set road_surface_condition = '01' where road_surface_condition = '1'$q$, year);
-        execute format($q$update temp_crash_%s set road_surface_condition = null where road_surface_condition = '98'$q$, year);
-
-        execute format($q$update temp_crash_%s set road_surface_type = '02' where road_surface_type = '2'$q$, year);
-        execute format($q$update temp_crash_%s set road_surface_type = null where road_surface_type = '98'$q$, year);
+        execute format($q$update temp_vehicle_%s set principle_damage_location = null where principle_damage_location = '16'$q$, year);
 
         execute format($q$update temp_crash_%s set road_system = null where road_system = '0'$q$, year);
 
         -- safety_equipment lookup: 10 and 11 are now reserved; 98 undocumented
-        execute format($q$update temp_occupant_%s set safety_equipment_available = null where safety_equipment_available in ('10', '11', '98')$q$, year);
-        execute format($q$update temp_occupant_%s set safety_equipment_used = null where safety_equipment_used in ('10', '11', '98')$q$, year);
-        execute format($q$update temp_pedestrian_%s set safety_equipment_used = null where safety_equipment_used in ('10', '11', '98')$q$, year);
+        execute format($q$update temp_occupant_%s set safety_equipment_available = null where safety_equipment_available in ('10', '11')$q$, year);
+        execute format($q$update temp_occupant_%s set safety_equipment_used = null where safety_equipment_used in ('10', '11')$q$, year);
+        execute format($q$update temp_pedestrian_%s set safety_equipment_used = null where safety_equipment_used in ('10', '11')$q$, year);
 
-        execute format($q$update temp_pedestrian_%s set traffic_controls = null where traffic_controls = '98'$q$, year);
-
-        execute format($q$update temp_crash_%s set temp_traffic_control_zone = null where temp_traffic_control_zone = '98'$q$, year);
-
-        execute format($q$update temp_occupant_%s set type_of_most_severe_injury = null where type_of_most_severe_injury = '98'$q$, year);
-        execute format($q$update temp_pedestrian_%s set type_of_most_severe_injury = null where type_of_most_severe_injury = '98'$q$, year);
+        execute format($q$update temp_vehicle_%s set special_function_vehicles = null where special_function_vehicles in ('89', '1F')$q$, year);
 
         execute format($q$update temp_crash_%s set unit_of_measure = 'FE' where unit_of_measure = 'FT'$q$, year);
+
+        execute format($q$update temp_vehicle_%s set veh_color = null where veh_color in ('99', 'AD', 'B/', 'Be', 'BE', 'Bl', 'BU', 'BZ', 'CA', 'CR', 'DB', 'DG', 'F', 'GL', 'Go', 'GO', 'GR', 'Gr', 'gr', 'LA', 'LB', 'LG', 'MA', 'Mr', 'MU', '.O', 'PN', 'TE', 'TP', 'UK', 'uk', 'un', 'Un')$q$, year);
+        execute format($q$update temp_vehicle_%s set veh_color = 'BG' where veh_color = 'Bg'$q$, year);
+        execute format($q$update temp_vehicle_%s set veh_color = 'BN' where veh_color in ('Br', 'BR')$q$, year);
+        execute format($q$update temp_vehicle_%s set veh_color = 'OG' where veh_color in ('OR', 'ON', 'Sl')$q$, year);
+        execute format($q$update temp_vehicle_%s set veh_color = 'RD' where veh_color in ('Re', 'RE', 'Sl')$q$, year);
+        execute format($q$update temp_vehicle_%s set veh_color = 'SL' where veh_color in ('Si', 'SI', 'Sl')$q$, year);
+        execute format($q$update temp_vehicle_%s set veh_color = 'TN' where veh_color in ('Ta', 'TA')$q$, year);
+        execute format($q$update temp_vehicle_%s set veh_color = 'WT' where veh_color in ('Wh', 'WH')$q$, year);
+        execute format($q$update temp_vehicle_%s set veh_color = 'YL' where veh_color in ('YE', 'YW')$q$, year);
+
+        -- drop V from v1,v2,v3
+        execute format($q$update temp_driver_%s set veh_num = '1' where veh_num = 'V1'$q$, year);
+        execute format($q$update temp_driver_%s set veh_num = '2' where veh_num = 'V2'$q$, year);
+        execute format($q$update temp_driver_%s set veh_num = '3' where veh_num = 'V3'$q$, year);
+        execute format($q$update temp_occupant_%s set veh_num = '1' where veh_num = 'V1'$q$, year);
+        execute format($q$update temp_occupant_%s set veh_num = '2' where veh_num = 'V2'$q$, year);
+        execute format($q$update temp_occupant_%s set veh_num = '3' where veh_num = 'V3'$q$, year);
+        execute format($q$update temp_vehicle_%s set veh_num = '1' where veh_num = 'V1'$q$, year);
+        execute format($q$update temp_vehicle_%s set veh_num = '2' where veh_num = 'V2'$q$, year);
+        execute format($q$update temp_vehicle_%s set veh_num = '3' where veh_num = 'V3'$q$, year);
+        
     elseif year = '2022' then
         execute format($q$update temp_occupant_%s set airbag_deployment = null where airbag_deployment in ('05', '06')$q$, year);
     elseif year = '2017' then

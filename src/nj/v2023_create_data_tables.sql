@@ -169,7 +169,7 @@ begin
         year text_year,
         ncic_code text references %2$s.ncic (code),
         dept_case_num text,
-        veh_num integer,
+        veh_num text,
         insurance_co_code text,
         owner_state text,
         veh_make text,

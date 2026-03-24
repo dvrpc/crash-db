@@ -11,6 +11,6 @@ begin
     -- execute format($q$alter table temp_vehicle_%s alter dir_of_travel type text_00_04_direction using dir_of_travel::text_00_04_direction$q$, year);
     execute format($q$alter table temp_pedestrian_%s alter dir_of_travel type text_direction1 using dir_of_travel::text_direction1$q$, year);
     execute format($q$alter table temp_vehicle_%s alter dir_of_travel type text_direction1 using dir_of_travel::text_direction1$q$, year);
-    
+
 end;
 $body$
