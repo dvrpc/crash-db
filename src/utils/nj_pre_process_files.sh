@@ -82,8 +82,18 @@ for file in $(ls "${NJ_DATA_DIR}"/*.txt); do
 
   # Replace any stray carriage returns with a space, as otherwise they add a break mid-line,
   # breaking spec.
-  tmpfile=$(mktemp /tmp/nj_preprocess.XXXXXX)
-  sed 's;\r; ;g' "${file}" > "${tmpfile}" && mv "${tmpfile}" "${file}"
+  if ! sed -i 's;\r; ;g' "${file}" 2>/dev/null; then
+    sed -i '' 's;\r; ;g' "${file}"
+  fi
+
+	# Sometimes there are tabs in the columns, remove them.
+	# Example: Burlington2023Drivers.txt, lines 119 and 124, in the 13th column (summons1)
+
+  if ! sed -i 's;\t; ;g' "${file}" 2>/dev/null; then
+    sed -i '' 's;\t; ;g' "${file}"
+	fi
+
+
 done
 
 # Remove new lines that have been mistakenly entered into the middle of the line.

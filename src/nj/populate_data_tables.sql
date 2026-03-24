@@ -63,14 +63,21 @@ begin
     raise info '.Alter domains';
     call nj_alter_temp_domains(year);
 
-    /* NOTE: The Drivers and Pedestrians tables in the 2021 and 2022 files do no match the 
-    file specification: DOB has length of 0 rather than 10, so there is a condition for those
-    tables to check the year and handle appropriately.
-    */
     raise info '.Parse columns from spec & insert into second set of temporary tables';
     foreach db_table in array db_tables loop
         for line in execute format($q1$select one_column from temp_%s_%s_one_column$q1$, db_table, year) loop
-            call insert_data(year, db_table, line);
+            begin
+                call insert_data(year, db_table, line);
+            exception
+                when not_null_violation then
+                    -- raise info 'not null violation occurred, this record will not be inserted into the % table:', db_table;
+                    -- raise info '%', quote_nullable(line);
+                    null;
+                when unique_violation then
+                    raise notice 'unique violation (duplicate primary key, likely) occurred, this record will not be inserted into the % table:', db_table;
+                    raise notice '%', quote_nullable(line);
+                    null;
+            end;
         end loop;
     end loop;
 
@@ -86,7 +93,17 @@ begin
     -- Copy the data from the temp tables into the non-temp tables, by exporting to file and then reimporting. Easiest way to go from text types in temp tables to types in non-temp tables.
     foreach db_table in array db_tables loop
         execute format($q$copy temp_%I_%s to '%s/%I.csv' with (format csv, header)$q$, db_table, year, postgres_data_dir, db_table);
-        execute format($q$copy nj_%s.%I from '%s/%I.csv' with (format csv, header, force_null *)$q$, year, db_table, postgres_data_dir, db_table); 
+        
+        begin
+            execute format($q$copy nj_%s.%I from '%s/%I.csv' with (format csv, header, force_null *)$q$, year, db_table, postgres_data_dir, db_table); 
+        exception
+            when unique_violation then
+                raise info 'unique violation (duplicate primary key, likely) occurred, record not inserted into % table.', db_table;
+                null;
+            when others then
+                raise info 'other error: %s', SQLSTATE;
+                null;
+        end;
     end loop;
 end;
 $body$
