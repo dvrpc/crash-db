@@ -48,35 +48,10 @@ begin
         end loop;
 
     
-        -- Add zero padding for columns using it.'
-        raise info '..Zeropad lookup values requiring it';
-        zeropadded = '{airbag_deployment, cargo_body_type, contrib_circ, crash_type, ejection, environmental_condition, extent_of_damage, light_condition, location_of_most_severe_injury, oversized_overweight_permit, position_in_veh, police_dept, pre_crash_action, refused_med_attn, road_divided_by, road_grade, road_horizontal_alignment, road_surface_condition, road_surface_type, road_system, route_suffix, safety_equipment, sequence_of_events, physical_condition, physical_status, special_function_vehicles, temp_traffic_control_zone, traffic_controls, type_of_most_severe_injury, veh_impact_area, veh_type, veh_use}';
-
-        -- Get the lookup tables that use zero padding in their values.
-        foreach tbl_name in array zeropadded loop
-            -- Use the table name to get name of the foreign key constraints referencing it.
-            -- raise info '%s', tbl_name;
-            for cons_name in
-                select constraint_name
-                from information_schema.constraint_column_usage
-                where constraint_schema = 'nj_' || year
-                    and table_schema = 'nj_' || year || '_lookup'
-                    and table_name = tbl_name
-            loop
-                -- Use the constraint name to get the table/column it is used in.
-                for tbl_name2, col_name2 in
-                    select table_name, column_name
-                        from information_schema.key_column_usage
-                        where constraint_name = cons_name and constraint_schema = 'nj_' || year
-                loop
-                    execute format($q$update temp_%I_%s set %I = lpad(%I, 2, '0')$q$, tbl_name2, year, col_name2, col_name2);
-                end loop;
-            end loop;
-        end loop;
+        execute format($q$update temp_driver_%s set alcohol_test_type = null where alcohol_test_type = '?'$q$, year);
 
         -- Some distance_to_cross_street values are floats or end with '.', trim them.
         execute format($q$update temp_crash_%s set distance_to_cross_street = rtrim(distance_to_cross_street, '.1234567890')$q$, year);
-
 
         execute format($q$update temp_occupant_%s set ejection = null where ejection = '10'$q$, year);
 
@@ -88,7 +63,9 @@ begin
         -- <https://dot.nj.gov/transportation/refdata/accident/pdf/CountyMunicipalCodes1-13-17.pdf>
         -- <https://www.nj.gov/treasury/taxation/pdf/lpt/cntycode.pdf>
         execute format($q$delete from temp_crash_%s where ncic_code in ('0800', '0826', '1216')$q$, year);
+        execute format($q$delete from temp_driver_%s where ncic_code in ('0800', '0826', '1216')$q$, year);
         execute format($q$delete from temp_occupant_%s where ncic_code in ('0800', '0826', '1216')$q$, year);
+        execute format($q$delete from temp_pedestrian_%s where ncic_code in ('0800', '0826', '1216')$q$, year);
         execute format($q$delete from temp_vehicle_%s where ncic_code in ('0800', '0826', '1216')$q$, year);
 
         -- "O" (oh) is no apparent injury, 05
@@ -96,6 +73,7 @@ begin
 
         execute format($q$update temp_occupant_%s set physical_condition = '00' where physical_condition = '0O'$q$, year);
         execute format($q$update temp_occupant_%s set physical_condition = null where physical_condition = '06'$q$, year);
+
 
         execute format($q$update temp_vehicle_%s set principle_damage_location = null where principle_damage_location = '16'$q$, year);
 
@@ -130,6 +108,31 @@ begin
         execute format($q$update temp_vehicle_%s set veh_num = '1' where veh_num = 'V1'$q$, year);
         execute format($q$update temp_vehicle_%s set veh_num = '2' where veh_num = 'V2'$q$, year);
         execute format($q$update temp_vehicle_%s set veh_num = '3' where veh_num = 'V3'$q$, year);
+
+        -- Add zero padding for columns using it.
+        raise info '..Zeropad lookup values requiring it';
+        zeropadded = '{airbag_deployment, cargo_body_type, contrib_circ, crash_type, ejection, environmental_condition, extent_of_damage, light_condition, location_of_most_severe_injury, oversized_overweight_permit, position_in_veh, police_dept, pre_crash_action, refused_med_attn, road_divided_by, road_grade, road_horizontal_alignment, road_surface_condition, road_surface_type, road_system, route_suffix, safety_equipment, sequence_of_events, physical_condition, physical_status, special_function_vehicles, temp_traffic_control_zone, traffic_controls, type_of_most_severe_injury, veh_impact_area, veh_type, veh_use}'; 
+
+        foreach tbl_name in array zeropadded loop
+            -- Use the table name to get name of the foreign key constraints referencing it.
+            for cons_name in
+                select constraint_name
+                from information_schema.constraint_column_usage
+                where constraint_schema = 'nj_' || year
+                    and table_schema = 'nj_' || year || '_lookup'
+                    and table_name = tbl_name
+            loop
+                -- Use the constraint name to get the table/column it is used in.
+                for tbl_name2, col_name2 in
+                    select table_name, column_name
+                        from information_schema.key_column_usage
+                        where constraint_name = cons_name and constraint_schema = 'nj_' || year
+                loop
+                    execute format($q$update temp_%I_%s set %s = lpad(%I, 2, '0') where %s is not null$q$, tbl_name2, year, col_name2, col_name2, col_name2);
+                end loop;
+            end loop;
+        end loop;
+
         
     elseif year = '2022' then
         execute format($q$update temp_occupant_%s set airbag_deployment = null where airbag_deployment in ('05', '06')$q$, year);

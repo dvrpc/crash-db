@@ -37,6 +37,15 @@ remove_newlines() {
 # Unzip all the downloaded files, overwriting any existing .txt files.
 unzip -o data/nj/\*.zip -d data/nj/
 
+# Replace bad characters with a space, so they don't get expanded into multiple characters that
+# we later have to remove.
+for file in $(ls data/nj/*.txt); do
+  # Try GNU sed first, fallback to BSD
+  if ! sed -i 's/�/ /' "${file}" 2>/dev/null; then
+    sed -i '' 's/�/ /' "${file}"
+  fi
+done
+
 # Convert encoding from win1252/cp1252 to UTF8 and write to new file.
 # (Postgres's `COPY`, even using the `encoding 'WIN1252'` option, was not able to decipher the
 # encoding from the original files correctly and would add odd symbols, replacing one character

@@ -498,7 +498,7 @@ begin
                 nullif(trim(substring(%3$s from 1 for 4)), ''),    -- year
                 nullif(trim(substring(%3$s from 5 for 4)), ''),    -- ncic (county & muni) code
                 nullif(trim(substring(%3$s from 9 for 23)), ''),   -- dept case no
-                nullif(trim(substring(%3$s from 33 for 2)), ''),   -- veh num
+                nullif(ltrim(trim(substring(%3$s from 33 for 2)), '0'), ''),   -- veh num
                 nullif(trim(substring(%3$s from 36 for 25)), ''),  -- driver city
                 nullif(trim(substring(%3$s from 62 for 2)), ''),   -- driver state
                 nullif(trim(substring(%3$s from 65 for 5)), ''),   -- driver zip code
