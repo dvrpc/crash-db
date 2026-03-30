@@ -1,4 +1,4 @@
-drop view if exists nj.all_person;
+drop view if exists nj.all_person cascade;
 create view nj.all_person as
 with occupant as (
 	select casenumber,
@@ -18,7 +18,9 @@ with occupant as (
 	false as is_bicycle,
 	false as is_other,
 	true as occupant, 
-	false as pedestrian
+	false as pedestrian,
+	null as contrib_circ1,
+	null as contrib_circ2
 	from nj.all_occupant),
 pedestrian as (
 	select casenumber,
@@ -38,7 +40,9 @@ pedestrian as (
 	is_bicycle,
 	is_other,
 	false as occupant, 
-	true as pedestrian 
+	true as pedestrian,
+	contrib_circ1,
+	contrib_circ2
 	from nj.all_pedestrian) 
 
 
