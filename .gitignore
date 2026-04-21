@@ -4,3 +4,5 @@
 /data
 /NJ_Roads_shp
 .env
+venv
+__pycache__
