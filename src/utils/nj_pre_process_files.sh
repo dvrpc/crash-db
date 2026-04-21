@@ -37,6 +37,15 @@ remove_newlines() {
 # Unzip all the downloaded files, overwriting any existing .txt files.
 unzip -o data/nj/\*.zip -d data/nj/
 
+# Replace bad characters with a space, so they don't get expanded into multiple characters that
+# we later have to remove.
+for file in $(ls data/nj/*.txt); do
+  # Try GNU sed first, fallback to BSD
+  if ! sed -i 's/�/ /' "${file}" 2>/dev/null; then
+    sed -i '' 's/�/ /' "${file}"
+  fi
+done
+
 # Convert encoding from win1252/cp1252 to UTF8 and write to new file.
 # (Postgres's `COPY`, even using the `encoding 'WIN1252'` option, was not able to decipher the
 # encoding from the original files correctly and would add odd symbols, replacing one character
@@ -81,6 +90,14 @@ for file in $(ls data/nj/*.txt); do
   if ! sed -i 's;\r; ;g' "${file}" 2>/dev/null; then
     sed -i '' 's;\r; ;g' "${file}"
   fi
+
+	# Sometimes there are tabs in the columns, remove them.
+	# Example: Burlington2023Drivers.txt, lines 119 and 124, in the 13th column (summons1)
+
+  if ! sed -i 's;\t; ;g' "${file}" 2>/dev/null; then
+    sed -i '' 's;\t; ;g' "${file}"
+	fi
+
 done
 
 # Remove new lines that have been mistakenly entered into the middle of the line.

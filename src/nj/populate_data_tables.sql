@@ -19,7 +19,6 @@ begin
     foreach db_table in array db_tables loop
         execute format($tt$create temporary table temp_%s_%s_one_column (one_column text) on commit drop$tt$, db_table, year, year, db_table);
     end loop;
-
     
     raise info '.Copy data into the one-column temporary tables';
     foreach db_table in array db_tables loop
@@ -35,23 +34,23 @@ begin
         end if;
     end loop;
 
+    /*
+        Create another set of temporary tables for cleaning, changing types to text so they'll
+        accept all data (to fix later). For those that will be booleans, use the broadest domain
+        that can be unambiguously converted to booleans (in cleaning data fn).
+    */
     raise info '.Create temporary tables for cleaning data';
     foreach db_table in array db_tables loop
         execute format($tt$create temporary table temp_%s_%s (like nj_%s.%I including all) on commit drop$tt$, db_table, year, year, db_table);
     end loop;
 
-    /*
-        Change field types in the temp tables to text so they'll accept all data (to fix later).
-        For those that will be booleans, use the broadest domain that can be unambiguously converted
-        to booleans (in cleaning data fn).
-    */
     raise info '.Change field types in temp tables';
     foreach db_table in array db_tables loop
     	for col_name, dat_type in select column_name, data_type from information_schema.columns where table_name = 'temp_' || db_table || '_' || year and data_type != 'text' loop
             if dat_type = 'boolean' then
-                execute format($q$alter table temp_%I_%s alter column %I type text019YNTFUspace_as_bool using %I::text019YNTFUspace_as_bool$q$, db_table, year, col_name, col_name);
+                execute format($q$alter table temp_%s_%s alter column %I type text019YNTFUspace_as_bool using %I::text019YNTFUspace_as_bool$q$, db_table, year, col_name, col_name);
             else
-                execute format($q$alter table temp_%I_%s alter column %I type text$q$, db_table, year, col_name);
+                execute format($q$alter table temp_%s_%s alter column %I type text$q$, db_table, year, col_name);
             end if;
         end loop;
     end loop;
@@ -63,30 +62,57 @@ begin
     raise info '.Alter domains';
     call nj_alter_temp_domains(year);
 
-    /* NOTE: The Drivers and Pedestrians tables in the 2021 and 2022 files do no match the 
-    file specification: DOB has length of 0 rather than 10, so there is a condition for those
-    tables to check the year and handle appropriately.
-    */
     raise info '.Parse columns from spec & insert into second set of temporary tables';
     foreach db_table in array db_tables loop
         for line in execute format($q1$select one_column from temp_%s_%s_one_column$q1$, db_table, year) loop
-            call insert_data(year, db_table, line);
+            begin
+                call insert_data(year, db_table, line);
+            exception
+                when not_null_violation then
+                    -- raise info 'not null violation occurred, this record will not be inserted into the % table: %', db_table, quote_nullable(line);
+                    null;
+                when unique_violation then
+                    -- raise info 'unique violation occurred, this record will not be inserted into the % table: %', db_table, quote_nullable(line);
+                    null;
+                when foreign_key_violation then
+                    -- raise info 'foreign key violation occurred, this record will not be inserted into the % table: %', db_table, quote_nullable(line);
+                    null;
+                when invalid_foreign_key then
+                    -- raise info 'invalid foreign key, this record will not be inserted into the % table: %', db_table, quote_nullable(line);
+                    null;
+                when others then
+                    raise info 'error in %: %', db_table, SQLSTATE;
+                    null;
+            end;                
         end loop;
     end loop;
 
     -- Run analyze on temporary tables, which should improve performance on queries on them.
     foreach db_table in array db_tables loop
-        execute format($a$ analyze temp_%I_%s$a$, db_table, year);
+        execute format($a$ analyze temp_%s_%s$a$, db_table, year);
     end loop;
 
     raise info '.Clean bad values';
     call nj_clean_data(year);
-    
+           
+    /* Copy the data from the temp tables into the non-temp tables, by exporting to file and then
+       reimporting. Easiest way to go from text types in temp tables to types in non-temp tables.
+       NOTE, however, that is table-by-table, not line-by-line.
+    */
     raise info '.Copy from temp to non-temp tables';
-    -- Copy the data from the temp tables into the non-temp tables, by exporting to file and then reimporting. Easiest way to go from text types in temp tables to types in non-temp tables.
     foreach db_table in array db_tables loop
-        execute format($q$copy temp_%I_%s to '%s/%I.csv' with (format csv, header)$q$, db_table, year, postgres_data_dir, db_table);
-        execute format($q$copy nj_%s.%I from '%s/%I.csv' with (format csv, header, force_null *)$q$, year, db_table, postgres_data_dir, db_table); 
+        execute format($q$copy temp_%s_%s to '%s/%s.csv' with (format csv, header)$q$, db_table, year, postgres_data_dir, db_table);
+        
+        begin
+            execute format($q$copy nj_%s.%I from '%s/%s.csv' with (format csv, header, force_null *)$q$, year, db_table, postgres_data_dir, db_table); 
+        exception
+            when unique_violation then
+                raise info 'unique violation (duplicate primary key, likely) occurred, data from table % not inserted into database.', db_table;
+                null;
+            when others then
+                raise info 'other error in %: %', db_table, SQLSTATE;
+                null;
+        end;
     end loop;
 end;
 $body$

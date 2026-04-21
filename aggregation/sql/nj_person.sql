@@ -12,6 +12,7 @@ with occupant as (
 	position_in_veh,
 	ejection,
 	case when "age" like '%M%' then '0' else "age" end as "age",
+	"age",
 	sex,
 	location_of_most_severe_injury,
 	type_of_most_severe_injury,
@@ -22,6 +23,7 @@ with occupant as (
 	null as contrib_circ1,
 	null as contrib_circ2,
 	safety_equipment_used 
+	null as contrib_circ2
 	from nj.all_occupant),
 pedestrian as (
 	select casenumber,
@@ -35,6 +37,7 @@ pedestrian as (
 	null as position_in_veh,
 	null as ejection,
 	case when "age" like '%M%' then '0' else "age" end as "age",
+	"age",
 	sex,
 	location_of_most_severe_injury,
 	type_of_most_severe_injury,
@@ -45,6 +48,7 @@ pedestrian as (
 	contrib_circ1,
 	contrib_circ2,
 	safety_equipment_used 
+	contrib_circ2
 	from nj.all_pedestrian) 
 
 

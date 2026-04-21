@@ -211,6 +211,9 @@ select
 		1
 	from
 		nj.all_crash c
+union all
+select c.casenumber, "year" AS crash_year, 'day_of_week', c.day_of_week, 1
+from nj.all_crash c
 
 union all
 select c.casenumber, "year" AS crash_year, 'hour', left(c.time_of_day, 2), 1
@@ -304,6 +307,9 @@ group by p.casenumber,  p.crash_year
 /* 
 --CRASH YEAR (GROUPED SUMMARY)
  
+/* =========================================================
+   CRASH YEAR (GROUPED SUMMARY)
+   ========================================================= 
 union all
 select
     null as casenumber,

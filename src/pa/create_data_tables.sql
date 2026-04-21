@@ -208,7 +208,7 @@ begin
         as: Drinking Driver, Use of a Cell Phone, Fatal Crash, Motorcycle involved, and over 60
         other crash defining items.
     */
-    execute format($t4$create unlogged table if not exists %1$s.flag (
+    execute format($t4$create unlogged table if not exists %1$s.flags (
         crn integer, -- crash record number – identifies a unique crash, database key field that identifies a unique crash case 
         aggressive_driving boolean, -- at least one aggressive driver action
         alcohol_related boolean, -- at least one driver or pedestrian with reported or suspected alcohol use

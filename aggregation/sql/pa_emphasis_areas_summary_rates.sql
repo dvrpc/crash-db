@@ -16,6 +16,24 @@ WITH flag_base AS (
     FROM pa.all_crash c
     LEFT JOIN pa.all_flags f ON c.crn = f.crn
     group by c.crn
+    SELECT 
+        c.crn,
+
+        COALESCE(f.intersection, FALSE) AS intersection,
+        COALESCE(f.lane_departure, FALSE) AS lane_departure,
+        COALESCE(f.bicycle, FALSE) AS bicycle,
+        COALESCE(f.pedestrian, FALSE) AS pedestrian,
+        COALESCE(f.distracted, FALSE) AS distracted,
+        COALESCE(f.aggressive_driving, FALSE) AS aggressive_driving,
+        COALESCE(f.impaired_driver, FALSE) AS impaired_driver,
+        COALESCE(f.work_zone, FALSE) AS work_zone,
+        COALESCE(f.train_trolley, FALSE) AS train_trolley,
+        COALESCE(f.hvy_truck_related, FALSE) AS hvy_truck_related,
+        COALESCE(f.motorcycle, FALSE) AS motorcycle,
+        COALESCE(f.unbelted, FALSE) AS unbelted
+
+    FROM pa.all_crash c
+    LEFT JOIN pa.all_flags f ON c.crn = f.crn
 ),
 
 driver_flags AS (
