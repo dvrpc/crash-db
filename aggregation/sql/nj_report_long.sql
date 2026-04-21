@@ -193,6 +193,24 @@ union all
 select c.casenumber, "year" AS crash_year, 'month', cast(extract(month from c."date") as text), 1
 from nj.all_crash c 
 
+
+union all
+select
+	c.casenumber,
+	"year" as crash_year,
+	'day_of_week',
+	case
+		when c.day_of_week = 'MO' then 'Monday'
+		when c.day_of_week = 'TU' then 'Tuesday'
+		when c.day_of_week = 'WE' then 'Wednesday'
+		when c.day_of_week = 'TH' then 'Thursday'
+		when c.day_of_week = 'FR' then 'Friday'
+		when c.day_of_week = 'SA' then 'Saturday'
+		when c.day_of_week = 'SU' then 'Sunday'
+		else null end,
+		1
+	from
+		nj.all_crash c
 union all
 select c.casenumber, "year" AS crash_year, 'day_of_week', c.day_of_week, 1
 from nj.all_crash c
@@ -286,6 +304,9 @@ from nj.all_person p where p.physical_condition = '99'
 group by p.casenumber,  p.crash_year
 
 
+/* 
+--CRASH YEAR (GROUPED SUMMARY)
+ 
 /* =========================================================
    CRASH YEAR (GROUPED SUMMARY)
    ========================================================= 

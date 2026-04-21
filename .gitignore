@@ -2,6 +2,8 @@
 *.csv
 *.pdf
 /data
+.env
+/venv
 /NJ_Roads_shp
 .env
 venv

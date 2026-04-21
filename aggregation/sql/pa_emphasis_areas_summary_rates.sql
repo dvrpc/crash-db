@@ -1,4 +1,21 @@
 WITH flag_base AS (
+      SELECT 
+        c.crn,
+		bool_or(case when "intersection" is true then true else false end) as "intersection",
+		bool_or(case when lane_departure is true then true else false end) as lane_departure,
+		bool_or(case when bicycle is true then true else false end) as bicycle,
+		bool_or(case when pedestrian is true then true else false end) as pedestrian,
+		bool_or(case when distracted is true then true else false end) as distracted,
+		bool_or(case when aggressive_driving is true then true else false end) as aggressive_driving,
+		bool_or(case when impaired_driver is true then true else false end) as impaired_driver,
+		bool_or(case when work_zone is true then true else false end) as work_zone,
+		bool_or(case when train_trolley is true then true else false end) as train_trolley,
+		bool_or(case when hvy_truck_related is true then true else false end) as hvy_truck_related,
+		bool_or(case when motorcycle is true then true else false end) as motorcycle,
+		bool_or(case when unbelted is true then true else false end) as unbelted
+    FROM pa.all_crash c
+    LEFT JOIN pa.all_flags f ON c.crn = f.crn
+    group by c.crn
     SELECT 
         c.crn,
 
