@@ -1,3 +1,6 @@
+drop materialized view if exists nj_report.crash_emphasis_areas; 
+create materialized view nj_report.crash_emphasis_areas as
+
 with flag_base as (
 select
 	c.casenumber,

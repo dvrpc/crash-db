@@ -1,3 +1,6 @@
+drop materialized view if exists pa.crash_emphasis_areas;
+create materialized view pa.crash_emphasis_areas as
+
 WITH flag_base AS (
       SELECT 
         c.crn,
