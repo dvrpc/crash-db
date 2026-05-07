@@ -1,5 +1,6 @@
-drop materialized view if exists region.emphasis_areas_summary_rates;
-create materialized view region.emphasis_areas_summary_rates as 
+create schema if not exists region;
+drop materialized view if exists region.crash_emphasis_areas;
+create materialized view region.crash_emphasis_areas as 
 
 with flag_base as (
 select
