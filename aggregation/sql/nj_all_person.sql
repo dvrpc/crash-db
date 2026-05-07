@@ -1,10 +1,10 @@
 drop view if exists nj.all_person cascade;
 create view nj.all_person as
 with occupant as (
-	select casenumber,
-	"year" as crash_year,
-	ncic_code,
-	dept_case_num,
+	select o.casenumber,
+	o."year" as crash_year,
+	o.ncic_code,
+	o.dept_case_num,
 	cast(null as int) as pedestrian_num,
 	veh_num,
 	occupant_num,
@@ -22,12 +22,15 @@ with occupant as (
 	null as contrib_circ1,
 	null as contrib_circ2,
 	safety_equipment_used 
-	from nj.all_occupant),
+	from nj.all_occupant o
+	inner join nj.all_crash c 
+	on o.casenumber = c.casenumber 
+	where c.road_system <> '09'),
 pedestrian as (
-	select casenumber,
-	"year" as crash_year,
-	ncic_code,
-	dept_case_num,
+	select p.casenumber,
+	p."year" as crash_year,
+	p.ncic_code,
+	p.dept_case_num,
 	pedestrian_num,
 	cast(null as int) as veh_num,
 	cast(null as int) as occupant_num,
@@ -41,11 +44,14 @@ pedestrian as (
 	is_bicycle,
 	is_other,
 	false as occupant, 
-	true as pedestrian,
+	case when is_bicycle is null then true else false end as pedestrian,
 	contrib_circ1,
 	contrib_circ2,
 	safety_equipment_used 
-	from nj.all_pedestrian) 
+	from nj.all_pedestrian p
+	inner join nj.all_crash c 
+	on p.casenumber = c.casenumber 
+	where c.road_system <> '09') 
 
 
 select * from occupant 
