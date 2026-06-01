@@ -1,8 +1,20 @@
 create schema if not exists pa_report;
-
 drop materialized view if exists pa_report.report_summary_long;
-
 create materialized view pa_report.report_summary_long as
+
+with counties as (
+select
+	crn,
+	case
+		when c.county = '09' then 'BUCKS'
+		when c.county = '15' then 'CHESTER'
+		when c.county = '23' then 'DELAWARE'
+		when c.county = '46' then 'MONTGOMERY'
+		when c.county = '67' then 'PHILADELPHIA'
+		else null
+	end as county
+from
+	pa.all_crash c)
 
 /* =========================================================
    COLLISION TYPE
@@ -10,178 +22,193 @@ create materialized view pa_report.report_summary_long as
 select
 	c.crn,
 	c.crash_year,
-	case
-		when county = '09' then 'BUCKS'
-		when county = '15' then 'CHESTER'
-		when county = '23' then 'DELAWARE'
-		when county = '46' then 'MONTGOMERY'
-		when county = '67' then 'PHILADELPHIA'
-		else null
-	end as county,
+	cnt.county,
 		'collision_type' as domain,
 		'noncollision' as category,
-		1 as cnt
+		count(distinct(c.crn)) as cnt
 from
 		pa.all_crash c
+left join counties cnt
+on
+	cnt.crn = c.crn
 where
 		c.collision_type = '0'
 	or c.collision_type is null
+group by
+	c.crn,
+	c.crash_year,
+	cnt.county
 union all
 select
 	c.crn,
 	c.crash_year,
-	case
-		when county = '09' then 'BUCKS'
-		when county = '15' then 'CHESTER'
-		when county = '23' then 'DELAWARE'
-		when county = '46' then 'MONTGOMERY'
-		when county = '67' then 'PHILADELPHIA'
-		else null
-	end as county,
+	cnt.county,
 	'collision_type',
 	'rearend',
-	1
+	count(distinct(c.crn)) as cnt
 from
 	pa.all_crash c
+left join counties cnt
+on
+	cnt.crn = c.crn
 where
 	c.collision_type = '1'
+group by
+	c.crn,
+	c.crash_year,
+	cnt.county
 union all
 select
 	c.crn,
 	c.crash_year,
-	case
-		when county = '09' then 'BUCKS'
-		when county = '15' then 'CHESTER'
-		when county = '23' then 'DELAWARE'
-		when county = '46' then 'MONTGOMERY'
-		when county = '67' then 'PHILADELPHIA' else null end as county,
+	cnt.county,
 	'collision_type',
 	'headon',
-	1
+	count(distinct(c.crn)) as cnt
 from
 	pa.all_crash c
+left join counties cnt
+on
+	cnt.crn = c.crn
 where
 	c.collision_type = '2'
+group by
+	c.crn,
+	c.crash_year,
+	cnt.county
 union all
 select
 	c.crn,
 	c.crash_year,
-	case
-		when county = '09' then 'BUCKS'
-		when county = '15' then 'CHESTER'
-		when county = '23' then 'DELAWARE'
-		when county = '46' then 'MONTGOMERY'
-		when county = '67' then 'PHILADELPHIA' else null end as county,
+	cnt.county,
 	'collision_type',
 	'backing',
-	1
+	count(distinct(c.crn)) as cnt
 from
 	pa.all_crash c
+left join counties cnt
+on
+	cnt.crn = c.crn
 where
 	c.collision_type = '3'
+group by
+	c.crn,
+	c.crash_year,
+	cnt.county
 union all
 select
 	c.crn,
 	c.crash_year,
-	case
-		when county = '09' then 'BUCKS'
-		when county = '15' then 'CHESTER'
-		when county = '23' then 'DELAWARE'
-		when county = '46' then 'MONTGOMERY'
-		when county = '67' then 'PHILADELPHIA' else null end as county,
+	cnt.county,
 	'collision_type',
 	'angle',
-	1
+	count(distinct(c.crn)) as cnt
 from
 	pa.all_crash c
+left join counties cnt
+on
+	cnt.crn = c.crn
 where
 	c.collision_type = '4'
+group by
+	c.crn,
+	c.crash_year,
+	cnt.county
 union all
 select
 	c.crn,
 	c.crash_year,
-	case
-		when county = '09' then 'BUCKS'
-		when county = '15' then 'CHESTER'
-		when county = '23' then 'DELAWARE'
-		when county = '46' then 'MONTGOMERY'
-		when county = '67' then 'PHILADELPHIA' else null end as county,
+	cnt.county,
 	'collision_type',
-	'sideswipe_same',
-	1
+	'sideswipe_same',	
+	count(distinct(c.crn)) as cnt
 from
 	pa.all_crash c
+left join counties cnt
+on
+	cnt.crn = c.crn
 where
 	c.collision_type = '5'
+group by
+	c.crn,
+	c.crash_year,
+	cnt.county
 union all
 select
 	c.crn,
 	c.crash_year,
-	case
-		when county = '09' then 'BUCKS'
-		when county = '15' then 'CHESTER'
-		when county = '23' then 'DELAWARE'
-		when county = '46' then 'MONTGOMERY'
-		when county = '67' then 'PHILADELPHIA' else null end as county,
+	cnt.county,
 	'collision_type',
 	'sideswipe_opposite',
-	1
+	count(distinct(c.crn)) as cnt
 from
 	pa.all_crash c
+left join counties cnt
+on
+	cnt.crn = c.crn
 where
 	c.collision_type = '6'
+group by
+	c.crn,
+	c.crash_year,
+	cnt.county
 union all
 select
 	c.crn,
 	c.crash_year,
-	case
-		when county = '09' then 'BUCKS'
-		when county = '15' then 'CHESTER'
-		when county = '23' then 'DELAWARE'
-		when county = '46' then 'MONTGOMERY'
-		when county = '67' then 'PHILADELPHIA' else null end as county,
+	cnt.county,
 	'collision_type',
 	'hit_fixed_object',
-	1
+	count(distinct(c.crn)) as cnt
 from
 	pa.all_crash c
+left join counties cnt
+on
+	cnt.crn = c.crn
 where
 	c.collision_type = '7'
+group by
+	c.crn,
+	c.crash_year,
+	cnt.county
 union all
 select
 	c.crn,
 	c.crash_year,
-	case
-		when county = '09' then 'BUCKS'
-		when county = '15' then 'CHESTER'
-		when county = '23' then 'DELAWARE'
-		when county = '46' then 'MONTGOMERY'
-		when county = '67' then 'PHILADELPHIA' else null end as county,
+	cnt.county,
 	'collision_type',
 	'hit_nonmotorist',
-	1
+	count(distinct(c.crn)) as cnt
 from
 	pa.all_crash c
+left join counties cnt
+on
+	cnt.crn = c.crn
 where
 	c.collision_type = '8'
+group by
+	c.crn,
+	c.crash_year,
+	cnt.county
 union all
 select
 	c.crn,
 	c.crash_year,
-	case
-		when county = '09' then 'BUCKS'
-		when county = '15' then 'CHESTER'
-		when county = '23' then 'DELAWARE'
-		when county = '46' then 'MONTGOMERY'
-		when county = '67' then 'PHILADELPHIA' else null end as county,
+	cnt.county,
 	'collision_type',
-	'other_unknown',
-	1
+	'other_unknown',	
+	count(distinct(c.crn)) as cnt
 from
 	pa.all_crash c
+left join counties cnt
+on
+	cnt.crn = c.crn
 where
 	c.collision_type in ('9', '98', '99')
-
+group by
+	c.crn,
+	c.crash_year,
+	cnt.county
 
 /* =========================================================
    MAX SEVERITY LEVEL
@@ -190,106 +217,117 @@ union all
 select
 	c.crn,
 	c.crash_year,
-	case
-		when county = '09' then 'BUCKS'
-		when county = '15' then 'CHESTER'
-		when county = '23' then 'DELAWARE'
-		when county = '46' then 'MONTGOMERY'
-		when county = '67' then 'PHILADELPHIA' else null end as county,
+	cnt.county,
 	'severity',
-	'no_injury',
-	1
+	'no_injury',	
+	count(distinct(c.crn)) as cnt
 from
 	pa.all_crash c
+left join counties cnt
+on
+	cnt.crn = c.crn
 where
 	c.max_severity_level = '0'
+group by 
+	c.crn,
+	c.crash_year,
+	cnt.county
 union all
 select
 	c.crn,
 	c.crash_year,
-	case
-		when county = '09' then 'BUCKS'
-		when county = '15' then 'CHESTER'
-		when county = '23' then 'DELAWARE'
-		when county = '46' then 'MONTGOMERY'
-		when county = '67' then 'PHILADELPHIA' else null end as county,
+	cnt.county,
 	'severity',
 	'fatal',
-	1
+	count(distinct(c.crn)) as cnt
 from
 	pa.all_crash c
+left join counties cnt
+on
+	cnt.crn = c.crn
 where
 	c.max_severity_level = '1'
+group by 
+	c.crn,
+	c.crash_year,
+	cnt.county
 union all
 select
 	c.crn,
 	c.crash_year,
-	case
-		when county = '09' then 'BUCKS'
-		when county = '15' then 'CHESTER'
-		when county = '23' then 'DELAWARE'
-		when county = '46' then 'MONTGOMERY'
-		when county = '67' then 'PHILADELPHIA' else null end as county,
+	cnt.county,
 	'severity',
-	'serious',
-	1
+	'serious',	
+	count(distinct(c.crn)) as cnt
 from
 	pa.all_crash c
+left join counties cnt
+on
+	cnt.crn = c.crn
 where
 	c.max_severity_level = '2'
+group by 
+	c.crn,
+	c.crash_year,
+	cnt.county
 union all
 select
 	c.crn,
 	c.crash_year,
-	case
-		when county = '09' then 'BUCKS'
-		when county = '15' then 'CHESTER'
-		when county = '23' then 'DELAWARE'
-		when county = '46' then 'MONTGOMERY'
-		when county = '67' then 'PHILADELPHIA' else null end as county,
+	cnt.county,
 	'severity',
-	'minor',
-	1
+	'minor',	
+	count(distinct(c.crn)) as cnt
 from
 	pa.all_crash c
+left join counties cnt
+on
+	cnt.crn = c.crn
 where
 	c.max_severity_level = '3'
+group by 
+	c.crn,
+	c.crash_year,
+	cnt.county
 union all
 select
 	c.crn,
 	c.crash_year,
-	case
-		when county = '09' then 'BUCKS'
-		when county = '15' then 'CHESTER'
-		when county = '23' then 'DELAWARE'
-		when county = '46' then 'MONTGOMERY'
-		when county = '67' then 'PHILADELPHIA' else null end as county,
+	cnt.county,
 	'severity',
-	'possible',
-	1
+	'possible',	
+	count(distinct(c.crn)) as cnt
 from
 	pa.all_crash c
+left join counties cnt
+on
+	cnt.crn = c.crn
 where
 	c.max_severity_level = '4'
+group by 
+	c.crn,
+	c.crash_year,
+	cnt.county
 union all
 select
 	c.crn,
 	c.crash_year,
-	case
-		when county = '09' then 'BUCKS'
-		when county = '15' then 'CHESTER'
-		when county = '23' then 'DELAWARE'
-		when county = '46' then 'MONTGOMERY'
-		when county = '67' then 'PHILADELPHIA' else null end as county,
+	cnt.county,
 	'severity',
-	'injury_unknown',
-	1
+	'injury_unknown',	
+	count(distinct(c.crn)) as cnt
 from
 	pa.all_crash c
+left join counties cnt
+on
+	cnt.crn = c.crn
 where
 	c.max_severity_level in ('8', '9')
 	or c.max_severity_level is null
-
+group by 
+	c.crn,
+	c.crash_year,
+	cnt.county
 
 /* =========================================================
    ROAD CONDITION
@@ -298,122 +336,137 @@ union all
 select
 	c.crn,
 	c.crash_year,
-	case
-		when county = '09' then 'BUCKS'
-		when county = '15' then 'CHESTER'
-		when county = '23' then 'DELAWARE'
-		when county = '46' then 'MONTGOMERY'
-		when county = '67' then 'PHILADELPHIA' else null end as county,
+	cnt.county,
 	'road_condition',
 	'dry',
-	1
+	count(distinct(c.crn)) as cnt
 from
 	pa.all_crash c
+
+left join counties cnt
+on
+	cnt.crn = c.crn
 where
 	c.road_condition = '01'
+group by 
+	c.crn,
+	c.crash_year,
+	cnt.county
 union all
 select
 	c.crn,
 	c.crash_year,
-	case
-		when county = '09' then 'BUCKS'
-		when county = '15' then 'CHESTER'
-		when county = '23' then 'DELAWARE'
-		when county = '46' then 'MONTGOMERY'
-		when county = '67' then 'PHILADELPHIA' else null end as county,
+	cnt.county,
 	'road_condition',
-	'ice',
-	1
+	'ice',	
+	count(distinct(c.crn)) as cnt
 from
 	pa.all_crash c
+left join counties cnt
+on
+	cnt.crn = c.crn
 where
 	c.road_condition = '02'
+group by 
+	c.crn,
+	c.crash_year,
+	cnt.county
 union all
 select
 	c.crn,
 	c.crash_year,
-	case
-		when county = '09' then 'BUCKS'
-		when county = '15' then 'CHESTER'
-		when county = '23' then 'DELAWARE'
-		when county = '46' then 'MONTGOMERY'
-		when county = '67' then 'PHILADELPHIA' else null end as county,
+	cnt.county,
 	'road_condition',
 	'snow',
-	1
+	count(distinct(c.crn)) as cnt
 from
 	pa.all_crash c
+left join counties cnt
+on
+	cnt.crn = c.crn
 where
 	c.road_condition = '07'
+group by 
+	c.crn,
+	c.crash_year,
+	cnt.county
 union all
 select
 	c.crn,
 	c.crash_year,
-	case
-		when county = '09' then 'BUCKS'
-		when county = '15' then 'CHESTER'
-		when county = '23' then 'DELAWARE'
-		when county = '46' then 'MONTGOMERY'
-		when county = '67' then 'PHILADELPHIA' else null end as county,
+	cnt.county,
 	'road_condition',
-	'water',
-	1
+	'water',	
+	count(distinct(c.crn)) as cnt
 from
 	pa.all_crash c
+left join counties cnt
+on
+	cnt.crn = c.crn
 where
 	c.road_condition = '08'
+group by 
+	c.crn,
+	c.crash_year,
+	cnt.county
 union all
 select
 	c.crn,
 	c.crash_year,
-	case
-		when county = '09' then 'BUCKS'
-		when county = '15' then 'CHESTER'
-		when county = '23' then 'DELAWARE'
-		when county = '46' then 'MONTGOMERY'
-		when county = '67' then 'PHILADELPHIA' else null end as county,
+	cnt.county,
 	'road_condition',
 	'wet',
-	1
+	count(distinct(c.crn)) as cnt
 from
 	pa.all_crash c
+left join counties cnt
+on
+	cnt.crn = c.crn
 where
 	c.road_condition = '09'
+group by 
+	c.crn,
+	c.crash_year,
+	cnt.county
 union all
 select
 	c.crn,
 	c.crash_year,
-	case
-		when county = '09' then 'BUCKS'
-		when county = '15' then 'CHESTER'
-		when county = '23' then 'DELAWARE'
-		when county = '46' then 'MONTGOMERY'
-		when county = '67' then 'PHILADELPHIA' else null end as county,
+	cnt.county,
 	'road_condition',
-	'other',
-	1
+	'other',	
+	count(distinct(c.crn)) as cnt
 from
 	pa.all_crash c
+left join counties cnt
+on
+	cnt.crn = c.crn
 where
 	c.road_condition in ('03', '04', '05', '06', '22', '98')
+group by 
+	c.crn,
+	c.crash_year,
+	cnt.county
 union all
 select
 	c.crn,
 	c.crash_year,
-	case
-		when county = '09' then 'BUCKS'
-		when county = '15' then 'CHESTER'
-		when county = '23' then 'DELAWARE'
-		when county = '46' then 'MONTGOMERY'
-		when county = '67' then 'PHILADELPHIA' else null end as county,
+	cnt.county,
 	'road_condition',
-	'unknown',
-	1
+	'unknown',	
+	count(distinct(c.crn)) as cnt
 from
 	pa.all_crash c
+left join counties cnt
+on
+	cnt.crn = c.crn
 where
 	c.road_condition = '99'
 	or c.road_condition is null
+group by 
+	c.crn,
+	c.crash_year,
+	cnt.county
 
 
 /* =========================================================
@@ -423,122 +476,136 @@ union all
 select
 	c.crn,
 	c.crash_year,
-	case
-		when county = '09' then 'BUCKS'
-		when county = '15' then 'CHESTER'
-		when county = '23' then 'DELAWARE'
-		when county = '46' then 'MONTGOMERY'
-		when county = '67' then 'PHILADELPHIA' else null end as county,
+	cnt.county,
 	'weather',
 	'clear',
-	1
+	count(distinct(c.crn)) as cnt
 from
 	pa.all_crash c
+left join counties cnt
+on
+	cnt.crn = c.crn
 where
 	c.weather1 = '03'
+group by 
+	c.crn,
+	c.crash_year,
+	cnt.county
 union all
 select
 	c.crn,
 	c.crash_year,
-	case
-		when county = '09' then 'BUCKS'
-		when county = '15' then 'CHESTER'
-		when county = '23' then 'DELAWARE'
-		when county = '46' then 'MONTGOMERY'
-		when county = '67' then 'PHILADELPHIA' else null end as county,
+	cnt.county,
 	'weather',
 	'cloudy',
-	1
+	count(distinct(c.crn)) as cnt
 from
 	pa.all_crash c
+left join counties cnt
+on
+	cnt.crn = c.crn
 where
 	c.weather1 = '04'
+group by 
+	c.crn,
+	c.crash_year,
+	cnt.county
 union all
 select
 	c.crn,
 	c.crash_year,
-	case
-		when county = '09' then 'BUCKS'
-		when county = '15' then 'CHESTER'
-		when county = '23' then 'DELAWARE'
-		when county = '46' then 'MONTGOMERY'
-		when county = '67' then 'PHILADELPHIA' else null end as county,
+	cnt.county,
 	'weather',
-	'fog_smog_smoke',
-	1
+	'fog_smog_smoke',	
+	count(distinct(c.crn)) as cnt
 from
 	pa.all_crash c
+left join counties cnt
+on
+	cnt.crn = c.crn
 where
 	c.weather1 = '05'
+group by 
+	c.crn,
+	c.crash_year,
+	cnt.county
 union all
 select
 	c.crn,
 	c.crash_year,
-	case
-		when county = '09' then 'BUCKS'
-		when county = '15' then 'CHESTER'
-		when county = '23' then 'DELAWARE'
-		when county = '46' then 'MONTGOMERY'
-		when county = '67' then 'PHILADELPHIA' else null end as county,
+	cnt.county,
 	'weather',
 	'rain',
-	1
+	count(distinct(c.crn)) as cnt
 from
 	pa.all_crash c
+left join counties cnt
+on
+	cnt.crn = c.crn
 where
 	c.weather1 = '07'
+group by 
+	c.crn,
+	c.crash_year,
+	cnt.county
 union all
 select
 	c.crn,
 	c.crash_year,
-	case
-		when county = '09' then 'BUCKS'
-		when county = '15' then 'CHESTER'
-		when county = '23' then 'DELAWARE'
-		when county = '46' then 'MONTGOMERY'
-		when county = '67' then 'PHILADELPHIA' else null end as county,
+	cnt.county,
 	'weather',
 	'snow',
-	1
+	count(distinct(c.crn)) as cnt
 from
 	pa.all_crash c
+left join counties cnt
+on
+	cnt.crn = c.crn
 where
 	c.weather1 = '10'
+group by 
+	c.crn,
+	c.crash_year,
+	cnt.county
 union all
 select
 	c.crn,
 	c.crash_year,
-	case
-		when county = '09' then 'BUCKS'
-		when county = '15' then 'CHESTER'
-		when county = '23' then 'DELAWARE'
-		when county = '46' then 'MONTGOMERY'
-		when county = '67' then 'PHILADELPHIA' else null end as county,
+	cnt.county,
 	'weather',
 	'other',
-	1
+	count(distinct(c.crn)) as cnt
 from
 	pa.all_crash c
+left join counties cnt
+on
+	cnt.crn = c.crn
 where
 	c.weather1 in ('01', '02', '06', '08', '09', '98')
+group by 
+	c.crn,
+	c.crash_year,
+	cnt.county
 union all
 select
 	c.crn,
 	c.crash_year,
-	case
-		when county = '09' then 'BUCKS'
-		when county = '15' then 'CHESTER'
-		when county = '23' then 'DELAWARE'
-		when county = '46' then 'MONTGOMERY'
-		when county = '67' then 'PHILADELPHIA' else null end as county,
+	cnt.county,
 	'weather',
 	'unknown',
-	1
+	count(distinct(c.crn)) as cnt
 from
 	pa.all_crash c
+left join counties cnt
+on
+	cnt.crn = c.crn
 where
 	c.weather1 = '99'
 	or c.weather1 is null
+group by 
+	c.crn,
+	c.crash_year,
+	cnt.county
 
 
 /* =========================================================
@@ -548,88 +615,98 @@ union all
 select
 	c.crn,
 	c.crash_year,
-	case
-		when county = '09' then 'BUCKS'
-		when county = '15' then 'CHESTER'
-		when county = '23' then 'DELAWARE'
-		when county = '46' then 'MONTGOMERY'
-		when county = '67' then 'PHILADELPHIA' else null end as county,
+	cnt.county,
 	'illumination',
 	'daylight',
-	1
+	count(distinct(c.crn)) as cnt
 from
 	pa.all_crash c
+left join counties cnt
+on
+	cnt.crn = c.crn
 where
 	c.illumination = '1'
+group by 
+	c.crn,
+	c.crash_year,
+	cnt.county
 union all
 select
 	c.crn,
 	c.crash_year,
-	case
-		when county = '09' then 'BUCKS'
-		when county = '15' then 'CHESTER'
-		when county = '23' then 'DELAWARE'
-		when county = '46' then 'MONTGOMERY'
-		when county = '67' then 'PHILADELPHIA' else null end as county,
+	cnt.county,
 	'illumination',
 	'dark_no_street',
-	1
+	count(distinct(c.crn)) as cnt
 from
 	pa.all_crash c
+left join counties cnt
+on
+	cnt.crn = c.crn
 where
 	c.illumination = '2'
+group by 
+	c.crn,
+	c.crash_year,
+	cnt.county
 union all
 select
 	c.crn,
 	c.crash_year,
-	case
-		when county = '09' then 'BUCKS'
-		when county = '15' then 'CHESTER'
-		when county = '23' then 'DELAWARE'
-		when county = '46' then 'MONTGOMERY'
-		when county = '67' then 'PHILADELPHIA' else null end as county,
+	cnt.county,
 	'illumination',
 	'dark_street',
-	1
+	count(distinct(c.crn)) as cnt
 from
 	pa.all_crash c
+left join counties cnt
+on
+	cnt.crn = c.crn
 where
 	c.illumination = '3'
+group by 
+	c.crn,
+	c.crash_year,
+	cnt.county
 union all
 select
 	c.crn,
 	c.crash_year,
-	case
-		when county = '09' then 'BUCKS'
-		when county = '15' then 'CHESTER'
-		when county = '23' then 'DELAWARE'
-		when county = '46' then 'MONTGOMERY'
-		when county = '67' then 'PHILADELPHIA' else null end as county,
+	cnt.county,
 	'illumination',
 	'dawn_dusk',
-	1
+	count(distinct(c.crn)) as cnt
 from
 	pa.all_crash c
+left join counties cnt
+on
+	cnt.crn = c.crn
 where
 	c.illumination in ('4', '5')
+group by 
+	c.crn,
+	c.crash_year,
+	cnt.county
 union all
 select
 	c.crn,
 	c.crash_year,
-	case
-		when county = '09' then 'BUCKS'
-		when county = '15' then 'CHESTER'
-		when county = '23' then 'DELAWARE'
-		when county = '46' then 'MONTGOMERY'
-		when county = '67' then 'PHILADELPHIA' else null end as county,
+	cnt.county,
 	'illumination',
 	'other_unknown',
-	1
+	count(distinct(c.crn)) as cnt
 from
 	pa.all_crash c
+left join counties cnt
+on
+	cnt.crn = c.crn
 where
 	c.illumination in ('6', '8', '9')
 	or c.illumination is null
+group by 
+	c.crn,
+	c.crash_year,
+	cnt.county
 
 
 /* =========================================================
@@ -639,47 +716,78 @@ union all
 select
 	c.crn,
 	c.crash_year,
-	case
-		when county = '09' then 'BUCKS'
-		when county = '15' then 'CHESTER'
-		when county = '23' then 'DELAWARE'
-		when county = '46' then 'MONTGOMERY'
-		when county = '67' then 'PHILADELPHIA' else null end as county,
+	cnt.county,
 	'month',
-	c.crash_month,
-	1
+	case 
+		when c.crash_month = '01' then 'January'
+		when c.crash_month = '02' then 'February'
+		when c.crash_month = '03' then 'March'
+		when c.crash_month = '04' then 'April'
+		when c.crash_month = '05' then 'May'
+		when c.crash_month = '06' then 'June'
+		when c.crash_month = '07' then 'July'
+		when c.crash_month = '08' then 'August'
+		when c.crash_month = '09' then 'September'
+		when c.crash_month = '10' then 'October'
+		when c.crash_month = '11' then 'November'
+		when c.crash_month = '12' then 'December'
+	end as crash_month
+	,	
+	count(distinct(c.crn)) as cnt
 from
 	pa.all_crash c
+left join counties cnt
+on
+	cnt.crn = c.crn
+group by 
+	c.crn,
+	c.crash_year,
+	cnt.county,
+	crash_month
 union all
 select
 	c.crn,
 	c.crash_year,
-	case
-		when county = '09' then 'BUCKS'
-		when county = '15' then 'CHESTER'
-		when county = '23' then 'DELAWARE'
-		when county = '46' then 'MONTGOMERY'
-		when county = '67' then 'PHILADELPHIA' else null end as county,
+	cnt.county,
 	'day_of_week',
-	c.day_of_week,
-	1
+	case 
+		when c.day_of_week = '1' then 'Sunday'
+		when c.day_of_week = '2' then 'Monday'
+		when c.day_of_week = '3' then 'Tuesday'
+		when c.day_of_week = '4' then 'Wednesday'
+		when c.day_of_week = '5' then 'Thursday'
+		when c.day_of_week = '6' then 'Friday'
+		when c.day_of_week = '7' then 'Saturday'
+	end as day_of_week,
+	count(distinct(c.crn)) as cnt
 from
 	pa.all_crash c
+left join counties cnt
+on
+	cnt.crn = c.crn
+group by 
+	c.crn,
+	c.crash_year,
+	cnt.county,
+	day_of_week
 union all
 select
 	c.crn,
 	c.crash_year,
-	case
-		when county = '09' then 'BUCKS'
-		when county = '15' then 'CHESTER'
-		when county = '23' then 'DELAWARE'
-		when county = '46' then 'MONTGOMERY'
-		when county = '67' then 'PHILADELPHIA' else null end as county,
+	cnt.county,
 	'hour',
 	c.hour_of_day,
-	1
+	count(distinct(c.crn)) as cnt
 from
 	pa.all_crash c
+left join counties cnt
+on
+	cnt.crn = c.crn
+group by 
+	c.crn,
+	c.crash_year,
+	cnt.county,
+	c.hour_of_day
 
 
 /* =========================================================
@@ -689,243 +797,223 @@ union all
 select
 	v.crn,
 	c.crash_year,
-	case
-		when county = '09' then 'BUCKS'
-		when county = '15' then 'CHESTER'
-		when county = '23' then 'DELAWARE'
-		when county = '46' then 'MONTGOMERY'
-		when county = '67' then 'PHILADELPHIA' else null end as county,
+	cnt.county,
 	'vehicle',
 	'automobile',
-	count(*)
+	count(distinct(c.crn, unit_num))
 from
 	pa.all_vehicle v
 inner join pa.all_crash c 
 on
 	v.crn = c.crn
+left join counties cnt
+on
+	cnt.crn = c.crn
 where
 	v.veh_type = '01'
 group by
 	v.crn,
 	c.crash_year,
-	c.county
+	cnt.county
 union all
 select
 	v.crn,
 	c.crash_year,
-	case
-		when county = '09' then 'BUCKS'
-		when county = '15' then 'CHESTER'
-		when county = '23' then 'DELAWARE'
-		when county = '46' then 'MONTGOMERY'
-		when county = '67' then 'PHILADELPHIA' else null end as county,
+	cnt.county,
 	'vehicle',
 	'motorcycle',
-	count(*)
+	count(distinct(c.crn, unit_num))
 from
 	pa.all_vehicle v
 inner join pa.all_crash c 
 on
 	v.crn = c.crn
+left join counties cnt
+on
+	cnt.crn = c.crn
 where
 	v.veh_type = '02'
 group by
 	v.crn,
 	c.crash_year,
-	c.county
+	cnt.county
 union all
 select
 	v.crn,
 	c.crash_year,
-	case
-		when county = '09' then 'BUCKS'
-		when county = '15' then 'CHESTER'
-		when county = '23' then 'DELAWARE'
-		when county = '46' then 'MONTGOMERY'
-		when county = '67' then 'PHILADELPHIA' else null end as county,
+	cnt.county,
 	'vehicle',
 	'bus',
-	count(*)
+	count(distinct(c.crn, unit_num))
 from
 	pa.all_vehicle v
 inner join pa.all_crash c 
 on
 	v.crn = c.crn
+left join counties cnt
+on
+	cnt.crn = c.crn
 where
 	v.veh_type = '03'
 group by
 	v.crn,
 	c.crash_year,
-	c.county
+	cnt.county
 union all
 select
 	v.crn,
 	c.crash_year,
-	case
-		when county = '09' then 'BUCKS'
-		when county = '15' then 'CHESTER'
-		when county = '23' then 'DELAWARE'
-		when county = '46' then 'MONTGOMERY'
-		when county = '67' then 'PHILADELPHIA' else null end as county,
+	cnt.county,
 	'vehicle',
 	'small_truck',
-	count(*)
+	count(distinct(c.crn, unit_num))
 from
 	pa.all_vehicle v
 inner join pa.all_crash c 
 on
 	v.crn = c.crn
+left join counties cnt
+on
+	cnt.crn = c.crn
 where
 	v.veh_type = '04'
 group by
 	v.crn,
 	c.crash_year,
-	c.county
+	cnt.county
 union all
 select
 	v.crn,
 	c.crash_year,
-	case
-		when county = '09' then 'BUCKS'
-		when county = '15' then 'CHESTER'
-		when county = '23' then 'DELAWARE'
-		when county = '46' then 'MONTGOMERY'
-		when county = '67' then 'PHILADELPHIA' else null end as county,
+	cnt.county,
 	'vehicle',
 	'large_truck',
-	count(*)
+	count(distinct(c.crn, unit_num))
 from
 	pa.all_vehicle v
 inner join pa.all_crash c 
 on
 	v.crn = c.crn
+left join counties cnt
+on
+	cnt.crn = c.crn
 where
 	v.veh_type = '05'
 group by
 	v.crn,
 	c.crash_year,
-	c.county
+	cnt.county
 union all
 select
 	v.crn,
 	c.crash_year,
-	case
-		when county = '09' then 'BUCKS'
-		when county = '15' then 'CHESTER'
-		when county = '23' then 'DELAWARE'
-		when county = '46' then 'MONTGOMERY'
-		when county = '67' then 'PHILADELPHIA' else null end as county,
+	cnt.county,
 	'vehicle',
 	'other_motor',
-	count(*)
+	count(distinct(c.crn, unit_num))
 from
 	pa.all_vehicle v
 inner join pa.all_crash c 
 on
 	v.crn = c.crn
+left join counties cnt
+on
+	cnt.crn = c.crn
 where
 	v.veh_type in ('06', '07', '08', '09', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19')
 group by
 	v.crn,
 	c.crash_year,
-	c.county
+	cnt.county
 union all
 select
 	v.crn,
 	c.crash_year,
-	case
-		when county = '09' then 'BUCKS'
-		when county = '15' then 'CHESTER'
-		when county = '23' then 'DELAWARE'
-		when county = '46' then 'MONTGOMERY'
-		when county = '67' then 'PHILADELPHIA' else null end as county,
+	cnt.county,
 	'vehicle',
 	'bicycle',
-	count(*)
+	count(distinct(c.crn, unit_num))
 from
 	pa.all_vehicle v
 inner join pa.all_crash c 
 on
 	v.crn = c.crn
+left join counties cnt
+on
+	cnt.crn = c.crn
 where
 	v.veh_type = '20'
 group by
 	v.crn,
 	c.crash_year,
-	c.county
+	cnt.county
 union all
 select
 	v.crn,
 	c.crash_year,
-	case
-		when county = '09' then 'BUCKS'
-		when county = '15' then 'CHESTER'
-		when county = '23' then 'DELAWARE'
-		when county = '46' then 'MONTGOMERY'
-		when county = '67' then 'PHILADELPHIA' else null end as county,
+	cnt.county,
 	'vehicle',
 	'pedestrian',
-	count(*)
+	count(distinct(c.crn, unit_num))
 from
 	pa.all_vehicle v
 inner join pa.all_crash c 
 on
 	v.crn = c.crn
+left join counties cnt
+on
+	cnt.crn = c.crn
 where
 	v.veh_type = '31'
 group by
 	v.crn,
 	c.crash_year,
-	c.county
+	cnt.county
 union all
 select
 	v.crn,
 	c.crash_year,
-	case
-		when county = '09' then 'BUCKS'
-		when county = '15' then 'CHESTER'
-		when county = '23' then 'DELAWARE'
-		when county = '46' then 'MONTGOMERY'
-		when county = '67' then 'PHILADELPHIA' else null end as county,
+	cnt.county,
 	'vehicle',
 	'other_nonmotor',
-	count(*)
+	count(distinct(c.crn, unit_num))
 from
 	pa.all_vehicle v
 inner join pa.all_crash c 
 on
 	v.crn = c.crn
+left join counties cnt
+on
+	cnt.crn = c.crn
 where
 	v.veh_type in ('21', '22', '23', '24', '25', '32', '33', '34', '35', '36', '98')
 group by
 	v.crn,
 	c.crash_year,
-	c.county
+	cnt.county
 union all
 select
 	v.crn,
 	c.crash_year,
-	case
-		when county = '09' then 'BUCKS'
-		when county = '15' then 'CHESTER'
-		when county = '23' then 'DELAWARE'
-		when county = '46' then 'MONTGOMERY'
-		when county = '67' then 'PHILADELPHIA' else null end as county,
+	cnt.county,
 	'vehicle',
 	'unknown',
-	count(*)
+	count(distinct(c.crn, unit_num))
 from
 	pa.all_vehicle v
 inner join pa.all_crash c 
 on
 	v.crn = c.crn
+left join counties cnt
+on
+	cnt.crn = c.crn
 where
 	v.veh_type = '99'
 	or v.veh_type is null
 group by
 	v.crn,
 	c.crash_year,
-	c.county
+	cnt.county
 
 
 /* =========================================================
@@ -935,148 +1023,135 @@ union all
 select
 	p.crn,
 	c.crash_year,
-	case
-		when county = '09' then 'BUCKS'
-		when county = '15' then 'CHESTER'
-		when county = '23' then 'DELAWARE'
-		when county = '46' then 'MONTGOMERY'
-		when county = '67' then 'PHILADELPHIA' else null end as county,
+	cnt.county,
 	'person_injury',
 	'not_injured',
-	count(*)
+	count(distinct(p.crn, p.unit_num, p.person_num))
 from
 	pa.all_person p
 inner join pa.all_crash c 
 on
 	p.crn = c.crn
+left join counties cnt
+on
+	cnt.crn = c.crn
 where
 	p.inj_severity = '0'
-group by
+group by 
 	p.crn,
 	c.crash_year,
-	c.county
+	cnt.county
 union all
 select
 	p.crn,
 	c.crash_year,
-	case
-		when county = '09' then 'BUCKS'
-		when county = '15' then 'CHESTER'
-		when county = '23' then 'DELAWARE'
-		when county = '46' then 'MONTGOMERY'
-		when county = '67' then 'PHILADELPHIA' else null end as county,
+	cnt.county,
 	'person_injury',
 	'fatal',
-	count(*)
+	count(distinct(p.crn, p.person_num))
 from
 	pa.all_person p
 inner join pa.all_crash c 
 on
 	p.crn = c.crn
+left join counties cnt
+on
+	cnt.crn = c.crn
 where
 	p.inj_severity = '1'
-group by
+group by 
 	p.crn,
 	c.crash_year,
-	c.county
+	cnt.county
 union all
 select
 	p.crn,
 	c.crash_year,
-	case
-		when county = '09' then 'BUCKS'
-		when county = '15' then 'CHESTER'
-		when county = '23' then 'DELAWARE'
-		when county = '46' then 'MONTGOMERY'
-		when county = '67' then 'PHILADELPHIA' else null end as county,
+	cnt.county,
 	'person_injury',
 	'serious',
-	count(*)
+	count(distinct(p.crn, p.unit_num, p.person_num))
 from
 	pa.all_person p
 inner join pa.all_crash c 
 on
 	p.crn = c.crn
+left join counties cnt
+on
+	cnt.crn = c.crn
 where
 	p.inj_severity = '2'
-group by
+group by 
 	p.crn,
 	c.crash_year,
-	c.county
+	cnt.county
 union all
 select
 	p.crn,
 	c.crash_year,
-	case
-		when county = '09' then 'BUCKS'
-		when county = '15' then 'CHESTER'
-		when county = '23' then 'DELAWARE'
-		when county = '46' then 'MONTGOMERY'
-		when county = '67' then 'PHILADELPHIA' else null end as county,
+	cnt.county,
 	'person_injury',
 	'minor',
-	count(*)
+	count(distinct(p.crn, p.unit_num, p.person_num))
 from
 	pa.all_person p
 inner join pa.all_crash c 
 on
 	p.crn = c.crn
+left join counties cnt
+on
+	cnt.crn = c.crn
 where
 	p.inj_severity = '3'
-group by
+group by 
 	p.crn,
 	c.crash_year,
-	c.county
+	cnt.county
 union all
 select
 	p.crn,
 	c.crash_year,
-	case
-		when county = '09' then 'BUCKS'
-		when county = '15' then 'CHESTER'
-		when county = '23' then 'DELAWARE'
-		when county = '46' then 'MONTGOMERY'
-		when county = '67' then 'PHILADELPHIA' else null end as county,
+	cnt.county,
 	'person_injury',
 	'possible',
-	count(*)
+	count(distinct(p.crn, p.unit_num, p.person_num))
 from
 	pa.all_person p
 inner join pa.all_crash c 
 on
 	p.crn = c.crn
+left join counties cnt
+on
+	cnt.crn = c.crn
 where
 	p.inj_severity = '4'
-group by
+group by 
 	p.crn,
 	c.crash_year,
-	c.county
+	cnt.county
 union all
 select
 	p.crn,
 	c.crash_year,
-	case
-		when county = '09' then 'BUCKS'
-		when county = '15' then 'CHESTER'
-		when county = '23' then 'DELAWARE'
-		when county = '46' then 'MONTGOMERY'
-		when county = '67' then 'PHILADELPHIA' else null end as county,
+	cnt.county,
 	'person_injury',
 	'injury_unknown',
-	count(*)
+	count(distinct(p.crn, p.unit_num, p.person_num))
 from
 	pa.all_person p
 inner join pa.all_crash c 
 on
 	p.crn = c.crn
+left join counties cnt
+on
+	cnt.crn = c.crn
 where
 	p.inj_severity in ('8', '9')
 	or p.inj_severity is null
-group by
+group by 
 	p.crn,
 	c.crash_year,
-	c.county
-
+	cnt.county
 
 /* =========================================================
    CRASH YEAR (GROUPED SUMMARY)
