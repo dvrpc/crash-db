@@ -185,7 +185,7 @@ if test ${download_pa} = true ; then
         -H 'User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36' \
         -o "data/pa/${county}_${year}.zip" \
         -w '%{filename_effective} downloaded\n' \
-        --progress-bar
+        --progress-bar --insecure
 
       # Extract the ZIP file to the processing directory
       if [ -f "data/pa/${county}_${year}.zip" ]; then
@@ -214,7 +214,7 @@ if test ${download_nj} = true ; then
           -H 'User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36' \
            -o "data/nj/${county}${year}${table}.zip" \
            -w '%{filename_effective} downloaded \n' \
-           --progress-bar
+           --progress-bar --insecure
       done
     done
   done
