@@ -1,6 +1,6 @@
-create schema if not exists region;
-drop materialized view if exists region.crash_emphasis_areas;
-create materialized view region.crash_emphasis_areas as 
+create schema if not exists region_report;
+drop materialized view if exists region_report.crash_emphasis_areas;
+create materialized view region_report.crash_emphasis_areas as 
 
 with flag_base as (
 select
@@ -128,17 +128,7 @@ crash_flags as (
 		d.younger_road_driver
 	from flag_base f 
 	left join driver_flags d 
-	on f.crn = d.crn
-	
-	union all 
-	
-	SELECT 
-        f.*,
-        d.older_road_driver,
-        d.younger_road_driver
-    FROM flag_base f
-    LEFT JOIN driver_flags d ON f.crn = d.crn
-),
+	on f.crn = d.crn),
 ksi_crashes as (  
 	select 
 		distinct(casenumber) as crn
@@ -216,10 +206,11 @@ final AS (
         SUM(pc.total_people) AS total_people,
         SUM(pc.ksi_people) AS total_ksi_people
     FROM emphasis_unpivot e
-    LEFT JOIN ksi_crashes k ON e.crn = k.crn
-    LEFT JOIN person_counts pc ON e.crn = pc.crn
+    left JOIN ksi_crashes k ON e.crn = k.crn
+    left JOIN person_counts pc ON e.crn = pc.crn
     GROUP BY e.emphasis_area
 )
+
 
 SELECT 
     f.emphasis_area,
@@ -228,7 +219,9 @@ SELECT
     f.total_ksi_events,
     round(f.total_ksi_events * 1.0 / f.total_crash_events, 3) AS pct_ksi_event,
     f.total_people,
+    f.total_ksi_people,
     round(f.total_ksi_people * 1.0 / f.total_people, 3) AS pct_ksi_people
 FROM final f
 CROSS JOIN totals t
 ORDER BY f.emphasis_area
+

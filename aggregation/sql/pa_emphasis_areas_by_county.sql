@@ -1,8 +1,10 @@
-drop materialized view if exists pa_report.crash_emphasis_areas_counties;
+--drop materialized view if exists pa_report.crash_emphasis_areas_counties;
 
-create materialized view pa_report.crash_emphasis_areas_counties as
+--create materialized view pa_report.crash_emphasis_areas_counties as
 
-with flag_base as (
+with var as (select concat(min(crash_year), '-', max(crash_year)) as date_range from pa.all_crash
+),
+flag_base as (
 select
 	c.crn,
 	case 
@@ -278,6 +280,7 @@ group by
 )
 
 select
+	var.date_range,
 	f.emphasis_area,
 	f.county_name,
 	f.total_crash_events,
@@ -293,5 +296,6 @@ from
 	final f
 inner join totals t
 on f.county_name = t.county_name
+cross join var 
 order by
 	f.county_name, f.emphasis_area;

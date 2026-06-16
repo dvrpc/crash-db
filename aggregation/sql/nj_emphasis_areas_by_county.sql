@@ -1,8 +1,13 @@
-drop materialized view if exists nj_report.crash_emphasis_areas_counties;
+--drop materialized view if exists nj_report.crash_emphasis_areas_counties;
+--create materialized view nj_report.crash_emphasis_areas_counties as
 
-create materialized view nj_report.crash_emphasis_areas_counties as
-
-with flag_base as (
+with var as (
+select
+	concat(min("year"), '-', 
+	max("year")) as date_range
+from
+	nj.all_crash),
+	flag_base as (
 select
 	c.casenumber,
 	case
@@ -297,6 +302,7 @@ group by
 
 
 select
+	var.date_range,
 	f.county_name,
 	f.emphasis_area,
 	f.total_crash_events,
@@ -306,12 +312,15 @@ select
 	round(f.total_ksi_events * 1.0 / f.total_crash_events,
 	3) as pct_ksi_event,
 	f.total_people,
+	f.total_ksi_people,
 	round(f.total_ksi_people * 1.0 / f.total_people,
 	3) as pct_ksi_people
 from
 	"final" f
 inner join totals t
-on f.county_name = t.county_name
+on
+	f.county_name = t.county_name
+cross join var 
 order by
 	f.county_name,
 	f.emphasis_area;
