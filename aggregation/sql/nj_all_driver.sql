@@ -50,6 +50,8 @@ select
 	*
 from
 	nj_2022.driver
-)
+union all
+select * 
+from nj_2023.driver)
 
 select d.* from driver d inner join nj.all_crash c on d.casenumber = c.casenumber;

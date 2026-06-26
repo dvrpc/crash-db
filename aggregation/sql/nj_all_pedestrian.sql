@@ -1,15 +1,15 @@
-drop view if exists nj.all_vehicle cascade;
+drop view if exists nj.all_pedestrian;
 
-create view nj.all_vehicle as 
+create view nj.all_pedestrian as 
 
-with vehicle as(
+with pedestrian as(
 select
 	concat("year",
 	ncic_code,
 	dept_case_num) as casenumber,
 	*
 from
-	nj_2017.vehicle
+	nj_2017.pedestrian
 union all
 select
 	concat("year",
@@ -17,7 +17,7 @@ select
 	dept_case_num) as casenumber,
 	*
 from
-	nj_2018.vehicle
+	nj_2018.pedestrian
 union all
 select
 	concat("year",
@@ -25,7 +25,7 @@ select
 	dept_case_num) as casenumber,
 	*
 from
-	nj_2019.vehicle
+	nj_2019.pedestrian
 union all
 select
 	concat("year",
@@ -33,7 +33,7 @@ select
 	dept_case_num) as casenumber,
 	*
 from
-	nj_2020.vehicle
+	nj_2020.pedestrian
 union all
 select
 	concat("year",
@@ -41,7 +41,7 @@ select
 	dept_case_num) as casenumber,
 	*
 from
-	nj_2021.vehicle
+	nj_2021.pedestrian
 union all
 select
 	concat("year",
@@ -49,8 +49,10 @@ select
 	dept_case_num) as casenumber,
 	*
 from
-	nj_2022.vehicle
-union all 
-select * from nj_2023.vehicle)
+	nj_2022.pedestrian
+union all
+select 
+* 
+from nj_2023.pedestrian)
 
-select v.* from vehicle v inner join nj.all_crash c on v.casenumber = c.casenumber;
+select p.* from pedestrian p inner join nj.all_crash c on p.casenumber = c.casenumber;

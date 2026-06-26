@@ -44,7 +44,11 @@ pedestrian as (
 	is_bicycle,
 	is_other,
 	false as occupant, 
-	case when is_bicycle is null then true else false end as pedestrian,
+	case 
+		when is_bicycle is null then true
+		when is_bicycle is false then true
+		else false 
+		end as pedestrian,
 	contrib_circ1,
 	contrib_circ2,
 	safety_equipment_used 

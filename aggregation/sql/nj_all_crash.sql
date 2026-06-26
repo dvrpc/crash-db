@@ -21,4 +21,8 @@ select concat("year", ncic_code, dept_case_num) as casenumber, * from nj_2021.cr
 
 union all 
 
-select concat("year", ncic_code, dept_case_num) as casenumber, * from nj_2022.crash where road_system <> '09';
+select concat("year", ncic_code, dept_case_num) as casenumber, * from nj_2022.crash where road_system <> '09'
+
+union all
+
+select * from nj_2023.crash where road_system <> '09';
