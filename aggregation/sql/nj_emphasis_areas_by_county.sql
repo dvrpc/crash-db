@@ -1,5 +1,5 @@
---drop materialized view if exists nj_report.crash_emphasis_areas_counties;
---create materialized view nj_report.crash_emphasis_areas_counties as
+drop materialized view if exists nj_report.crash_emphasis_areas_counties;
+create materialized view nj_report.crash_emphasis_areas_counties as
 
 with var as (
 select
