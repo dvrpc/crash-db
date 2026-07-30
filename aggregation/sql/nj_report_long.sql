@@ -1354,9 +1354,21 @@ select
 	initcap(c.municipality) as municipality,
 	initcap(c.county) as county,
 	'month',
-	cast(extract(month
-from
-	c."date") as text),
+	case 
+when cast(extract(month from c."date") as text) = '1' then 'January'
+when cast(extract(month from c."date") as text) = '2' then 'February'
+when cast(extract(month from c."date") as text) = '3' then 'March'
+when cast(extract(month from c."date") as text) = '4' then 'April'
+when cast(extract(month from c."date") as text) = '5' then 'May'
+when cast(extract(month from c."date") as text) = '6' then 'June'
+when cast(extract(month from c."date") as text) = '7' then 'July'
+when cast(extract(month from c."date") as text) = '8' then 'August'
+when cast(extract(month from c."date") as text) = '9' then 'September'
+when cast(extract(month from c."date") as text) = '10' then 'October'
+when cast(extract(month from c."date") as text) = '11' then 'November'
+when cast(extract(month from c."date") as text) = '12' then 'December'
+	else null
+end,
 	m.max_severity_level,
 	b.pedestrian_event,
 	b.bike_event,
