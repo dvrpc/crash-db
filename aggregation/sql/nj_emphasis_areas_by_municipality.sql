@@ -1,5 +1,5 @@
---drop materialized view if exists nj_report.crash_emphasis_areas_municipalities;
---create materialized view nj_report.crash_emphasis_areas_municipalities as
+drop materialized view if exists nj_report.crash_emphasis_areas_municipalities;
+create materialized view nj_report.crash_emphasis_areas_municipalities as
 
 with var as (
 select
@@ -87,17 +87,17 @@ driver_flags as (
 select 
 	casenumber,
 	bool_or(case 
-		when "age"::int >= 65
-			and position_in_veh = '01' then true
+		when ("age"::int >= 65
+			and position_in_veh = '01') or (age::int >= 65 and pedestrian is True) or (age::int >= 65 and is_bicycle is True) then true
 			else false
 		end
-	) as older_road_driver,
+	) as older_road_user,
 	bool_or(case 
-		when "age"::int <= 20
-			and position_in_veh = '01' then true
+		when ("age"::int <= 20
+			and position_in_veh = '01') or (age::int <= 20 and pedestrian is True) or (age::int <= 20 and is_bicycle is True) then true
 			else false
 		end
-	) as younger_road_driver
+	) as younger_road_user
 from
 	nj.all_person
 group by
@@ -105,8 +105,8 @@ group by
 crash_flags as (
 select 
 		f.*,
-		d.older_road_driver,
-		d.younger_road_driver
+		d.older_road_user,
+		d.younger_road_user
 from
 	flag_base f
 left join driver_flags d 
@@ -148,20 +148,20 @@ emphasis_unpivot as (
 select
 	casenumber,
 	municipality,
-	'older_road_driver' as emphasis_area
+	'older_road_user' as emphasis_area
 from
 	crash_flags
 where
-	older_road_driver = true
+	older_road_user = true
 union all
 select
 	casenumber,
 	municipality,
-	'younger_road_driver'
+	'younger_road_user'
 from
 	crash_flags
 where
-	younger_road_driver = true
+	younger_road_user = true
 union all
 select
 	casenumber,

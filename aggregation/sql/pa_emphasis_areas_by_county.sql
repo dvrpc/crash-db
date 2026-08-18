@@ -1,6 +1,5 @@
---drop materialized view if exists pa_report.crash_emphasis_areas_counties;
-
---create materialized view pa_report.crash_emphasis_areas_counties as
+drop materialized view if exists pa_report.crash_emphasis_areas_counties;
+create materialized view pa_report.crash_emphasis_areas_counties as
 
 with var as (select concat(min(crash_year), '-', max(crash_year)) as date_range from pa.all_crash
 ),
@@ -74,11 +73,11 @@ driver_flags as (
 select
 	crn,
 	MAX(case 
-            when age >= 65 and seat_position = '01' then 1 else 0 
-        end) as older_road_driver,
+            when (age >= 65 and seat_position = '01') or (age >= 65 and person_type in ('4', '7')) then 1 else 0 
+        end) as older_road_user,
 	MAX(case 
-            when age <= 20 and seat_position = '01' then 1 else 0 
-        end) as younger_road_driver
+            when (age <= 20 and seat_position = '01') or (age <= 20 and person_type in ('4', '7')) then 1 else 0 
+        end) as younger_road_user
 from
 	pa.all_person
 group by
@@ -88,10 +87,10 @@ group by
 crash_flags as (
 select
 	f.*,
-	coalesce(d.older_road_driver,
-	0) as older_road_driver,
-	coalesce(d.younger_road_driver,
-	0) as younger_road_driver
+	coalesce(d.older_road_user,
+	0) as older_road_user,
+	coalesce(d.younger_road_user,
+	0) as younger_road_user
 from
 	flag_base f
 left join driver_flags d on
@@ -137,20 +136,20 @@ emphasis_unpivot as (
 select
 	crn,
 	county_name,
-	'older_road_driver' as emphasis_area
+	'older_road_user' as emphasis_area
 from
 	crash_flags
 where
-	older_road_driver = 1
+	older_road_user = 1
 union all
 select
 	crn,
 	county_name,
-	'younger_road_driver'
+	'younger_road_user'
 from
 	crash_flags
 where
-	younger_road_driver = 1
+	younger_road_user = 1
 union all
 select
 	crn,
