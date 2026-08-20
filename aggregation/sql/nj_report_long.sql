@@ -1503,6 +1503,39 @@ select
 	initcap(c.municipality) as municipality,
 	initcap(c.county) as county,
 	'vehicle',
+	'suv',
+	m.max_severity_level,
+	b.pedestrian_event,
+	b.bike_event,
+	count(*)
+from
+	nj.all_vehicle v
+left join nj.all_crash c 
+on
+	v.casenumber = c.casenumber
+left join max_severity m 
+on
+	v.casenumber = m.casenumber
+left join bike_ped b 
+on
+	v.casenumber = b.casenumber
+where
+	v.veh_type = '04'
+group by
+	v.casenumber,
+	crash_year,
+	municipality,
+	c.county,
+	m.max_severity_level,
+	b.pedestrian_event,
+	b.bike_event
+union all
+select
+	v.casenumber,
+	c."year" as crash_year,
+	initcap(c.municipality) as municipality,
+	initcap(c.county) as county,
+	'vehicle',
 	'motorcycle',
 	m.max_severity_level,
 	b.pedestrian_event,
@@ -1619,7 +1652,7 @@ left join bike_ped b
 on
 	v.casenumber = b.casenumber
 where
-	v.veh_type in ('02', '03', '04', '06', '07', '10', '15', '16', '19', '30', '31', '40', '99')
+	v.veh_type in ('02', '03', '06', '07', '10', '15', '16', '19', '30', '31', '40', '99')
 group by
 	v.casenumber,
 	crash_year,
