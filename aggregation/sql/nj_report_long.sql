@@ -277,7 +277,7 @@ select
 	initcap(c.municipality) as municipality,
 	initcap(c.county) as county,
 	'person_injury',
-	'serious',
+	'suspected serious injury',
 	m.max_severity_level,
 	b.pedestrian_event,
 	b.bike_event,
@@ -310,7 +310,7 @@ select
 	initcap(c.municipality) as municipality,
 	initcap(c.county) as county,
 	'person_injury',
-	'minor',
+	'suspected minor injury',
 	m.max_severity_level,
 	b.pedestrian_event,
 	b.bike_event,
@@ -343,7 +343,7 @@ select
 	initcap(c.municipality) as municipality,
 	initcap(c.county) as county,
 	'person_injury',
-	'possible',
+	'possible injury',
 	m.max_severity_level,
 	b.pedestrian_event,
 	b.bike_event,
@@ -376,7 +376,7 @@ select
 	initcap(c.municipality) as municipality,
 	initcap(c.county) as county,
 	'person_injury',
-	'no_injury',
+	'no injury',
 	m.max_severity_level,
 	b.pedestrian_event,
 	b.bike_event,
@@ -409,7 +409,7 @@ select
 	initcap(c.municipality) as municipality,
 	initcap(c.county) as county,
 	'person_injury',
-	'other',
+	'other or unknown',
 	m.max_severity_level,
 	b.pedestrian_event,
 	b.bike_event,
@@ -426,7 +426,7 @@ left join bike_ped b
 on
 	p.casenumber = b.casenumber
 where
-	p.physical_condition = '99'
+	p.physical_condition = '99' or p.physical_condition is null
 group by
 	p.casenumber,
 	crash_year,
