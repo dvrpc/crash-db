@@ -210,40 +210,6 @@ select
 	initcap(c.municipality) as municipality,
 	initcap(c.county) as county,
 	'person_injury',
-	'unknown',
-	m.max_severity_level,
-	b.pedestrian_event,
-	b.bike_event,
-	count(*)
-from
-	nj.all_person p
-left join nj.all_crash c 
-on
-	p.casenumber = c.casenumber
-left join max_severity m 
-on
-	p.casenumber = m.casenumber
-left join bike_ped b 
-on
-	p.casenumber = b.casenumber
-where
-	p.physical_condition = '00'
-	or p.physical_condition is null
-group by
-	p.casenumber,
-	crash_year,
-	municipality,
-	c.county,
-	m.max_severity_level,
-	b.pedestrian_event,
-	b.bike_event
-union all
-select
-	p.casenumber,
-	p.crash_year,
-	initcap(c.municipality) as municipality,
-	initcap(c.county) as county,
-	'person_injury',
 	'fatal',
 	m.max_severity_level,
 	b.pedestrian_event,
@@ -426,7 +392,7 @@ left join bike_ped b
 on
 	p.casenumber = b.casenumber
 where
-	p.physical_condition = '99' or p.physical_condition is null
+	p.physical_condition = '99' or p.physical_condition = '00' or p.physical_condition is null
 group by
 	p.casenumber,
 	crash_year,
