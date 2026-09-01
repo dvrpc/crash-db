@@ -48,12 +48,12 @@ max_severity as (
 select
 	casenumber,
 	case 
-		when max_severity_calc = '1' then 'fatal'
-		when max_severity_calc = '2' then 'suspected serious injury'
-		when max_severity_calc = '3' then 'suspected minor injury'
-		when max_severity_calc = '4' then 'possible injury'
-		when max_severity_calc = '9' then 'no apparent injury'
-		when max_severity_calc = '0' then 'other or unknown'
+		when max_severity_calc = '1' then 'Fatal'
+		when max_severity_calc = '2' then 'Suspected Serious Injury'
+		when max_severity_calc = '3' then 'Suspected Minor Injury'
+		when max_severity_calc = '4' then 'Possible Injury'
+		when max_severity_calc = '9' then 'No Apparent Injury'
+		when max_severity_calc = '0' then 'Other or Unknown'
 		else null
 	end as max_severity_level
 from
@@ -85,7 +85,7 @@ select
 	initcap(c.municipality) as municipality,
 	initcap(c.county) as county,
 	'max severity' as domain,
-	'fatal' as category,
+	'Fatal' as category,
 	m.max_severity_level,
 	b.pedestrian_event,
 	b.bike_event,
@@ -97,7 +97,7 @@ left join max_severity m on
 left join bike_ped b on 
 		c.casenumber = b.casenumber
 where
-		m.max_severity_level = 'fatal'
+		m.max_severity_level = 'Fatal'
 union all
 select
 	c.casenumber,
@@ -105,7 +105,7 @@ select
 	initcap(c.municipality) as municipality,
 	initcap(c.county) as county,
 	'max severity' as domain,
-	'suspected serious injury' as category,
+	'Suspected Serious Injury' as category,
 	m.max_severity_level,
 	b.pedestrian_event,
 	b.bike_event,
@@ -117,7 +117,7 @@ left join max_severity m on
 left join bike_ped b on 
 		c.casenumber = b.casenumber
 where
-		m.max_severity_level = 'suspected serious injury'
+		m.max_severity_level = 'Suspected Serious Injury'
 union all
 select
 	c.casenumber,
@@ -125,7 +125,7 @@ select
 	initcap(c.municipality) as municipality,
 	initcap(c.county) as county,
 	'max severity' as domain,
-	'suspected minor injury' as category,
+	'Suspected Minor Injury' as category,
 	m.max_severity_level,
 	b.pedestrian_event,
 	b.bike_event,
@@ -137,7 +137,7 @@ left join max_severity m on
 left join bike_ped b on 
 		c.casenumber = b.casenumber
 where
-		m.max_severity_level = 'suspected minor injury'
+		m.max_severity_level = 'Suspected Minor Injury'
 union all
 select
 	c.casenumber,
@@ -145,7 +145,7 @@ select
 	initcap(c.municipality) as municipality,
 	initcap(c.county) as county,
 	'max severity' as domain,
-	'possible injury' as category,
+	'Possible Injury' as category,
 	m.max_severity_level,
 	b.pedestrian_event,
 	b.bike_event,
@@ -157,7 +157,7 @@ left join max_severity m on
 left join bike_ped b on 
 		c.casenumber = b.casenumber
 where
-		m.max_severity_level = 'possible injury'
+		m.max_severity_level = 'Possible Injury'
 union all
 select
 	c.casenumber,
@@ -165,7 +165,7 @@ select
 	initcap(c.municipality) as municipality,
 	initcap(c.county) as county,
 	'max severity' as domain,
-	'no apparent injury' as category,
+	'No Apparent Injury' as category,
 	m.max_severity_level,
 	b.pedestrian_event,
 	b.bike_event,
@@ -177,7 +177,7 @@ left join max_severity m on
 left join bike_ped b on 
 		c.casenumber = b.casenumber
 where
-		m.max_severity_level = 'no apparent injury'
+		m.max_severity_level = 'No Apparent Injury'
 union all
 select
 	c.casenumber,
@@ -185,7 +185,7 @@ select
 	initcap(c.municipality) as municipality,
 	initcap(c.county) as county,
 	'max severity' as domain,
-	'other or unknown' as category,
+	'Other or Unknown' as category,
 	m.max_severity_level,
 	b.pedestrian_event,
 	b.bike_event,
@@ -197,8 +197,28 @@ left join max_severity m on
 left join bike_ped b on 
 		c.casenumber = b.casenumber
 where
-		m.max_severity_level = 'other or unknown'
-		or m.max_severity_level is null
+		m.max_severity_level = 'Other or Unknown'
+		
+union all
+select
+	c.casenumber,
+	c."year" as crash_year,
+	initcap(c.municipality) as municipality,
+	initcap(c.county) as county,
+	'max severity' as domain,
+	NULL as category,
+	m.max_severity_level,
+	b.pedestrian_event,
+	b.bike_event,
+		1 as cnt
+from
+		nj.all_crash c
+left join max_severity m on
+		c.casenumber = m.casenumber
+left join bike_ped b on 
+		c.casenumber = b.casenumber
+where
+		m.max_severity_level is null
 
 /* =========================================================
    PERSON INJURY SEVERITY
