@@ -1,5 +1,5 @@
-drop view if exists nj.all_person cascade;
-create view nj.all_person as
+drop materialized view if exists nj.all_person cascade;
+create materialized view nj.all_person as
 with occupant as (
 	select o.casenumber,
 	o."year" as crash_year,
