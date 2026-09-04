@@ -1,4 +1,5 @@
---create materialized view nj_report.max_severity_level as  
+drop materialized view if exists nj_report.max_severity_level cascade;
+create materialized view nj_report.max_severity_level as  
 with severity_calc as (
 select
 	p.casenumber,
@@ -11,9 +12,7 @@ select
             when '03' then 3
             when '04' then 4
             when '05' then 5
-            when '00' then 6
-            when '99' then 6
-            else null
+            else 6
         end
     )
 		when 1 then '1'
@@ -38,12 +37,12 @@ max_severity as (
 select
 	casenumber,
 	case 
-		when max_severity_calc = '1' then 'fatal'
-		when max_severity_calc = '2' then 'suspected serious injury'
-		when max_severity_calc = '3' then 'suspected minor injury'
-		when max_severity_calc = '4' then 'possible injury'
-		when max_severity_calc = '9' then 'no apparent injury'
-		when max_severity_calc = '0' then 'other or unknown'
+		when max_severity_calc = '1' then 'Fatal'
+		when max_severity_calc = '2' then 'Suspected Serious Injury'
+		when max_severity_calc = '3' then 'Suspected Minor Injury'
+		when max_severity_calc = '4' then 'Possible Injury'
+		when max_severity_calc = '9' then 'No Apparent Injury'
+		when max_severity_calc = '0' then 'Other or Unknown'
 		else null
 	end as max_severity_level
 from

@@ -5,18 +5,15 @@ create materialized view nj_report.report_summary_long as
 with severity_calc as (
 select
 	p.casenumber,
-	c."year" as crash_year,
 	case
 		MIN(
-        case nullif(TRIM(p.physical_condition), '')
+        case p.physical_condition
             when '01' then 1
             when '02' then 2
             when '03' then 3
             when '04' then 4
             when '05' then 5
-            when '00' then 6
-            when '99' then 6
-            else null
+            else 6
         end
     )
 		when 1 then '1'
@@ -26,23 +23,13 @@ select
 		when 5 then '9'
 		when 6 then '0'
 		else null
-	end as max_severity_calc,
-	case
-		when c.county in ('Burlington', 'BURLINGTON') then 'BURLINGTON'
-		when c.county in ('Camden', 'CAMDEN') then 'CAMDEN'
-		when c.county in ('Gloucester', 'GLOUCESTER') then 'GLOUCESTER'
-		when c.county in ('Mercer', 'MERCER') then 'MERCER'
-		else null
-	end as 
-	county
+	end as max_severity_calc
 from
 	nj.all_person p
 left join nj.all_crash c on
 	p.casenumber = c.casenumber
 group by
-	p.casenumber,
-	"year",
-	county
+	p.casenumber
 ), 
 max_severity as (
 select

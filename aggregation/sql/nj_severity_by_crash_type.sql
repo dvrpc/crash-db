@@ -10,7 +10,7 @@ with people as  (
 			when physical_condition = '03' then 'Suspected Minor Injury'
 			when physical_condition = '04' then 'Possible Injury'
 			when physical_condition = '05' then 'No Apparent Injury'
-			when physical_condition in ('00', '06') then 'Other or Unknown'
+			when physical_condition in ('00', '06') or physical_condition is null then 'Other or Unknown'
 			else null end as physical_condition
 	from nj.all_person
 		)
