@@ -13,18 +13,25 @@ with people as  (
 			when physical_condition in ('00', '06') or physical_condition is null then 'Other or Unknown'
 			else null end as physical_condition
 	from nj.all_person
-		)
+		),
+person_events as (  
+select distinct(casenumber) from nj.all_person),
+crashes as (  
+select c.* 
+from nj.all_crash c 
+inner join person_events pe
+on c.casenumber = pe.casenumber)
 		
 --Event-level
 select 
-'event' as resolution,
+'events' as resolution,
 ct.description as crash_type,
 ms.max_severity_level as severity,
 'state' as geography_resolution,
 'NJ' as geography,
 count(*) as total,
 round(count(*)/sum(count(*)) over (partition by ct.description), 3) as pct
-from nj.all_crash c 
+from crashes c 
 left join nj_report.max_severity_level ms
 on c.casenumber = ms.casenumber
 left join nj_2017_lookup.crash_type ct 
@@ -36,14 +43,14 @@ union all
 
 
 select 
-'event',
+'events',
 ct.description as crash_type,
 ms.max_severity_level as severity,
 'county' as geography_resolution,
 initcap(county) as geography,
 count(*) as total,
 round(count(*)/sum(count(*)) over (partition by initcap(county), ct.description), 3) as pct
-from nj.all_crash c 
+from crashes c 
 left join nj_report.max_severity_level ms
 on c.casenumber = ms.casenumber
 left join nj_2017_lookup.crash_type ct 
@@ -55,14 +62,14 @@ union all
 
 
 select 
-'event',
+'events',
 ct.description as crash_type,
 ms.max_severity_level as severity,
 'municipality' as geography_resolution,
 initcap(municipality) as geography,
 count(*) as total,
 round(count(*)/sum(count(*)) over (partition by initcap(municipality), ct.description), 3) as pct
-from nj.all_crash c 
+from crashes c 
 left join nj_report.max_severity_level ms
 on c.casenumber = ms.casenumber
 left join nj_2017_lookup.crash_type ct 
@@ -82,7 +89,7 @@ p.physical_condition as severity,
 'NJ' as geography,
 count(*) as total,
 round(count(*)/sum(count(*)) over (partition by ct.description), 3) as pct
-from nj.all_crash c 
+from crashes c 
 left join people p 
 on c.casenumber = p.casenumber
 left join nj_2017_lookup.physical_condition pc 
@@ -103,7 +110,7 @@ p.physical_condition as severity,
 initcap(county) as geography,
 count(*) as total,
 round(count(*)/sum(count(*)) over (partition by initcap(county), ct.description), 3) as pct
-from nj.all_crash c 
+from crashes c 
 left join people p 
 on c.casenumber = p.casenumber
 left join nj_2017_lookup.physical_condition pc 
@@ -123,7 +130,7 @@ p.physical_condition as severity,
 initcap(municipality) as geography,
 count(*) as total,
 round(count(*)/sum(count(*)) over (partition by initcap(municipality), ct.description), 3) as pct
-from nj.all_crash c 
+from crashes c 
 left join people p 
 on c.casenumber = p.casenumber
 left join nj_2017_lookup.physical_condition pc 

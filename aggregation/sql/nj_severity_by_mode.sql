@@ -40,7 +40,14 @@ people as (
 			when physical_condition in ('00', '06') or physical_condition is null then 'Other or Unknown'
 			else null end as physical_condition
 	from nj.all_person
-		)
+		),
+person_events as (  
+select distinct(casenumber) from nj.all_person),
+crashes as (  
+select c.* 
+from nj.all_crash c 
+inner join person_events pe
+on c.casenumber = pe.casenumber)
 
 -- state
 
@@ -59,7 +66,7 @@ select
         ),
         3
     ) as pct
-from nj.all_crash c
+from crashes c
 left join nj_report.max_severity_level ms
     on c.casenumber = ms.casenumber
 left join vehicles v
@@ -89,7 +96,7 @@ select
         3
     ) as pct
 from people p
-left join nj.all_crash c 
+left join crashes c 
 on p.casenumber = c.casenumber
 left join vehicles v
     on p.casenumber = v.casenumber and p.veh_num = v.veh_num
@@ -118,7 +125,7 @@ select
         ),
         3
     ) as pct
-from nj.all_crash c
+from crashes c
 left join nj_report.max_severity_level ms
     on c.casenumber = ms.casenumber
 left join events_by_mode ebm
@@ -152,7 +159,7 @@ select
         ),
         3
     ) as pct
-from nj.all_crash c
+from crashes c
 left join nj_report.max_severity_level ms
     on c.casenumber = ms.casenumber
 left join vehicles v
@@ -183,7 +190,7 @@ select
         3
     ) as pct
 from people p
-left join nj.all_crash c 
+left join crashes c 
 on p.casenumber = c.casenumber
 left join vehicles v
     on p.casenumber = v.casenumber and p.veh_num = v.veh_num
@@ -214,7 +221,7 @@ select
         ),
         3
     ) as pct
-from nj.all_crash c
+from crashes c
 left join nj_report.max_severity_level ms
     on c.casenumber = ms.casenumber
 left join events_by_mode ebm
@@ -247,7 +254,7 @@ select
         ),
         3
     ) as pct
-from nj.all_crash c
+from crashes c
 left join nj_report.max_severity_level ms
     on c.casenumber = ms.casenumber
 left join vehicles v
@@ -277,7 +284,7 @@ select
         3
     ) as pct
 from people p 
-left join nj.all_crash c 
+left join crashes c 
 on p.casenumber = c.casenumber 
 left join vehicles v
     on p.casenumber = v.casenumber and p.veh_num = v.veh_num
@@ -307,7 +314,7 @@ select
         ),
         3
     ) as pct
-from nj.all_crash c
+from crashes c
 left join nj_report.max_severity_level ms
     on c.casenumber = ms.casenumber
 left join events_by_mode ebm
