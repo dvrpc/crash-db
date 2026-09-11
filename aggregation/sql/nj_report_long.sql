@@ -60,7 +60,14 @@ from
 	nj.all_person p
 group by
 	casenumber
-)
+),
+person_events as (  
+select distinct(casenumber) from nj.all_person),
+crashes as (  
+select c.* 
+from nj.all_crash c 
+inner join person_events pe
+on c.casenumber = pe.casenumber)
 
 /* =========================================================
    MAX SEVERITY
@@ -78,7 +85,7 @@ select
 	b.bike_event,
 		1 as cnt
 from
-		nj.all_crash c
+		crashes c
 left join max_severity m on
 		c.casenumber = m.casenumber
 left join bike_ped b on 
@@ -98,7 +105,7 @@ select
 	b.bike_event,
 		1 as cnt
 from
-		nj.all_crash c
+		crashes c
 left join max_severity m on
 		c.casenumber = m.casenumber
 left join bike_ped b on 
@@ -118,7 +125,7 @@ select
 	b.bike_event,
 		1 as cnt
 from
-		nj.all_crash c
+		crashes c
 left join max_severity m on
 		c.casenumber = m.casenumber
 left join bike_ped b on 
@@ -138,7 +145,7 @@ select
 	b.bike_event,
 		1 as cnt
 from
-		nj.all_crash c
+		crashes c
 left join max_severity m on
 		c.casenumber = m.casenumber
 left join bike_ped b on 
@@ -158,7 +165,7 @@ select
 	b.bike_event,
 		1 as cnt
 from
-		nj.all_crash c
+		crashes c
 left join max_severity m on
 		c.casenumber = m.casenumber
 left join bike_ped b on 
@@ -178,7 +185,7 @@ select
 	b.bike_event,
 		1 as cnt
 from
-		nj.all_crash c
+		crashes c
 left join max_severity m on
 		c.casenumber = m.casenumber
 left join bike_ped b on 
@@ -199,7 +206,7 @@ select
 	b.bike_event,
 		1 as cnt
 from
-		nj.all_crash c
+		crashes c
 left join max_severity m on
 		c.casenumber = m.casenumber
 left join bike_ped b on 
@@ -224,7 +231,7 @@ select
 	count(*)
 from
 	nj.all_person p
-left join nj.all_crash c 
+left join crashes c 
 on
 	p.casenumber = c.casenumber
 left join max_severity m 
@@ -257,7 +264,7 @@ select
 	count(*)
 from
 	nj.all_person p
-left join nj.all_crash c 
+left join crashes c 
 on
 	p.casenumber = c.casenumber
 left join max_severity m 
@@ -290,7 +297,7 @@ select
 	count(*)
 from
 	nj.all_person p
-left join nj.all_crash c 
+left join crashes c 
 on
 	p.casenumber = c.casenumber
 left join max_severity m 
@@ -323,7 +330,7 @@ select
 	count(*)
 from
 	nj.all_person p
-left join nj.all_crash c 
+left join crashes c 
 on
 	p.casenumber = c.casenumber
 left join max_severity m 
@@ -356,7 +363,7 @@ select
 	count(*)
 from
 	nj.all_person p
-left join nj.all_crash c 
+left join crashes c 
 on
 	p.casenumber = c.casenumber
 left join max_severity m 
@@ -389,7 +396,7 @@ select
 	count(*)
 from
 	nj.all_person p
-left join nj.all_crash c 
+left join crashes c 
 on
 	p.casenumber = c.casenumber
 left join max_severity m 
@@ -425,7 +432,7 @@ union all
 	b.bike_event,
 		1 as cnt
 from
-		nj.all_crash c
+		crashes c
 left join max_severity m on
 		c.casenumber = m.casenumber
 left join bike_ped b on 
@@ -446,7 +453,7 @@ select
 	b.bike_event,
 		1 as cnt
 from
-		nj.all_crash c
+		crashes c
 left join max_severity m on
 		c.casenumber = m.casenumber
 left join bike_ped b on 
@@ -466,7 +473,7 @@ select
 	b.bike_event,
 		1 as cnt
 from
-		nj.all_crash c
+		crashes c
 left join max_severity m on
 		c.casenumber = m.casenumber
 left join bike_ped b on 
@@ -486,7 +493,7 @@ select
 	b.bike_event,
 		1 as cnt
 from
-		nj.all_crash c
+		crashes c
 left join max_severity m on
 		c.casenumber = m.casenumber
 left join bike_ped b on 
@@ -506,7 +513,7 @@ select
 	b.bike_event,
 		1 as cnt
 from
-		nj.all_crash c
+		crashes c
 left join max_severity m on
 		c.casenumber = m.casenumber
 left join bike_ped b on 
@@ -526,7 +533,7 @@ select
 	b.bike_event,
 		1 as cnt
 from
-		nj.all_crash c
+		crashes c
 left join max_severity m on
 		c.casenumber = m.casenumber
 left join bike_ped b on 
@@ -546,7 +553,7 @@ select
 	b.bike_event,
 		1 as cnt
 from
-		nj.all_crash c
+		crashes c
 left join max_severity m on
 		c.casenumber = m.casenumber
 left join bike_ped b on 
@@ -566,7 +573,7 @@ select
 	b.bike_event,
 		1 as cnt
 from
-		nj.all_crash c
+		crashes c
 left join max_severity m on
 		c.casenumber = m.casenumber
 left join bike_ped b on 
@@ -586,7 +593,7 @@ select
 	b.bike_event,
 		1 as cnt
 from
-		nj.all_crash c
+		crashes c
 left join max_severity m on
 		c.casenumber = m.casenumber
 left join bike_ped b on 
@@ -606,7 +613,7 @@ select
 	b.bike_event,
 		1 as cnt
 from
-		nj.all_crash c
+		crashes c
 left join max_severity m on
 		c.casenumber = m.casenumber
 left join bike_ped b on 
@@ -626,7 +633,7 @@ select
 	b.bike_event,
 		1 as cnt
 from
-		nj.all_crash c
+		crashes c
 left join max_severity m on
 		c.casenumber = m.casenumber
 left join bike_ped b on 
@@ -646,7 +653,7 @@ select
 	b.bike_event,
 		1 as cnt
 from
-		nj.all_crash c
+		crashes c
 left join max_severity m on
 		c.casenumber = m.casenumber
 left join bike_ped b on 
@@ -666,7 +673,7 @@ select
 	b.bike_event,
 		1 as cnt
 from
-		nj.all_crash c
+		crashes c
 left join max_severity m on
 		c.casenumber = m.casenumber
 left join bike_ped b on 
@@ -686,7 +693,7 @@ select
 	b.bike_event,
 		1 as cnt
 from
-		nj.all_crash c
+		crashes c
 left join max_severity m on
 		c.casenumber = m.casenumber
 left join bike_ped b on 
@@ -706,7 +713,7 @@ select
 	b.bike_event,
 		1 as cnt
 from
-		nj.all_crash c
+		crashes c
 left join max_severity m on
 		c.casenumber = m.casenumber
 left join bike_ped b on 
@@ -726,7 +733,7 @@ select
 	b.bike_event,
 		1 as cnt
 from
-		nj.all_crash c
+		crashes c
 left join max_severity m on
 		c.casenumber = m.casenumber
 left join bike_ped b on 
@@ -746,7 +753,7 @@ select
 	b.bike_event,
 		1 as cnt
 from
-		nj.all_crash c
+		crashes c
 left join max_severity m on
 		c.casenumber = m.casenumber
 left join bike_ped b on 
@@ -766,7 +773,7 @@ select
 	b.bike_event,
 		1 as cnt
 from
-		nj.all_crash c
+		crashes c
 left join max_severity m on
 		c.casenumber = m.casenumber
 left join bike_ped b on 
@@ -791,7 +798,7 @@ select
 	b.bike_event,
 		1 as cnt
 from
-		nj.all_crash c
+		crashes c
 left join max_severity m on
 		c.casenumber = m.casenumber
 left join bike_ped b on 
@@ -811,7 +818,7 @@ select
 	b.bike_event,
 		1 as cnt
 from
-		nj.all_crash c
+		crashes c
 left join max_severity m on
 		c.casenumber = m.casenumber
 left join bike_ped b on 
@@ -831,7 +838,7 @@ select
 	b.bike_event,
 		1 as cnt
 from
-		nj.all_crash c
+		crashes c
 left join max_severity m on
 		c.casenumber = m.casenumber
 left join bike_ped b on 
@@ -851,7 +858,7 @@ select
 	b.bike_event,
 		1 as cnt
 from
-		nj.all_crash c
+		crashes c
 left join max_severity m on
 		c.casenumber = m.casenumber
 left join bike_ped b on 
@@ -871,7 +878,7 @@ select
 	b.bike_event,
 		1 as cnt
 from
-		nj.all_crash c
+		crashes c
 left join max_severity m on
 		c.casenumber = m.casenumber
 left join bike_ped b on 
@@ -891,7 +898,7 @@ select
 	b.bike_event,
 		1 as cnt
 from
-		nj.all_crash c
+		crashes c
 left join max_severity m on
 		c.casenumber = m.casenumber
 left join bike_ped b on 
@@ -915,7 +922,7 @@ select
 	b.bike_event,
 		1 as cnt
 from
-		nj.all_crash c
+		crashes c
 left join max_severity m on
 		c.casenumber = m.casenumber
 left join bike_ped b on 
@@ -936,7 +943,7 @@ select
 	b.bike_event,
 		1 as cnt
 from
-		nj.all_crash c
+		crashes c
 left join max_severity m on
 		c.casenumber = m.casenumber
 left join bike_ped b on 
@@ -956,7 +963,7 @@ select
 	b.bike_event,
 		1 as cnt
 from
-		nj.all_crash c
+		crashes c
 left join max_severity m on
 		c.casenumber = m.casenumber
 left join bike_ped b on 
@@ -976,7 +983,7 @@ select
 	b.bike_event,
 		1 as cnt
 from
-		nj.all_crash c
+		crashes c
 left join max_severity m on
 		c.casenumber = m.casenumber
 left join bike_ped b on 
@@ -996,7 +1003,7 @@ select
 	b.bike_event,
 		1 as cnt
 from
-		nj.all_crash c
+		crashes c
 left join max_severity m on
 		c.casenumber = m.casenumber
 left join bike_ped b on 
@@ -1016,7 +1023,7 @@ select
 	b.bike_event,
 		1 as cnt
 from
-		nj.all_crash c
+		crashes c
 left join max_severity m on
 		c.casenumber = m.casenumber
 left join bike_ped b on 
@@ -1041,7 +1048,7 @@ select
 	b.bike_event,
 		1 as cnt
 from
-		nj.all_crash c
+		crashes c
 left join max_severity m on
 		c.casenumber = m.casenumber
 left join bike_ped b on 
@@ -1062,7 +1069,7 @@ select
 	b.bike_event,
 		1 as cnt
 from
-		nj.all_crash c
+		crashes c
 left join max_severity m on
 		c.casenumber = m.casenumber
 left join bike_ped b on 
@@ -1082,7 +1089,7 @@ select
 	b.bike_event,
 		1 as cnt
 from
-		nj.all_crash c
+		crashes c
 left join max_severity m on
 		c.casenumber = m.casenumber
 left join bike_ped b on 
@@ -1102,7 +1109,7 @@ select
 	b.bike_event,
 		1 as cnt
 from
-		nj.all_crash c
+		crashes c
 left join max_severity m on
 		c.casenumber = m.casenumber
 left join bike_ped b on 
@@ -1122,7 +1129,7 @@ select
 	b.bike_event,
 		1 as cnt
 from
-		nj.all_crash c
+		crashes c
 left join max_severity m on
 		c.casenumber = m.casenumber
 left join bike_ped b on 
@@ -1148,7 +1155,7 @@ select
 	b.bike_event,
 		1 as cnt
 from
-		nj.all_crash c
+		crashes c
 left join max_severity m on
 		c.casenumber = m.casenumber
 left join bike_ped b on 
@@ -1169,7 +1176,7 @@ select
 	b.bike_event,
 		1 as cnt
 from
-		nj.all_crash c
+		crashes c
 left join max_severity m on
 		c.casenumber = m.casenumber
 left join bike_ped b on 
@@ -1189,7 +1196,7 @@ select
 	b.bike_event,
 		1 as cnt
 from
-		nj.all_crash c
+		crashes c
 left join max_severity m on
 		c.casenumber = m.casenumber
 left join bike_ped b on 
@@ -1209,7 +1216,7 @@ select
 	b.bike_event,
 		1 as cnt
 from
-		nj.all_crash c
+		crashes c
 left join max_severity m on
 		c.casenumber = m.casenumber
 left join bike_ped b on 
@@ -1229,7 +1236,7 @@ select
 	b.bike_event,
 		1 as cnt
 from
-		nj.all_crash c
+		crashes c
 left join max_severity m on
 		c.casenumber = m.casenumber
 left join bike_ped b on 
@@ -1249,7 +1256,7 @@ select
 	b.bike_event,
 		1 as cnt
 from
-		nj.all_crash c
+		crashes c
 left join max_severity m on
 		c.casenumber = m.casenumber
 left join bike_ped b on 
@@ -1269,7 +1276,7 @@ select
 	b.bike_event,
 		1 as cnt
 from
-		nj.all_crash c
+		crashes c
 left join max_severity m on
 		c.casenumber = m.casenumber
 left join bike_ped b on 
@@ -1289,7 +1296,7 @@ select
 	b.bike_event,
 		1 as cnt
 from
-		nj.all_crash c
+		crashes c
 left join max_severity m on
 		c.casenumber = m.casenumber
 left join bike_ped b on 
@@ -1309,7 +1316,7 @@ select
 	b.bike_event,
 		1 as cnt
 from
-		nj.all_crash c
+		crashes c
 left join max_severity m on
 		c.casenumber = m.casenumber
 left join bike_ped b on 
@@ -1347,7 +1354,7 @@ end,
 	b.bike_event,
 		1 as cnt
 from
-		nj.all_crash c
+		crashes c
 left join max_severity m on
 		c.casenumber = m.casenumber
 left join bike_ped b on 
@@ -1374,7 +1381,7 @@ select
 	b.bike_event,
 		1 as cnt
 from
-		nj.all_crash c
+		crashes c
 left join max_severity m on
 		c.casenumber = m.casenumber
 left join bike_ped b on 
@@ -1393,7 +1400,7 @@ select
 	b.bike_event,
 		1 as cnt
 from
-		nj.all_crash c
+		crashes c
 left join max_severity m on
 		c.casenumber = m.casenumber
 left join bike_ped b on 
@@ -1416,7 +1423,7 @@ select
 	count(*)
 from
 	nj.all_vehicle v
-left join nj.all_crash c 
+left join crashes c 
 on
 	v.casenumber = c.casenumber
 left join max_severity m 
@@ -1450,7 +1457,7 @@ select
 	count(*)
 from
 	nj.all_vehicle v
-left join nj.all_crash c 
+left join crashes c 
 on
 	v.casenumber = c.casenumber
 left join max_severity m 
@@ -1483,7 +1490,7 @@ select
 	count(*)
 from
 	nj.all_vehicle v
-left join nj.all_crash c 
+left join crashes c 
 on
 	v.casenumber = c.casenumber
 left join max_severity m 
@@ -1516,7 +1523,7 @@ select
 	count(*)
 from
 	nj.all_vehicle v
-left join nj.all_crash c 
+left join crashes c 
 on
 	v.casenumber = c.casenumber
 left join max_severity m 
@@ -1549,7 +1556,7 @@ select
 	count(*)
 from
 	nj.all_vehicle v
-left join nj.all_crash c 
+left join crashes c 
 on
 	v.casenumber = c.casenumber
 left join max_severity m 
@@ -1582,7 +1589,7 @@ select
 	count(*)
 from
 	nj.all_vehicle v
-left join nj.all_crash c 
+left join crashes c 
 on
 	v.casenumber = c.casenumber
 left join max_severity m 
@@ -1615,7 +1622,7 @@ select
 	count(*)
 from
 	nj.all_vehicle v
-left join nj.all_crash c 
+left join crashes c 
 on
 	v.casenumber = c.casenumber
 left join max_severity m 
@@ -1648,7 +1655,7 @@ select
 	count(*)
 from
 	nj.all_vehicle v
-left join nj.all_crash c 
+left join crashes c 
 on
 	v.casenumber = c.casenumber
 left join max_severity m 
@@ -1681,7 +1688,7 @@ select
 	count(*)
 from
 	nj.all_vehicle v
-left join nj.all_crash c 
+left join crashes c 
 on
 	v.casenumber = c.casenumber
 left join max_severity m 
