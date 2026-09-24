@@ -119,9 +119,9 @@ NOTE: Where lookup tables contain reserved codes/values, they are included in th
 
 ### PennDOT
 
-  - 2024 Crash Database Primer: <https://gis.penndot.gov/gishub/crashZip/OPEN%20DATA%20PORTAL%20Database%20Primer%2010-16.pdf>
+  - Crash Database Primer: <https://gis.penndot.pa.gov/gishub/crashzip/crash_database_primer.pdf>
   - Data dictionary (06-26 version): <https://gis.penndot.pa.gov/gishub/crashZip/Crash_Data_Dictionary_2026.pdf>
-  - 2024 data download: <https://experience.arcgis.com/experience/51809b06e7b140208a4ed6fbad964990>
+  - Data download: <https://experience.arcgis.com/experience/51809b06e7b140208a4ed6fbad964990>
 
 #### 2025 re-issue of all years
 
