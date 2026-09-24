@@ -15,7 +15,8 @@ declare
 begin
 
     raise info '..Fix miscellaneous issues';
-    -- Cleaning that applies to all years comes first; below that is year-specific cleaning.
+    -- All cleaning applies to every year (values found only in some years are harmless no-ops in
+    -- others, and PennDOT may re-issue past years).
 
     /* start lookup -> bool */
     -- Convert fields that use lookup tables to represent boolean values into booleans.
@@ -80,38 +81,20 @@ begin
     execute format($q$update temp_vehicle_%s set make_cd = null where make_cd in ('BLUI', 'DGEN', 'ENGF', 'FREF', 'ICBU', 'KALM', 'KNNW', 'LUCI', 'TRIU')$q$, year);
     execute format($q$update temp_vehicle_%s set make_cd = 'BMW' where make_cd = 'BMW1'$q$, year);
     execute format($q$update temp_vehicle_%s set veh_reg_state = null where veh_reg_state in ('04', '08', '09', '12', '99', 'A', 'AF', 'AP', 'FA', 'KA', 'NT', 'P', 'P-', 'PQ', 'PS', 'PZ', 'UK', 'UN', 'US', 'XN', 'XX', 'Z')$q$, year);
+    execute format($q$update temp_vehicle_%s set vina_body_type_cd = null where vina_body_type_cd in ('''', '4C', 'C', 'M', 'P', 'P2C', 'P2W', 'P3D', 'P3P', 'P4C', 'P4D', 'P4H', 'P4L', 'P4P', 'P4T', 'PBU', 'PC4', 'PCC', 'PCG', 'PCU', 'PDS', 'PFW', 'PGS', 'PNX', 'PRS', 'PSD', 'PSV', 'PSW', 'PUT', 'PVN', 'PWC', 'PYY', 'T', 'T2W')$q$, year);
     execute format($q$update temp_cycle_%s set mc_dvr_hlmt_type = null where mc_dvr_hlmt_type = ' '$q$, year);
     execute format($q$update temp_cycle_%s set mc_pas_hlmt_type = null where mc_pas_hlmt_type = ' '$q$, year);
+    execute format($q$update temp_person_%s set dvr_ped_condition = null where dvr_ped_condition = '8.0'$q$, year);
+    execute format($q$update temp_vehicle_%s set body_type = null where body_type = '77'$q$, year);
 
     -- Change invalid values/codes used for null to null.
     -- axle_cnt: 99 = Unknown (98 = Other, also not a count) per data dictionary.
     execute format($q$update temp_commveh_%s set axle_cnt = null where axle_cnt in ('98', '99')$q$, year);
     execute format($q$update temp_commveh_%s set gvwr = null where gvwr = 'UNKNOW'$q$, year);
+    execute format($q$update temp_vehicle_%s set travel_spd = null where travel_spd = 'UNK'$q$, year);
 
     -- Miscellaneous fixes.
     execute format($q$update temp_commveh_%s set gvwr = replace(gvwr, ',', '')$q$, year);
-
-    execute format($q$update temp_vehicle_%s set vina_body_type_cd = null where vina_body_type_cd in ('''', '4C', 'C', 'M', 'P', 'P2C', 'P2W', 'P3D', 'P3P', 'P4C', 'P4D', 'P4H', 'P4L', 'P4P', 'P4T', 'PBU', 'PC4', 'PCC', 'PCG', 'PCU', 'PDS', 'PFW', 'PGS', 'PNX', 'PRS', 'PSD', 'PSV', 'PSW', 'PUT', 'PVN', 'PWC', 'PYY', 'T', 'T2W')$q$, year);
-    
-    /* Year-specific. */
-    -- If anything here occurs in more than one year, move above to apply to all years.
-    if year = '2007' or year = '2006' or year = '2005' then
-        execute format($q$update temp_person_%s set dvr_ped_condition = null where dvr_ped_condition = '8.0'$q$, year);
-    end if;
-    
-    if year = '2024' then
-    elseif year = '2023' then
-    elseif year = '2022' then
-    elseif year = '2021' then      
-    elseif year = '2020' then
-    elseif year = '2019' then
-    elseif year = '2018' then
-    elseif year = '2013' then
-        execute format($q$update temp_vehicle_%s set body_type = null where body_type = '77'$q$, year);
-    elseif year = '2008' then
-        execute format($q$update temp_vehicle_%s set travel_spd = null where travel_spd = 'UNK'$q$, year);
-    elseif year = '2007' then
-    end if;
 
     -- Remove decimals from values in fields that reference lookup tables.'
     raise info '..Remove decimals from lookup table values';
