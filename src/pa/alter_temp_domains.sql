@@ -17,11 +17,12 @@ begin
     execute format($q$alter table temp_commveh_%s alter hazmat_rel_ind3 type text129_as_bool using hazmat_rel_ind3::text129_as_bool$q$, year);
     execute format($q$alter table temp_commveh_%s alter hazmat_rel_ind4 type text129_as_bool using hazmat_rel_ind4::text129_as_bool$q$, year);
 
-    -- text24hhmm FAILED (contains 9999). 
-    execute format($q$alter table temp_crash_%s alter arrival_tm type text24hhmm_9999 using arrival_tm::text24hhmm_9999$q$, year);
-    execute format($q$alter table temp_crash_%s alter dispatch_tm type text24hhmm_9999 using dispatch_tm::text24hhmm_9999$q$, year);
+    -- text24hhmm FAILED (contains 9999, and other values > 2400, e.g. 3227 in 2006). Values > 2400
+    -- are made null in clean_data.sql.
+    execute format($q$alter table temp_crash_%s alter arrival_tm type text_as_pos_int using arrival_tm::text_as_pos_int$q$, year);
+    execute format($q$alter table temp_crash_%s alter dispatch_tm type text_as_pos_int using dispatch_tm::text_as_pos_int$q$, year);
     execute format($q$alter table temp_crash_%s alter roadway_cleared type text24hhmm_9999 using roadway_cleared::text24hhmm_9999$q$, year);
-    execute format($q$alter table temp_crash_%s alter time_of_day type text24hhmm_9999 using time_of_day::text24hhmm_9999$q$, year);
+    execute format($q$alter table temp_crash_%s alter time_of_day type text_as_pos_int using time_of_day::text_as_pos_int$q$, year);
 
     -- text00_23 FAILED (contains 99).
     execute format($q$alter table temp_crash_%s alter hour_of_day type text00_23_99 using hour_of_day::text00_23_99$q$, year);

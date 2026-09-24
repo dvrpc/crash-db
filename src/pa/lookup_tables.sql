@@ -30,6 +30,7 @@ begin
             ('00', 'Not Transported'),
             ('01', 'EMS Air'),
             ('02', 'EMS Ground'),
+            ('03', 'Law Enforcement'), -- Added from 2026 data dictionary
             ('98', 'Other'),
             ('99', 'Unknown');
     
@@ -65,7 +66,8 @@ begin
             ('4', 'Steering - evidence or driver stated'),
             ('5', 'Steering and braking - evidence or stated'),
             ('6', 'Other avoidance maneuver'),
-            ('7', 'Inconclusive');
+            ('7', 'Inconclusive'),
+            ('8', 'Unknown'); -- Added from 2026 data dictionary
 
         insert into pa_lookup.body_type (code, description) values
             ('01', 'Convertible'),
@@ -369,6 +371,7 @@ begin
             ('2', 'Suspected Serious injury'),
             ('3', 'Suspected Minor injury'),
             ('4', 'Possible Injury'),
+            ('5', 'Died Prior to Crash'), -- Added from 2026 data dictionary
             ('8', 'Injury/ Unknown Severity'),
             ('9', 'Unknown if Injured');
     
@@ -441,6 +444,7 @@ begin
             ('2', 'Suspected Serious Injury'),
             ('3', 'Suspected Minor Injury'),
             ('4', 'Possible Injury'),
+            ('5', 'Died Prior to Crash'), -- Added from 2026 data dictionary
             ('8', 'Injury – Unknown Severity'),
             ('9', 'Unknown if Injured');
     
@@ -514,8 +518,12 @@ begin
             ('10', 'Safety belt used improperly'),
             ('11', 'Child safety seat used improperly'),
             ('12', 'Helmet used improperly'),
-            ('21', 'Child safety Seat (Front Facing)'),
-            ('22', 'Child Safety Seat (Rear Facing)'),
+            ('13', 'Stretcher'), -- Added from 2026 data dictionary
+            ('14', 'Wheelchair'), -- Added from 2026 data dictionary
+            -- 21/22 descriptions were swapped in earlier data dictionaries; 2026 version (and ages in
+            -- the data: median 1 for 21, 3 for 22) confirm 21 = rear facing.
+            ('21', 'Child safety Seat (Rear Facing)'),
+            ('22', 'Child Safety Seat (Front Facing)'),
             ('23', 'Booster Seat'),
             ('24', 'Child Restraint Unknown'),
             ('90', 'Restraint used/ Type unknown'),
@@ -586,15 +594,17 @@ begin
             ('13', 'Trailing unit'),
             ('14', 'Riding on vehicle exterior'),
             ('15', 'Bus passenger'),
-            ('21', 'Fourth Row – Left Side'),
-            ('22', 'Fourth Row – Middle Position'),
-            ('23', 'Fourth Row – Right Side'),
-            ('24', 'Other Row – Left Side'),
-            ('25', 'Other Row – Middle Position'),
-            ('26', 'Other Row – Right Side'),
-            ('27', 'Unknown Row – Left Side'),
-            ('28', 'Unknown Row – Middle Position'),
-            ('29', 'Unknown Row – Right Side'), -- Was "left", DVRPC corrected to "right"
+            -- 2026 data dictionary numbers these 16-24 (earlier versions listed them as 21-29), which
+            -- matches the codes used in the data.
+            ('16', 'Fourth Row – Left Side'),
+            ('17', 'Fourth Row – Middle Position'),
+            ('18', 'Fourth Row – Right Side'),
+            ('19', 'Other Row – Left Side'),
+            ('20', 'Other Row – Middle Position'),
+            ('21', 'Other Row – Right Side'),
+            ('22', 'Unknown Row – Left Side'),
+            ('23', 'Unknown Row – Middle Position'),
+            ('24', 'Unknown Row – Right Side'),
             ('98', 'Other'),
             ('99', 'Unknown');
     
@@ -762,6 +772,9 @@ begin
             ('17', 'Negotiating curve - left'),
             ('18', 'Entering Traffic Lane'),
             ('19', 'Leaving Traffic Lane'),
+            ('20', 'Changing lanes'), -- Added from 2026 data dictionary
+            ('21', 'Merging (other than from a parking position)'), -- Added from 2026 data dictionary
+            ('22', 'Lane Splitting or Filtering'), -- Added from 2026 data dictionary
             -- Non-Motorist Movement values
             ('00', 'None'),
             ('31', 'Adjacent to Roadway'),
@@ -779,6 +792,7 @@ begin
     
         insert into pa_lookup.veh_or_non_motorist_position (code, description) values
             -- Motor Vehicle Position Values
+            ('00', 'Not Applicable (for Peds)'), -- Added from 2026 data dictionary
             ('01', 'Right lane (Curb)'),
             ('02', 'Right turn lane'),
             ('03', 'Left lane'),
@@ -981,6 +995,7 @@ begin
             ('08', 'Severe Crosswinds'),
             ('09', 'Sleet or Hail'),
             ('10', 'Snow'),
+            ('11', 'Smog or Smoke'), -- Added from 2026 data dictionary
             ('98', 'Other'),
             ('99', 'Unknown');
       
@@ -5495,6 +5510,20 @@ begin
             ('ZERO', 'ZERO MOTORCYCLES'),
             ('ZMCC', 'ZIMMER');
     
+        -- Added in 2026 data dictionary.
+        insert into pa_lookup.vin_eng_fuel_cd (code, description) values
+            ('B', 'Electric and Gas Hybrid'),
+            ('C', 'Convertible'),
+            ('D', 'Diesel'), -- was "Deisel", DVRPC corrected spelling
+            ('E', 'Electric'),
+            ('F', 'Flexible'),
+            ('G', 'Gas'),
+            ('N', 'Compressed Natural Gas (CNG)'),
+            ('P', 'Propane'),
+            ('U', 'Unknown'),
+            ('X', 'Gas and Oil Mix'),
+            ('Y', 'Electric and Diesel Hybrid'); -- was "Deisel", DVRPC corrected spelling
+
         -- insert into pa_lookup. (code, description) values ('', ''));
     exception
         when duplicate_column then

@@ -106,6 +106,9 @@ begin
         urban_rural text, -- code to classify crash as urban or rural (1=rural, 2=urbanized, 3=urban) 
         van_count integer, -- total amount of vans involved 
         vehicle_count integer, -- total number of all motor vehicles involved in the crash 
+        vulnerable_road_user_count integer, -- total count of vulnerable road users (pedestrians, pedestrian conveyances, bicyclists) involved
+        vulnerable_road_user_death_count integer, -- total count of vulnerable road user fatalities
+        vulnerable_road_user_ser_inj_count integer, -- total count of vulnerable road user suspected serious injuries
         weather1 text references pa_lookup.weather (code), -- code for the first weather condition at time of crash (see column code)
         weather2 text references pa_lookup.weather (code), -- code for the second weather condition at time of crash (see column code) 
         workers_pres boolean, -- were construction personnel present?
@@ -223,6 +226,7 @@ begin
         child_passenger boolean, -- the crash involved at least one vehicle passenger under the age of 12.
         comm_vehicle boolean, -- crash has at least one involved commercial vehicle
         core_network boolean, -- crash took place on a core network roadway.
+        crossing_median_reported boolean, -- at least one unit reported as crossing a median
         cross_median boolean, -- at least one unit crossed a median
         curved_road boolean, -- curve in road
         curve_dvr_error boolean, -- at least one driver action involving curve negotiation
@@ -239,6 +243,7 @@ begin
         driver_75plus boolean, -- at least one driver 75 plus years of age
         drugged_driver boolean, -- indicates any motor vehicle driver had a condition of drug use or was suspected of drug use by police or had a positive drug test result indicating presence of a controlled substance. (definition changed may 2022)
         drug_related boolean, -- indicates either a motor vehicle driver or non-motorist (such as a bicyclist or pedestrian) had a condition of drug use or was suspected of drug use by police or had a positive drug test result indicating presence of a controlled substance. (definition changed may 2022)
+        ev boolean, -- the crash involved at least one electric vehicle
         fatal boolean, -- at least one fatality
         fatal_or_susp_serious_inj boolean, -- the crash has at least one person who was killed or sustained a suspected serious injury
         fatigue_asleep boolean, -- at least one driver with a condition listed fatigued or asleep
@@ -247,6 +252,7 @@ begin
         hazardous_truck boolean, -- at least one heavy truck carrying hazardous material
         hit_barrier boolean, -- at least one unit hit a barrier
         hit_bridge boolean, -- at least one unit hit a bridge
+        hit_bridge_overhead_structure boolean, -- at least one unit hit a bridge overhead structure
         hit_deer boolean, -- at least one unit hit a deer
         hit_embankment boolean, -- at least one unit hit an embankment
         hit_fixed_object boolean, -- crash description of hit fixed object
@@ -338,6 +344,7 @@ begin
         vulnerable_roadway_user_fatal boolean, -- the crash involved at least 1 fatality to a vulnerable roadway user
         wet_road boolean, -- wet road indicator
         work_zone boolean, -- work zone indicator
+        wrong_way_expressways_only boolean, -- wrong-way driving on an expressway
         young_driver boolean -- the crash involved at least 1 driver age 16-20
     )$t4$, schema_name);
 
@@ -379,7 +386,6 @@ begin
     /*
         DVRPC NOTES:
           - The order of the fields in the CSVs do not match the data dictionary; this is order in CSVs. 
-          - Data dictionary contains field "adj_roadway_seq" that is not in CSVs; excluded.
 
         Notes from PennDOT's database primer:
         Information about all the roadways involved in the crash such as: Route number or name,
@@ -422,7 +428,6 @@ begin
     /*
         DVRPC NOTES:
           - The order of the fields in the CSVs do not match the data dictionary; this is order in CSVs. 
-          - non_motorist field was added: not in data dictionary but is in CSVs.
 
         Notes from PennDOT's database primer:
         Information about all vehicles involved in the crash such as: Body Type, Commercial Vehicle,
@@ -457,7 +462,7 @@ begin
         prin_imp_pt text references pa_lookup.impact_point (code),  -- principle impact point – only for fatal crashes (see column code for impact point) 
         rdwy_alignment text references pa_lookup.rdwy_alignment (code),  -- roadway alignment code (see column code) 
         special_usage text references pa_lookup.special_usage (code),  -- special usage of the vehicle (see column code)
-        tow_ind boolean, -- DVRPC addition (not in data dictionary but is in CSVs)
+        tow_ind boolean, -- towing included? (y=yes, n=no)
         travel_direction text references pa_lookup.travel_direction (code),  -- travel direction of the vehicle (see column code) 
         travel_spd integer,  -- estimated travel speed 
         trl_veh_cnt integer,  -- trailing vehicle count 
@@ -470,7 +475,8 @@ begin
         veh_reg_state text references pa_lookup.state_code (code),  -- vehicle registration state (see state codes)
         veh_role text references pa_lookup.veh_role (code),  -- vehicle role (see column code) 
         veh_type text references pa_lookup.veh_or_non_motorist_type (code),  -- vehicle or non-motorist type (see column code) 
-        vina_body_type_cd text references pa_lookup.vina_body_type_cd (code)  -- body type code interpreted by vina software (see column code) 
+        vina_body_type_cd text references pa_lookup.vina_body_type_cd (code),  -- body type code interpreted by vina software (see column code) 
+        vin_eng_fuel_cd text references pa_lookup.vin_eng_fuel_cd (code)  -- engine fuel type according to the VIN; not available before 2018 (see column code)
     )$t8$, schema_name);
 end;
 $body$

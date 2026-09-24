@@ -67,6 +67,7 @@ insert into pa_lookup_table_names (name, zero_padded) values
     ('veh_role', false),
     ('veh_or_non_motorist_type', true),
     ('vina_body_type_cd', false),
+    ('vin_eng_fuel_cd', false),
     ('weather', true),
     ('work_zone_loc', false),
     ('work_zone_type', false),

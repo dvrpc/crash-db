@@ -145,8 +145,8 @@ if test ${pa} = true || test ${download_pa} = true; then
     fi
 
     # Check that they are valid years.
-    if (( pa_start_year < 2005 || pa_end_year < 2005 )); then
-      echo "Invalid PA year. Data only available from 2005 onwards. Quitting."
+    if (( pa_start_year < 2006 || pa_end_year < 2006 )); then
+      echo "Invalid PA year. Data only available from 2006 onwards. Quitting."
       echo "${usage}"
       exit 1
     fi

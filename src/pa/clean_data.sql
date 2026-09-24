@@ -68,21 +68,29 @@ begin
     end;
     
     -- Make values not in lookup tables null.
-    execute format($q$update temp_crash_%s set police_agcy = null where police_agcy in ('00000', '02336', '15601', '30601', '46601', '51601', '68000', '68K00', '68S01', '68S02', '68Z99')$q$, year);
+    execute format($q$update temp_crash_%s set police_agcy = null where police_agcy in ('00000', '02336', '15601', '30601', '46601', '51601', '68000', '68K00', '68S01', '68S02', '68Z02', '68Z99')$q$, year);
     execute format($q$update temp_person_%s set airbag_pads = null where airbag_pads in ('10', '10.0', '12', '12.0')$q$, year);
     execute format($q$update temp_person_%s set dvr_lic_state = null where dvr_lic_state in ('GU', 'NT', 'QR', 'PQ', 'XN', '99')$q$, year);
     execute format($q$update temp_person_%s set extric_ind = null where extric_ind = '9'$q$, year);
-    execute format($q$update temp_person_%s set restraint_helmet = null where restraint_helmet in ('13', '13.0', '14', '14.0')$q$, year);
-    execute format($q$update temp_person_%s set seat_position = null where seat_position in ('16', '17', '18', '19', '20')$q$, year);
-    execute format($q$update temp_person_%s set transported_by = null where transported_by = '03'$q$, year);
+    execute format($q$update temp_person_%s set seat_position = null where seat_position = '27'$q$, year);
     execute format($q$update temp_roadway_%s set county = null where county = '68'$q$, year);
     execute format($q$update temp_roadway_%s set rdwy_orient = null where rdwy_orient = 'B'$q$, year);
     execute format($q$update temp_trailveh_%s set trl_veh_reg_state = null where trl_veh_reg_state in ('??', '0', '1', '99', 'A', 'AA', 'AD', 'B', 'BB', 'BG', 'BQ', 'DO', 'E', 'EB', 'EE', 'F', 'FI', 'G', 'GQ', 'H', 'HA', 'HW', 'HY', 'I', 'IC', 'II', 'IJ', 'PB', 'IU', 'J', 'JB', 'JJ', 'JI', 'JL', 'JO', 'JP', 'JY', 'K', 'KI', 'L', 'M', 'MZ', 'NG', 'NI', 'NT', 'O', 'OY', 'P', 'PM', 'PY', 'Q', 'QB', 'R', 'RA', 'RB', 'RE', 'T', 'TF', 'U', 'UN', 'VJ', 'VN', 'W', 'WL', 'WP', 'X', 'Y', 'YW', 'YX', 'Z', 'ZJ')$q$, year);
     execute format($q$update temp_vehicle_%s set avoid_man_cd = null where avoid_man_cd = '9'$q$, year);
-    execute format($q$update temp_vehicle_%s set make_cd = null where make_cd in ('BLUI', 'DGEN', 'ENGF', 'FREF', 'ICBU', 'KALM', 'KNNW', 'TRIU')$q$, year);
+    execute format($q$update temp_vehicle_%s set make_cd = null where make_cd in ('BLUI', 'DGEN', 'ENGF', 'FREF', 'ICBU', 'KALM', 'KNNW', 'LUCI', 'TRIU')$q$, year);
     execute format($q$update temp_vehicle_%s set make_cd = 'BMW' where make_cd = 'BMW1'$q$, year);
-    execute format($q$update temp_vehicle_%s set veh_position = null where veh_position = '00'$q$, year);
     execute format($q$update temp_vehicle_%s set veh_reg_state = null where veh_reg_state in ('04', '08', '09', '12', '99', 'A', 'AF', 'AP', 'FA', 'KA', 'NT', 'P', 'P-', 'PQ', 'PS', 'PZ', 'UK', 'UN', 'US', 'XN', 'XX', 'Z')$q$, year);
+    execute format($q$update temp_cycle_%s set mc_dvr_hlmt_type = null where mc_dvr_hlmt_type = ' '$q$, year);
+    execute format($q$update temp_cycle_%s set mc_pas_hlmt_type = null where mc_pas_hlmt_type = ' '$q$, year);
+
+    -- Change invalid values/codes used for null to null.
+    -- axle_cnt: 99 = Unknown (98 = Other, also not a count) per data dictionary.
+    execute format($q$update temp_commveh_%s set axle_cnt = null where axle_cnt in ('98', '99')$q$, year);
+    execute format($q$update temp_commveh_%s set gvwr = null where gvwr = 'UNKNOW'$q$, year);
+
+    -- Miscellaneous fixes.
+    execute format($q$update temp_commveh_%s set gvwr = replace(gvwr, ',', '')$q$, year);
+
     execute format($q$update temp_vehicle_%s set vina_body_type_cd = null where vina_body_type_cd in ('''', '4C', 'C', 'M', 'P', 'P2C', 'P2W', 'P3D', 'P3P', 'P4C', 'P4D', 'P4H', 'P4L', 'P4P', 'P4T', 'PBU', 'PC4', 'PCC', 'PCG', 'PCU', 'PDS', 'PFW', 'PGS', 'PNX', 'PRS', 'PSD', 'PSV', 'PSW', 'PUT', 'PVN', 'PWC', 'PYY', 'T', 'T2W')$q$, year);
     
     /* Year-specific. */
@@ -93,16 +101,6 @@ begin
     
     if year = '2024' then
     elseif year = '2023' then
-        -- Make values not in lookup tables null.
-        execute format($q$update temp_cycle_%s set mc_dvr_hlmt_type = null where mc_dvr_hlmt_type = ' '$q$, year);
-        execute format($q$update temp_cycle_%s set mc_pas_hlmt_type = null where mc_pas_hlmt_type = ' '$q$, year);
-        -- Change invalid values/codes used for null to null.
-        execute format($q$update temp_commveh_%s set axle_cnt = null where axle_cnt = '99'$q$, year);
-        execute format($q$update temp_commveh_%s set gvwr = null where gvwr = 'UNKNOW'$q$, year);
-
-        -- Miscellaneous fixes.
-        execute format($q$update temp_commveh_%s set gvwr = replace(gvwr, ',', '')$q$, year);
-
     elseif year = '2022' then
     elseif year = '2021' then      
     elseif year = '2020' then

@@ -50,7 +50,7 @@ port=5437
 # NOTE: REQUIRED
 # start and end years for each state
 # use the same year for start and end to process a single year's data
-pa_start_year=2024  # earliest year that data is available for is 2005
+pa_start_year=2024  # earliest year that data is available for is 2006
 pa_end_year=2024
 nj_start_year=2022  # earliest year that data is available for is 2006
 nj_end_year=2022
@@ -109,7 +109,7 @@ After downloading, import the data into the database:
 
 ### Important Considerations
 - **Data Years**: Ensure the year ranges in your `.env` file are within the available data bounds:
-  - PA: 2005 and later
+  - PA: 2006 and later
   - NJ: 2006 and later
 - **Spatial Data**: NJ crash data requires the road network to be imported first for geometry generation. If you run `--nj` without `--roads`, a warning will be displayed. 
 
@@ -120,8 +120,24 @@ NOTE: Where lookup tables contain reserved codes/values, they are included in th
 ### PennDOT
 
   - 2024 Crash Database Primer: <https://gis.penndot.gov/gishub/crashZip/OPEN%20DATA%20PORTAL%20Database%20Primer%2010-16.pdf>
-  - 2024 data dictionary: <https://gis.penndot.pa.gov/gishub/crashZip/Crash_Data_Dictionary_2025.pdf>
+  - Data dictionary (06-26 version): <https://gis.penndot.pa.gov/gishub/crashZip/Crash_Data_Dictionary_2026.pdf>
   - 2024 data download: <https://experience.arcgis.com/experience/51809b06e7b140208a4ed6fbad964990>
+
+#### 2025 re-issue of all years
+
+In June 2026, PennDOT re-published the data for every year (2006-2025; 2005 is no longer available) in a single, new layout, and revised the data itself (e.g. slightly different row counts than earlier downloads). Files downloaded before then are in the old layout and will no longer import; re-download them. The new layout added these fields, which are populated back to 2006 unless noted:
+
+  - crash: vulnerable_road_user_count, vulnerable_road_user_death_count, vulnerable_road_user_ser_inj_count
+  - flags: crossing_median_reported, ev (all false in earlier years), hit_bridge_overhead_structure, wrong_way_expressways_only
+  - vehicle: vin_eng_fuel_cd (fuel type according to the VIN; the dictionary says it's unavailable before 2018, though a small number of earlier records have it)
+
+Changes made to lookup tables from the 2026 data dictionary (values previously changed to null in clean_data.sql are now kept):
+  - seat_position: fourth/other/unknown row codes are 16-24 (previously listed as 21-29, which mislabeled 21-24 and nulled 16-20).
+  - restraint_helmet: 21 is rear-facing and 22 front-facing child seat (previously swapped; confirmed by the ages of those persons). Added 13 (Stretcher) and 14 (Wheelchair).
+  - veh_or_non_motorist_position: added 00 (Not Applicable (for Peds)).
+  - transported_by: added 03 (Law Enforcement).
+  - New codes not yet seen in the data: inj_severity/max_severity_level 5 (Died Prior to Crash), weather 11 (Smog or Smoke), veh_or_non_motorist_movement 20-22, avoid_man_cd 8 (Unknown).
+  - New vin_eng_fuel_cd lookup table.
 
 #### 2024-version data issues and questions
 
@@ -130,12 +146,12 @@ There are a number of discrepancies between the data dictionary and the CSVs. Th
 Lookup tables:
   - Some fields have values that aren't in their corresponding lookup tables; where obvious, unambiguous values could be added they were, others were were changed to null. See clean_data.sql and lookup_tables.sql.
   - Some lookup tables were added, taken from explicit values listed in the data dictionary. See lookup_tables.sql.
-  - hazmat_rel_1 - hazmat_rel_4 in the commveh table: in the data dictionary, it lists "1=Y, 0=N" as the possible values, but then there is also a lookup table for it that contains "1 – No Release, 2 – Release occurred, 9 – Unknown". The latter is what is actually in the CSV files. This was converted to a boolean field.
+  - hazmat_rel_ind1 - hazmat_rel_ind4 in the commveh table use "1 – No Release, 2 – Release occurred, 9 – Unknown" (earlier data dictionaries also listed "1=Y, 0=N"; the 2026 version is consistent with the data). This was converted to a boolean field.
   - Some of the values between the pdf and the spreadsheet differ. This seems to be either in spelling, e.g. using "Twp" (pdf) or "Township" (spreadsheet), or zero-padding.
 
 Misc:
-  - The commveh table's "axle_cnt" doesn't have a lookup table, but seems to use 99 for unknown. Converted to null. But what about others that are very high? What's the highest number of axles a vehicle and trailers could have?
-  - The crash table's "lane_closed" field contains no data for years 2008-2024. I have not checked other fields but probably worthwhile to do so. 
+  - The commveh table's "axle_cnt" uses 0-97 for counts, 98 for Other and 99 for Unknown (per the 2026 data dictionary); 98 and 99 are converted to null. A handful of values are implausibly high (e.g. 62, 94) but within the dictionary's range, so they're kept.
+  - The crash table's "lane_closed" field: the data dictionary lists "1=Y, 0=N", but the data uses 0 (not applicable), 1 (partially closed), 2 (fully closed) and 9 (unknown), consistent with ln_close_dir; the lookup table uses the latter. (In pre-2026 downloads this field was empty for 2008-2024; the re-issued data has it for all years.)
 
 ### NJDOT
 
