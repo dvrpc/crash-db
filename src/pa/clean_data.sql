@@ -24,9 +24,9 @@ begin
     
     -- hazmat_rel_ind fields
     execute format($q$alter table temp_commveh_%s alter hazmat_rel_ind1 type text0129_as_bool using hazmat_rel_ind1::text129_as_bool$q$, year);
-    execute format($q$alter table temp_commveh_%s alter hazmat_rel_ind2 type text0129_as_bool using hazmat_rel_ind1::text129_as_bool$q$, year);
-    execute format($q$alter table temp_commveh_%s alter hazmat_rel_ind3 type text0129_as_bool using hazmat_rel_ind1::text129_as_bool$q$, year);
-    execute format($q$alter table temp_commveh_%s alter hazmat_rel_ind4 type text0129_as_bool using hazmat_rel_ind1::text129_as_bool$q$, year);
+    execute format($q$alter table temp_commveh_%s alter hazmat_rel_ind2 type text0129_as_bool using hazmat_rel_ind2::text129_as_bool$q$, year);
+    execute format($q$alter table temp_commveh_%s alter hazmat_rel_ind3 type text0129_as_bool using hazmat_rel_ind3::text129_as_bool$q$, year);
+    execute format($q$alter table temp_commveh_%s alter hazmat_rel_ind4 type text0129_as_bool using hazmat_rel_ind4::text129_as_bool$q$, year);
     -- Order is important: first 1 -> 0 and then 2 -> 1
     execute format($q$update temp_commveh_%s set hazmat_rel_ind1 = '0' where hazmat_rel_ind1 = '1'$q$, year);
     execute format($q$update temp_commveh_%s set hazmat_rel_ind2 = '0' where hazmat_rel_ind2 = '1'$q$, year);
