@@ -120,119 +120,29 @@ select
 from
 	pa.all_crash
 ),
-
-emphasis_unpivot as (
-select
-	crn,
-	'older_road_user' as emphasis_area
-from
-	crash_flags
-where
-	older_road_user = 1
-union all
-select
-	crn,
-	'younger_road_user'
-from
-	crash_flags
-where
-	younger_road_user = 1
-union all
-select
-	crn,
-	'intersection'
-from
-	crash_flags
-where
-	intersection = true
-union all
-select
-	crn,
-	'lane_departure'
-from
-	crash_flags
-where
-	lane_departure = true
-union all
-select
-	crn,
-	'bicycle'
-from
-	crash_flags
-where
-	bicycle = true
-union all
-select
-	crn,
-	'pedestrian'
-from
-	crash_flags
-where
-	pedestrian = true
-union all
-select
-	crn,
-	'distracted'
-from
-	crash_flags
-where
-	distracted = true
-union all
-select
-	crn,
-	'aggressive_driving'
-from
-	crash_flags
-where
-	aggressive_driving = true
-union all
-select
-	crn,
-	'impaired_driver'
-from
-	crash_flags
-where
-	impaired_driver = true
-union all
-select
-	crn,
-	'work_zone'
-from
-	crash_flags
-where
-	work_zone = true
-union all
-select
-	crn,
-	'train_trolley'
-from
-	crash_flags
-where
-	train_trolley = true
-union all
-select
-	crn,
-	'hvy_truck_related'
-from
-	crash_flags
-where
-	hvy_truck_related = true
-union all
-select
-	crn,
-	'motorcycle'
-from
-	crash_flags
-where
-	motorcycle = true
-union all
-select
-	crn,
-	'unbelted'
-from
-	crash_flags
-where
-	unbelted = true
+emphasis_unpivot AS (
+    SELECT
+        cf.crn,
+        e.emphasis_area
+    FROM crash_flags cf
+    CROSS JOIN LATERAL (
+        VALUES
+            ('older_road_user', cf.older_road_user = 1),
+            ('younger_road_user', cf.younger_road_user = 1),
+            ('intersection', cf.intersection),
+            ('lane_departure', cf.lane_departure),
+            ('bicycle', cf.bicycle),
+            ('pedestrian', cf.pedestrian),
+            ('distracted', cf.distracted),
+            ('aggressive_driving', cf.aggressive_driving),
+            ('impaired_driver', cf.impaired_driver),
+            ('work_zone', cf.work_zone),
+            ('train_trolley', cf.train_trolley),
+            ('hvy_truck_related', cf.hvy_truck_related),
+            ('motorcycle', cf.motorcycle),
+            ('unbelted', cf.unbelted)
+    ) AS e(emphasis_area, is_present)
+    WHERE e.is_present IS TRUE
 ),
 
 final as (
