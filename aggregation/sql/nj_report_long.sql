@@ -274,7 +274,7 @@ CROSS JOIN LATERAL (
          */
 
         (
-            'max severity',
+            'max_severity',
             c.max_severity_level
         ),
 
@@ -345,14 +345,6 @@ CROSS JOIN LATERAL (
             END
         ),
 
-        /*
-         * MAX SEVERITY LEVEL
-         */
-
-        (
-            'max_severity_level',
-            c.max_severity_level
-        ),
 
         /*
          * ROAD CONDITION
