@@ -239,7 +239,7 @@ CROSS JOIN LATERAL (
             CASE c.max_severity_level
                 WHEN '0' THEN 'Property Damage Only'
                 WHEN '1' THEN 'Fatal'
-                WHEN '2' THEN 'Supsected Serious Injury'
+                WHEN '2' THEN 'Suspected Serious Injury'
                 WHEN '3' THEN 'Suspected Minor Injury'
                 WHEN '4' THEN 'Possible Injury'
                 WHEN '8' THEN 'Injury - Unknown Severity'
@@ -257,7 +257,6 @@ CROSS JOIN LATERAL (
             'collision_type',
             CASE
                 WHEN c.collision_type = '0'
-                     OR c.collision_type IS NULL
                     THEN 'Noncollision'
 
                 WHEN c.collision_type = '1'
@@ -284,7 +283,7 @@ CROSS JOIN LATERAL (
                 WHEN c.collision_type = '8'
                     THEN 'Hit Non-Motorist'
 
-                WHEN c.collision_type IN ('9','98','99')
+                WHEN c.collision_type IN ('9','98','99') or c.collision_type is null
                     THEN 'Other/Unknown'
 
                 ELSE 'Other/Unknown'
