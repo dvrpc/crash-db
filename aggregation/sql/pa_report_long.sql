@@ -41,7 +41,14 @@ crashes AS (
         c.crash_year,
         cnt.municipality,
         cnt.county,
-
+        case 
+        	when c.bicycle_count > 0 
+        	then true else false
+        end as bicycle,
+        case 
+        	when c.ped_count > 0 
+        	then true else false
+        end as pedestrian,
         c.max_severity_level,
         c.collision_type,
         c.road_condition,
@@ -216,10 +223,13 @@ vehicles AS (
  */
 
 SELECT
+    'event' as resolution,
     c.crn,
     c.crash_year,
     c.municipality,
     c.county,
+    c.bicycle,
+    c.pedestrian,
     x.domain,
     x.category,
     1 AS cnt
@@ -457,10 +467,13 @@ UNION ALL
  */
 
 SELECT
+    'person' as resolution,
     p.crn,
     p.crash_year,
     p.municipality,
     p.county,
+    null as bicycle,
+    null as pedestrian,
     'person_injury' AS domain,
     p.category,
     p.cnt
@@ -478,10 +491,13 @@ UNION ALL
  */
 
 SELECT
+    'vehicle' as resolution,
     v.crn,
     v.crash_year,
     v.municipality,
     v.county,
+    null as bicycle,
+    null as pedestrian,
     'vehicle' AS domain,
     v.category,
     v.cnt
